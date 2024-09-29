@@ -29,9 +29,9 @@ INSTALLED_APPS += [
 ]
 
 # local apps
-INSTALLED_APPS += [
-    
-]
+INSTALLED_APPS += [ f'apps.{app}' for app in [
+    'users',
+]]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -115,6 +115,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'users.User'
 
 from config.settings.rest_framework import *
 from config.settings.simplejwt import *
