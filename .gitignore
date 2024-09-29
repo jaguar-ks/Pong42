@@ -1,0 +1,38 @@
+# Django specific
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+staticfiles/
+.env
+
+# Virtual environments
+venv/
+env/
+.idea/
+.vscode/
+
+# Node.js specific (for Next.js)
+node_modules/
+.next/
+out/
+npm-debug.log
+yarn-error.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Pytest cache
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Migrations
+**/migrations/*
+!**/migrations/__init__.py
