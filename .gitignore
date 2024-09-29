@@ -6,7 +6,13 @@ __pycache__/
 db.sqlite3
 media/
 staticfiles/
-.env
+*.env
+
+# pythonvirtual-env
+venv/
+.venv/
+.env/
+env/
 
 # Virtual environments
 venv/
