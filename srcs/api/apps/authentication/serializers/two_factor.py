@@ -19,7 +19,7 @@ class   TwoFASerializer(serializers.Serializer):
         action = self.context['action']
         assert action in ['enable', 'disable', 'verify']
         
-        call = getattr(self, action)
-        if call(self.user.otp, attrs['otp_code']):
+        call = getattr(self.user.otp, action)
+        if call(attrs['otp_code']) and action != 'verify':
             raise serializers.ValidationError(f'Failed to {action} 2FA: Invalid OTP code')
         return {'message': f'Successfully {action}d 2FA'}
