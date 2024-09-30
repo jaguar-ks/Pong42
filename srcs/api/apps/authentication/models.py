@@ -39,3 +39,11 @@ class   OneTimePass(models.Model):
     
     def __str__(self) -> str:
         return f"otp for [{self.user}]"
+
+class   SocialAuth(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='social_auth')
+    uid = models.CharField(max_length=150)
+    provider = models.CharField(max_length=150)
+
+    class   Meta:
+        unique_together = ('uid', 'provider', )
