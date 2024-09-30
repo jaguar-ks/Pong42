@@ -36,3 +36,6 @@ class   OneTimePass(models.Model):
         self.enable = False
         self.save()
         return True
+    
+    def __str__(self) -> str:
+        return f"otp for [{self.user}]"
