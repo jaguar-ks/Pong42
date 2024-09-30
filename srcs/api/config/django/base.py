@@ -31,6 +31,7 @@ INSTALLED_APPS += [
 # local apps
 INSTALLED_APPS += [ f'apps.{app}' for app in [
     'users',
+    'authentication',
 ]]
 
 MIDDLEWARE = [
