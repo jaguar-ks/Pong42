@@ -1,7 +1,7 @@
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from apps.authentication.serializers.two_factor import TwoFASerializer
+from apps.authentication.serializers import TwoFASerializer
 
 class   TwoFaBaseView(GenericAPIView):
     serializer_class = TwoFASerializer
