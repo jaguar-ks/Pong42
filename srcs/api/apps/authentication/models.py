@@ -5,7 +5,7 @@ import pyotp
 
 # one time password for 2 factor authentication 
 class   OneTimePass(models.Model):
-    user = models.OneToOneField(to=get_user_model(), related_name='otp')
+    user = models.OneToOneField(to=get_user_model(), on_delete=models.CASCADE, related_name='otp')
     otp_secret = models.CharField(max_length=32, blank=True)
     enabled = models.BooleanField(default=False)
 
