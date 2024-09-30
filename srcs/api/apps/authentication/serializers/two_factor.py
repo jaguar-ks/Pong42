@@ -8,7 +8,7 @@ class   TwoFASerializer(serializers.Serializer):
         super().__init__(instance, data, **kwargs)
         self.user = self.context['request'].user
 
-    otp_code = serializers.CharField(max_length=6, min_length=6, required=True)
+    otp_code = serializers.CharField(max_length=6, min_length=6, required=False)
     
     def validate_otp_code(self, otp_code):
         if not self.user.otp.verify(otp_code):
@@ -16,8 +16,11 @@ class   TwoFASerializer(serializers.Serializer):
         return otp_code
     
     def validate(self, attrs):
+        if 'otp_code' not in attrs:
+            raise serializers.ValidationError('this field is required')
+
         action = self.context['action']
-        assert action in ['enable', 'disable']
+        assert action in ['enable', 'disable', 'verify']
         
         call = getattr(self, action)
         if call(self.user.otp, attrs['otp_code']):
