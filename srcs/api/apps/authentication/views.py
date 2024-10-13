@@ -18,10 +18,10 @@ class   TwoFaBaseView(GenericAPIView):
             context=self.context,
         )
         serializer.is_valid(raise_exception=True)
-        return Response(serializer.data)
+        return Response(serializer.validated_data)
 
 class   Enable2FaView(TwoFaBaseView):
-    context = {'action': 'disable'}
+    pass
 
 class   Disable2FaView(TwoFaBaseView):
     context = {'action': 'disable'}

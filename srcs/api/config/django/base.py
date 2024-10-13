@@ -33,7 +33,7 @@ INSTALLED_APPS += [
 # local apps
 INSTALLED_APPS += [ f'apps.{app}' for app in [
     'users',
-    'users.notifications',
+    # 'users.notifications',
     'authentication',
 ]]
 
