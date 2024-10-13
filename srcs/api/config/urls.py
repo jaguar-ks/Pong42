@@ -18,4 +18,7 @@ urlpatterns = [
 
     # authentication URLs
     path('api/auth/', include('apps.authentication.urls')),
+
+    # users
+    path('api/users/', include('apps.users.urls')),
 ]
