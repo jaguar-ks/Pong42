@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from apps.authentication.serializers import TwoFASerializer
 
+
 class   TwoFaBaseView(GenericAPIView):
     serializer_class = TwoFASerializer
     context = {'action': 'enable'}
@@ -21,4 +22,3 @@ class   Enable2FaView(TwoFaBaseView):
 
 class   Disable2FaView(TwoFaBaseView):
     context = {'action': 'disable'}
-
