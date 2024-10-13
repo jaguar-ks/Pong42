@@ -34,6 +34,7 @@ INSTALLED_APPS += [
 INSTALLED_APPS += [ f'apps.{app}' for app in [
     'users',
     # 'users.notifications',
+    'users.relationships',
     'authentication',
 ]]
 
