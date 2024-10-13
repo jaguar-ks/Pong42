@@ -5,7 +5,7 @@ services:
         image: postgres:14
         container_name: postgres
         volumes:
-            - ./srcs/api/:/var/lib/postgresql/data/
+            - postgres_data:/var/lib/postgresql/data/
         networks:
             - transcendance_net
         environment:
