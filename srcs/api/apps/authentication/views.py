@@ -2,10 +2,13 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from apps.authentication.serializers import TwoFASerializer
+from rest_framework.permissions import AllowAny
 
 
 class   TwoFaBaseView(GenericAPIView):
     serializer_class = TwoFASerializer
+    permission_classes = [AllowAny]
+
     context = {'action': 'enable'}
     
     def post(self, request):
