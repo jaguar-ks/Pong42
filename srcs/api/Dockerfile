@@ -13,8 +13,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY tools/setup.sh .
-COPY tools/run_server.sh .
 
 # Copy the project files into the container
 COPY . .
