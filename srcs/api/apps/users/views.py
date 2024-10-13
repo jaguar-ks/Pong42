@@ -15,6 +15,13 @@ class   AuthUserView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         return self.request.user
 
+class   ListUserView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AuthUserSerializer
+
+    def get_queryset(self):
+        return User.objects.all()
+
 
 """
 /api/users/me
