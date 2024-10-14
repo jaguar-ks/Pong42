@@ -1,4 +1,4 @@
-version: '3'
+# version: '3.8'
 
 services:
     pgdb:
@@ -8,13 +8,12 @@ services:
             - postgres_data:/var/lib/postgresql/data/
         networks:
             - transcendance_net
-        environment:
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        env_file:
+            - .env.example
+        restart: always
 
     backend:
-        image: backend:trns
+        image: django:trns
         container_name: backend
         build:
             context: ./srcs/api/
@@ -26,22 +25,25 @@ services:
             - 8000:8000
         depends_on:
             - pgdb
-        environment:
-            DEBUG: True # ['True', 'False']
-            DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-            DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
-            DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
-            DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
+        env_file:
+            - .env.example
+        restart: on-failure
+        # environment:
+        #     DEBUG: True # ['True', 'False']
+        #     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+        #     DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
+        #     DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
+        #     DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
 
 
 volumes:
     postgres_data:
     backend_files:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: /Users/zel-bouz/transcendance/srcs/api
+    #     driver: local
+    #     driver_opts:
+    #         type: none
+    #         o: bind
+    #         device: /Users/zel-bouz/transcendance/srcs/api
 
 networks:
     transcendance_net:
