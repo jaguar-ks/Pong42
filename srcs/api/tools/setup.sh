@@ -2,7 +2,7 @@
 set -e  # Exit immediately if a command exits with a non-zero status
 
 # Apply migrations
-python3 manage.py makemigrations users authentication
+python3 manage.py makemigrations
 python3 manage.py migrate
 
 

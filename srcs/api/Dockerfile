@@ -4,7 +4,7 @@ FROM python:3.11-slim-bullseye
 WORKDIR /var/www/
 
 # Install PostgreSQL client libraries and build tools
-RUN apt-get update && apt-get install -y libpq-dev gcc
+# RUN apt-get update && apt-get install -y libpq-dev gcc
 
 # Copy the requirements file into the container
 COPY requirements.txt .
@@ -19,6 +19,3 @@ COPY . .
 
 # Run the setup script for migrations
 ENTRYPOINT [ "bash", "tools/setup.sh" ]
-
-# Start the server after setup
-# CMD [ "bash", "tools/run_server.sh" ]
