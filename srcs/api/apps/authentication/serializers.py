@@ -43,7 +43,10 @@ class   SignUpSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'password', 'email', 'first_name', 'last_name')
         extra_kwargs = {
             'username': {'validators': [validators.UsernameValidator()]},
-            'password': {'validators': [validators.PasswordValidator()]},
+            'password': {
+                'write_only': True,
+                'validators': [validators.PasswordValidator()]
+            },
             'email': {'validators': [validators.EmailValidator()]},
             'first_name': {'validators': [validators.NameValidator('First name')]},
             'last_name': {'validators': [validators.NameValidator('Last name')]}
@@ -54,3 +57,11 @@ class   SignUpSerializer(serializers.ModelSerializer):
             if data['first_name'].lower() == data['last_name'].lower():
                 raise serializers.ValidationError("First name and last name should not be the same.")
         return data
+    
+    def create(self, validated_data):
+        user = get_user_model()(**validated_data)
+        user.full_clean()
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
