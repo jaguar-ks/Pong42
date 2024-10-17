@@ -8,4 +8,6 @@ urlpatterns = [
     path('2fa/disable/', views.Enable2FaView.as_view(), name='disable_2fa'),
 
     path('sign-up/', views.SignUpView.as_view(), name='sign_up'),
+    path('sign-in/', views.SignInView.as_view(), name='sign_in'),
+    path('sign-out/', views.SignOutView.as_view(), name='sign_out'),
 ]
