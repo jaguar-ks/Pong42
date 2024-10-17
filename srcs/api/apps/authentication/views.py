@@ -25,3 +25,12 @@ class   Enable2FaView(TwoFaBaseView):
 
 class   Disable2FaView(TwoFaBaseView):
     context = {'action': 'disable'}
+
+
+from rest_framework import generics, permissions
+from . import serializers
+
+
+class   SignUpView(generics.CreateAPIView):
+    serializer_class = serializers.SignUpSerializer
+    permission_classes = [permissions.AllowAny]
