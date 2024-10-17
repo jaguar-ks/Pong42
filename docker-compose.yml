@@ -31,6 +31,7 @@ services:
         restart: on-failure
         environment:
             DEBUG: True # ['True', 'False']
+            DJANGO_SETTING_MODULE: config.django.local
             DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgdb:5432/${POSTGRES_DB}
             DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
             DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
