@@ -1,11 +1,7 @@
 from rest_framework import generics, filters
-from .serializers import AuthUserSerializer, SignUpSerializer
+from .serializers import AuthUserSerializer
 from rest_framework.permissions import AllowAny
 from .models import User
-
-class   SignUpView(generics.CreateAPIView):
-    serializer_class = SignUpSerializer
-    permission_classes = [AllowAny]
 
 
 class   AuthUserView(generics.RetrieveUpdateDestroyAPIView):
