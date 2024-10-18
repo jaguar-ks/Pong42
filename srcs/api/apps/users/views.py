@@ -2,10 +2,15 @@ from rest_framework import generics, filters
 from .serializers import AuthUserSerializer
 from rest_framework.permissions import AllowAny
 from .models import User
+from rest_framework.response import Response
 
 
 class   AuthUserView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AuthUserSerializer
+    def destroy(self, request, *args, **kwargs):
+        request.user.is_active = False
+        request.user.save()
+        return Response({'detail': 'successfully deleted your account'})
 
     def get_object(self):
         return self.request.user
