@@ -19,10 +19,7 @@ class JWTAuthenticationMiddleware:
             setattr(request, '_user', SimpleLazyObject(lambda: user))
             setattr(request, 'is_authenticated_using_middleware', user is not None)
 
-        # Print for debugging
-        print('Entering middleware')
         response = self.get_response(request)
-        print('Exiting middleware')
 
         # Update token if refreshed
         return self._update_token_if_refreshed(request, response)
