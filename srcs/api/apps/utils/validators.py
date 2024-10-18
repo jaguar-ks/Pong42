@@ -6,16 +6,19 @@ User = get_user_model()
 
 class PasswordValidator:
     def __call__(self, value):
-        if len(value) < 8:
-            raise serializers.ValidationError("Password must be at least 8 characters long.")
+        errors = []
+        if len(value) < 8 or len(value) > 30:
+            errors.append("Password must be 8 to 30 characters long.")
         if not re.search(r'[A-Z]', value):
-            raise serializers.ValidationError("Password must contain at least one uppercase letter.")
+            errors.append("Password must contain at least one uppercase letter.")
         if not re.search(r'[a-z]', value):
-            raise serializers.ValidationError("Password must contain at least one lowercase letter.")
+            errors.append("Password must contain at least one lowercase letter.")
         if not re.search(r'\d', value):
-            raise serializers.ValidationError("Password must contain at least one digit.")
+            errors.append("Password must contain at least one digit.")
         if not re.search(r'[!@#$%^&*(),.?":{}|<>]', value):
-            raise serializers.ValidationError("Password must contain at least one special character.")
+            errors.append("Password must contain at least one special character.")
+        if errors:
+            raise serializers.ValidationError(errors)
 
 class NameValidator:
     def __init__(self, field_name):
@@ -23,9 +26,16 @@ class NameValidator:
 
     def __call__(self, value):
         errors = []
+        if len(value) < 2 or len(value) > 50:
+            errors.append(f"{self.field_name} must be 2 to 15 characters long.")
+        if not value.isalpha():
+            errors.append(f"{self.field_name} should only contain alphabetic characters.")
+        if errors:
+            raise serializers.ValidationError(errors)
 
-        if User.objects.filter(username=value).exists():
-            errors.append("A user with that username already exists.")
+class UsernameValidator:
+    def __call__(self, value):
+        errors = []
 
         if 30 < len(value) < 4:
             errors.append("Username must be 5 to 30 characters long.")
@@ -40,11 +50,6 @@ class NameValidator:
             errors.append("This username is reserved and cannot be used.")
         if errors:
             raise serializers.ValidationError(errors)
-
-class UsernameValidator:
-    def __call__(self, value):
-        if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("A user with that username already exists.")
 
 class EmailValidator:
     def __call__(self, value):
