@@ -49,7 +49,7 @@ class JWTAuthenticationMiddleware:
     def _get_user_from_access_token(self, validated_token):
         try:
             user_id = validated_token['user_id']
-            return User.objects.get(id=user_id)
+            return User.objects.get(id=user_id, is_active=True)
         except User.DoesNotExist:
             return None
 
