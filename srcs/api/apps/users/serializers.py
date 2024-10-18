@@ -5,23 +5,29 @@ from apps.utils import validators
 class   AuthUserSerializer(serializers.ModelSerializer):
     class   Meta:
         model = get_user_model()
-        exclude = ('password', )
+        exclude = ('password', 'groups', 'user_permissions')
 
 class   UpdateAuthUserSerializer(serializers.ModelSerializer):
     class   Meta:
         model = get_user_model()
-        fields = ('id', 'first_name', 'last_name', \
-                    'username', 'email', 'avatar_url', 'password')
+        fields = ('id', 'first_name', 'last_name', 'username', 'avatar_url', 'password')
         extra_kwargs = {
-            'username': {'validators': [validators.UsernameValidator()]},
+            'username': {
+                'required': False,
+                'validators': [validators.UsernameValidator()],
+            },
             'password': {
                 'write_only': True,
+                'required': False,
                 'validators': [validators.PasswordValidator()]
             },
-            'email': {'validators': [validators.EmailValidator()]},
             'first_name': {'validators': [validators.NameValidator('First name')]},
             'last_name': {'validators': [validators.NameValidator('Last name')]},
+            'avatar_url': {'required': False}
         }
+
+    def validate(self, attrs):
+        return {key: value for key, value in attrs.items() if value}
     
     def update(self, instance, validated_data):
         if 'password' in validated_data:
