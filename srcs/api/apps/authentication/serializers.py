@@ -2,8 +2,6 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from apps.authentication.models import OneTimePass
-
 class   TwoFASerializer(serializers.Serializer):
     otp_code = serializers.CharField(max_length=6, min_length=6, required=False)
 
@@ -38,6 +36,7 @@ class   Token2FaObtainPairSerializer(TokenObtainPairSerializer):
 from apps.utils import validators
 
 class   SignUpSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True, validators=[validators.EmailValidator()])
     class   Meta:
         model = get_user_model()
         fields = ('id', 'username', 'password', 'email', 'first_name', 'last_name')
@@ -47,12 +46,14 @@ class   SignUpSerializer(serializers.ModelSerializer):
                 'write_only': True,
                 'validators': [validators.PasswordValidator()]
             },
-            'email': {'validators': [validators.EmailValidator()]},
             'first_name': {'validators': [validators.NameValidator('First name')]},
             'last_name': {'validators': [validators.NameValidator('Last name')]}
         }
 
     def validate(self, data):
+        print(data)
+        if 'email' not in data:
+            raise serializers.ValidationError({'email': 'this field is required'})
         if data.get('first_name') and data.get('last_name'):
             if data['first_name'].lower() == data['last_name'].lower():
                 raise serializers.ValidationError("First name and last name should not be the same.")
