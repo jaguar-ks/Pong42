@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from django.core.validators import MinLengthValidator, MaxLengthValidator
 import re
 
 User = get_user_model()
@@ -23,12 +22,24 @@ class NameValidator:
         self.field_name = field_name
 
     def __call__(self, value):
-        if len(value) < 2:
-            raise serializers.ValidationError(f"{self.field_name} must be at least 2 characters long.")
-        if len(value) > 30:
-            raise serializers.ValidationError(f"{self.field_name} must not exceed 30 characters.")
-        if not value.isalpha():
-            raise serializers.ValidationError(f"{self.field_name} should only contain alphabetic characters.")
+        errors = []
+
+        if User.objects.filter(username=value).exists():
+            errors.append("A user with that username already exists.")
+
+        if 30 < len(value) < 4:
+            errors.append("Username must be 5 to 30 characters long.")
+        if not re.match(r'^[A-Za-z0-9_-]+$', value):
+            errors.append("Username can only contain letters, numbers, underscores, hyphens.")
+        if value[0] in '_-' or value[-1] in '_-':
+            errors.append("Username cannot start or end with an underscore, hyphen, or dot.")
+        if any(bad in value for bad in ["__", "--", "_-", "-_"]):
+            errors.append("Username cannot contain consecutive special characters like '__', '_-', or similar.")
+        reserved_usernames = ['admin', 'root', 'superuser']
+        if value.lower() in reserved_usernames:
+            errors.append("This username is reserved and cannot be used.")
+        if errors:
+            raise serializers.ValidationError(errors)
 
 class UsernameValidator:
     def __call__(self, value):
