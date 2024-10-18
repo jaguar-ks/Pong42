@@ -12,7 +12,6 @@ class   AuthUserView(generics.RetrieveUpdateDestroyAPIView):
             return serializers.UpdateAuthUserSerializer
         return serializers.AuthUserSerializer
 
-        return super().get_serializer_class()
     def destroy(self, request, *args, **kwargs):
         request.user.is_active = False
         request.user.save()
@@ -39,9 +38,3 @@ class   UserSearchView(generics.ListAPIView):
     filter_backends = [filters.SearchFilter]
     serializer_class = serializers.AuthUserSerializer
     search_fields = ['username', 'email', 'first_name', 'last_name']
-
-
-"""
-/api/users/me
-/api/users/{user_id}
-"""
