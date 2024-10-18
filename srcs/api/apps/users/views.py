@@ -20,6 +20,10 @@ class   AuthUserView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         return self.request.user
 
+class   UserRetriveView(generics.RetrieveAPIView):
+    serializer_class = serializers.AuthUserSerializer
+    queryset = User.objects.filter(is_active=True)
+    lookup_field = 'id'
 
 class   ListUserView(generics.ListAPIView):
     serializer_class = serializers.AuthUserSerializer
