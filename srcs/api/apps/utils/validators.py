@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from django.core.validators import MinLengthValidator, MaxLengthValidator
 import re
 
 User = get_user_model()
@@ -30,10 +29,28 @@ class NameValidator:
         if not value.isalpha():
             raise serializers.ValidationError(f"{self.field_name} should only contain alphabetic characters.")
 
+
 class UsernameValidator:
     def __call__(self, value):
+        errors = []
+        if 5 < len(value) < 30:
+            errors.append(serializers.ValidationError("Username must be 5 to 30 characters long."))
+        
+        if not re.match(r'^[A-Za-z0-9_.]+$', value):
+            errors.append(serializers.ValidationError("Username can only contain letters, numbers, underscores, and dots."))
+        
+        if value[0] in '._' or value[-1] in '._':
+            errors.append(serializers.ValidationError("Username cannot start or end with an underscore or dot."))
+        
+        if "__" in value or ".." in value or "._" in value or "._" in value:
+            errors.append(serializers.ValidationError("Username cannot contain consecutive special characters like '__', '..', or '._'."))
+        
         if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("A user with that username already exists.")
+            errors.append(serializers.ValidationError("A user with that username already exists."))
+
+        if errors:
+            raise errors
+
 
 class EmailValidator:
     def __call__(self, value):
