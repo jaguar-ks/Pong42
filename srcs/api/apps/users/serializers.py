@@ -14,6 +14,12 @@ class   AuthUserSerializer(serializers.ModelSerializer):
         user.rotate_otp()
         return user.otp_uri
 
+class   UserSerializer(serializers.ModelSerializer):
+    class   Meta:
+        model = get_user_model()
+        fields = ('id', 'username', 'first_name', 'last_name', 'is_online', \
+            'avatar_url', 'wins', 'loses', 'rating', 'rank')
+
 class   UpdateAuthUserSerializer(serializers.ModelSerializer):
     class   Meta:
         model = get_user_model()
