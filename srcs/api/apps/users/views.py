@@ -21,18 +21,18 @@ class   AuthUserView(generics.RetrieveUpdateDestroyAPIView):
         return self.request.user
 
 class   UserRetriveView(generics.RetrieveAPIView):
-    serializer_class = serializers.AuthUserSerializer
+    serializer_class = serializers.UserSerializer
     queryset = User.objects.filter(is_active=True)
     lookup_field = 'id'
 
 class   ListUserView(generics.ListAPIView):
-    serializer_class = serializers.AuthUserSerializer
+    serializer_class = serializers.UserSerializer
 
     def get_queryset(self):
         return User.objects.filter(is_active=True)
 
 class LeaderBoardView(generics.ListAPIView):
-    serializer_class = serializers.AuthUserSerializer
+    serializer_class = serializers.UserSerializer
 
     def get_queryset(self):
         return User.objects.filter(is_active=True).order_by('-rating')
@@ -40,5 +40,5 @@ class LeaderBoardView(generics.ListAPIView):
 class   UserSearchView(generics.ListAPIView):
     queryset = User.objects.filter(is_active=True)
     filter_backends = [filters.SearchFilter]
-    serializer_class = serializers.AuthUserSerializer
+    serializer_class = serializers.UserSerializer
     search_fields = ['username', 'email', 'first_name', 'last_name']
