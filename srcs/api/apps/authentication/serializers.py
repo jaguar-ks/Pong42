@@ -2,23 +2,23 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from apps.utils import validators
+
 class   TwoFASerializer(serializers.Serializer):
-    otp_code = serializers.CharField(max_length=6, min_length=6, required=False)
+    otp_code = serializers.CharField(max_length=6, min_length=6, required=True)
 
     def validate(self, attrs):
         self.user = self.context['request'].user
-        if 'otp_code' not in attrs:
-            raise serializers.ValidationError({'otp_code': 'this field is required'})
-        if not self.user.otp.verify(attrs['otp_code']):
+        if self.user.verify_otp(attrs['otp_code']):
             raise serializers.ValidationError({'otp_code':'Invalid OTP code!'})
 
-        action = self.context['action']
-        assert action in ['enable', 'disable']
-        
-        call = getattr(self.user.otp, action)
-        if call(attrs['otp_code']) and action:
-            raise serializers.ValidationError(f'Failed to {action} 2FA: Invalid OTP code')
-        return {'message': f'Successfully {action}d 2FA'}
+        match self.context['action']:
+            case 'enable':
+                self.user.two_fa_enabled = True
+            case 'disable':
+                self.user.two_fa_enabled = False
+        self.user.save()
+        return {'detail': f'successfully {self.context['action']}d two factor authentication'}
 
 
 class   Token2FaObtainPairSerializer(TokenObtainPairSerializer):
@@ -26,14 +26,12 @@ class   Token2FaObtainPairSerializer(TokenObtainPairSerializer):
     
     def validate(self, attrs):
         data = TokenObtainPairSerializer.validate(self, attrs)
-        if self.user.otp.enabled:
+        if self.user.two_fa_enabled:
             if 'otp_code' not in attrs:
-                raise serializers.ValidationError({'otp_code', 'this field is required'})
-            if not self.user.otp.verify(attrs['otp_code']):
+                raise serializers.ValidationError({'otp_code': 'this field is required'})
+            if not self.user.verify_otp(attrs['otp_code']):
                 raise serializers.ValidationError({'otp_code':'Invalid OTP code!'})
         return data
-
-from apps.utils import validators
 
 class   SignUpSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True, validators=[validators.EmailValidator()])

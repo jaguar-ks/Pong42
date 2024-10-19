@@ -1,16 +1,13 @@
-from rest_framework.generics import GenericAPIView
+from rest_framework import generics, permissions, views
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from apps.authentication.serializers import TwoFASerializer
-from rest_framework.permissions import AllowAny
+from . import serializers
 
+class   TwoFaBaseView(generics.GenericAPIView):
+    serializer_class = serializers.TwoFASerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-class   TwoFaBaseView(GenericAPIView):
-    serializer_class = TwoFASerializer
-    permission_classes = [AllowAny]
-
-    context = {'action': 'enable'}
-    
     def post(self, request):
         self.context['request'] = request
         serializer = self.serializer_class(
@@ -21,15 +18,10 @@ class   TwoFaBaseView(GenericAPIView):
         return Response(serializer.validated_data)
 
 class   Enable2FaView(TwoFaBaseView):
-    pass
+    context = {'action': 'enable'}
 
 class   Disable2FaView(TwoFaBaseView):
     context = {'action': 'disable'}
-
-
-from rest_framework import generics, permissions, views
-from . import serializers
-from rest_framework_simplejwt.views import TokenObtainPairView
 
 class   SignUpView(generics.CreateAPIView):
     serializer_class = serializers.SignUpSerializer
@@ -59,8 +51,6 @@ class   SignInView(TokenObtainPairView):
                 'detail': 'Successfully signed in.',
             }
         return response
-
-
 
 class   SignOutView(views.APIView):
     def post(self, request):

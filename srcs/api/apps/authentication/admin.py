@@ -1,11 +1,6 @@
 from django.contrib import admin
 
-from .models import OneTimePass, SocialAuth
-
-@admin.register(OneTimePass)
-class   OneTimePassAdmin(admin.ModelAdmin):
-    pass
-
+from .models import SocialAuth
 
 @admin.register(SocialAuth)
 class   SocialAuthAdmin(admin.ModelAdmin):
