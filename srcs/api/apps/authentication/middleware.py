@@ -15,7 +15,7 @@ class JWTAuthenticationMiddleware:
         if token:
             user = self._get_user_from_access_token(token)
             # Set attributes on the request
-            setattr(request, 'auth', token)
+            setattr(request, '_auth', token)
             setattr(request, '_user', SimpleLazyObject(lambda: user))
             setattr(request, 'is_authenticated_using_middleware', user is not None)
 
@@ -70,7 +70,7 @@ class SessionJWTAuth(BaseAuthentication):
     def authenticate(self, request):
         # Avoid recursive call by directly using the attributes set by middleware
         if getattr(request, 'is_authenticated_using_middleware', False):
-            return request._user, request.auth
+            return request._user, request._auth
         return None
     
     def authenticate_header(self, request):
