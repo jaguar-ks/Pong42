@@ -5,7 +5,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from apps.utils import validators
 
 class   TwoFASerializer(serializers.Serializer):
-    otp_code = serializers.CharField(max_length=6, min_length=6, required=True)
+    otp_code = serializers.CharField(max_length=6, min_length=6, required=True, write_only=True)
 
     def validate(self, attrs):
         self.user = self.context['request'].user
@@ -22,7 +22,7 @@ class   TwoFASerializer(serializers.Serializer):
 
 
 class   Token2FaObtainPairSerializer(TokenObtainPairSerializer):
-    otp_code = serializers.CharField(max_length=6, min_length=6, required=False)
+    otp_code = serializers.CharField(max_length=6, min_length=6, required=False, write_only=True)
     
     def validate(self, attrs):
         data = TokenObtainPairSerializer.validate(self, attrs)
