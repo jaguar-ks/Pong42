@@ -8,7 +8,7 @@ class   AuthUserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         exclude = ('password', 'groups', 'user_permissions')
 
-    def get_otp_uri(self, user):
+    def get_otp_uri(self, user) -> str:
         if user.two_fa_enabled:
             return ""
         user.rotate_otp()
