@@ -18,7 +18,7 @@ class   TwoFASerializer(serializers.Serializer):
             case 'disable':
                 self.user.two_fa_enabled = False
         self.user.save()
-        return {'detail': f'successfully {self.context['action']}d two factor authentication'}
+        return {'detail': f"successfully {self.context['action']}d two factor authentication"}
 
 
 class   Token2FaObtainPairSerializer(TokenObtainPairSerializer):

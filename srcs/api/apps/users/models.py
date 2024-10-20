@@ -6,7 +6,7 @@ def generate_secret():
     return pyotp.random_base32()
 
 class   User(AbstractUser):
-    otp_secret = models.CharField(max_length=6, default=generate_secret())
+    otp_secret = models.CharField(max_length=32, default=generate_secret())
     two_fa_enabled = models.BooleanField(default=False)
     is_online = models.BooleanField(default=False)
     avatar_url = models.URLField(max_length=200, null=True, blank=True)
@@ -22,7 +22,7 @@ class   User(AbstractUser):
         )
     
     def rotate_otp(self) -> str:
-        self.otp_secret = pyotp.random_base32()
+        self.otp_secret = generate_secret()
         self.two_fa_enabled = False
     
     def verify_otp(self, otp_code) -> bool:
