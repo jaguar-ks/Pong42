@@ -18,7 +18,7 @@ services:
         build:
             context: ./srcs/api/
         volumes:
-            - backend_files:/var/www/
+            - ./srcs/api/:/var/www/
         networks:
             - transcendance_net
         ports:
