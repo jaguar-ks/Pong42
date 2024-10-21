@@ -1,0 +1,39 @@
+version: '2'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
+    container_name: elasticsearch
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      discovery.type: single-node
+    networks:
+      - efk
+  kibana:
+      image: docker.elastic.co/kibana/kibana:7.8.0
+      ports:
+        - 5601:5601
+      networks:
+        - efk
+      links:
+        - elasticsearch
+      depends_on:
+        - elasticsearch
+  filebeat:
+      image: docker.elastic.co/beats/filebeat:7.8.0
+      volumes:
+        - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+        - ../srcs/api/:/usr/share/filebeat/logs
+      environment:
+        ELASTICSEARCH_URL: http://elasticsearch:9200
+      networks:
+        - efk
+      links:
+        - kibana
+        - elasticsearch
+      depends_on:
+        - elasticsearch
+networks:
+  efk:
+    driver: bridge
