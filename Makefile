@@ -11,6 +11,12 @@ up: build
 down:
 	docker-compose -f docker-compose.yml down
 
+ELK:
+	docker-compose -f ./ELK/docker-compose.yml up
+
+ELK_down:
+	docker-compose -f ./ELK/docker-compose.yml down
+
 delete_images:
 	if [ -n "$(images)" ];\
 		then docker rmi $(images);\
@@ -21,6 +27,6 @@ delete_images:
 fclean: down delete_images
 	docker system prune -a --force
 
-.PHONY: all build up down delete_images fclean
+.PHONY: all build up down delete_images fclean ELK
 
 .SILENT: all build up down delete_images fclean
