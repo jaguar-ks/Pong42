@@ -1,5 +1,6 @@
 from config.env import BASE_DIR, env
 import os
+import logstash
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
@@ -157,7 +158,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '[{asctime}] {levelname} | {module} | {message}',
+            'format': '{levelname} {asctime} {module} {message}',
             'style': '{',
         },
         'simple': {
@@ -166,16 +167,25 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
+        'logstash': {
+            'level': 'INFO',
+            'class': 'logstash.TCPLogstashHandler',
+            'host': 'localhost',  # or the IP of your Logstash instance
+            'port': 5000,         # The port you configured in Logstash
+            'version': 1,         # Logstash format version
+            'message_type': 'django',  # Optional
+            'fqdn': False,        # Fully qualified domain name
+            'tags': ['django'],   # Optional tags
+        },
+        'console': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'django_server.log'),
+            'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['console', 'logstash'],
             'level': 'DEBUG',
             'propagate': True,
         },
