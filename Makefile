@@ -24,7 +24,7 @@ delete_images:
 		echo "No images to delete";\
 	fi
 
-fclean: down delete_images
+fclean: down ELK_down delete_images
 	docker system prune -a --force
 
 .PHONY: all build up down delete_images fclean ELK
