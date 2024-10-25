@@ -16,10 +16,11 @@
 
     .container2 {
         max-width: 1000px;
-        height: 80vh;
+        height: 100vh;
 
-        max-height: 729px;
+        max-height: 760px;
         display: flex;
+        
         border: 1px solid black;
         border-radius: 10px; /* Rounded corners for a softer look */
         overflow: hidden; /* Ensure content doesn't overflow the container */
@@ -63,7 +64,7 @@
             max-width: 160px; /* Slightly wider button */
             height: 50px; /* Increased height for a more comfortable click area */
             border: none;
-            background-color: #F5F5F5;
+            background-color: #E0E0E0;
             padding: 10px 15px; /* Padding adjusted for better appearance */
             border-radius: 25px; /* Rounded corners for the button */
             cursor: pointer;
@@ -75,6 +76,24 @@
         .submitButton:hover {
             background-color: #E0E0E0; /* Change background color on hover */
             border-color: #B0B0B0; /* Darker border on hover */
+        }
+
+
+        .message{
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-top: 5px;
+            .link{
+                color: hsl(216.38deg 44.76% 41.18%);
+                border: none;
+                border-bottom: 2px solid hsl(216.38deg 44.76% 41.18%);
+                background-color: transparent;
+                font-size: 16px;
+                cursor: pointer;
+            }
         }
     }
 

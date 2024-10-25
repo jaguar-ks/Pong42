@@ -1,0 +1,39 @@
+.layout-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  .verticalNavbarr {
+    background-color: #E0E0E0;
+    width: 70px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-shrink: 0;
+  }
+  
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: #ffffff;
+  }
+  
+  .page-content {
+    flex: 1;
+    padding: 10px;
+  }
+  .horizontalNavbarr {
+    height: 55px;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid black;
+    width: calc(100vw - 70px);
+  }
+  
+  
