@@ -1,0 +1,1 @@
+export const pages = ["home", "chat", "game", "leaderboard"];
