@@ -24,6 +24,7 @@ class   User(AbstractUser):
     def rotate_otp(self) -> str:
         self.otp_secret = generate_secret()
         self.two_fa_enabled = False
+        self.save()
     
     def verify_otp(self, otp_code) -> bool:
         return pyotp.TOTP(self.otp_secret).verify(otp_code)
