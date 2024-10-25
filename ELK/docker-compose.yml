@@ -40,19 +40,24 @@ services:
         condition: service_healthy
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:8.10.1
     container_name: logstash
-    ports:
-      - "50000:50000"
-      - "9600:9600"
+    image: docker.elastic.co/logstash/logstash:8.10.1
     volumes:
       - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
       - ./logstash/pipeline:/usr/share/logstash/pipeline
-    command: logstash -f /usr/share/logstash/pipeline/logstash.conf
-    depends_on:
-      - elasticsearch
+    ports:
+      - "50000:50000"
+      - "9600:9600"
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+      - LS_JAVA_OPTS=-Xms256m -Xmx256m
     networks:
       - elk
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
 
   kibana:
     container_name: kibana
@@ -71,20 +76,6 @@ services:
       - "5601:5601"
     networks:
       - elk
-    # image: docker.elastic.co/kibana/kibana:8.10.1
-    # container_name: kibana
-    # environment:
-    #   - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    #   - ELASTICSEARCH_USERNAME=kibana_system
-    #   - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-    # volumes:
-    #   - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
-    # ports:
-    #   - "5601:5601"
-    # depends_on:
-    #   - elasticsearch
-    # networks:
-    #   - elk
 
 volumes:
   es_data:
@@ -92,4 +83,6 @@ volumes:
 
 networks:
   elk:
-    driver: bridge
+    external: true
+    name: elk_net
+    # driver: bridge
