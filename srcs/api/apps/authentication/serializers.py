@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.validators import UniqueValidator
 
 from apps.utils import validators
 
@@ -39,7 +40,12 @@ class   SignUpSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ('id', 'username', 'password', 'email', 'first_name', 'last_name')
         extra_kwargs = {
-            'username': {'validators': [validators.UsernameValidator()]},
+            'username': {
+                'validators': [
+                    UniqueValidator(queryset=get_user_model().objects.all()),
+                    validators.UsernameValidator()
+                ],
+            },
             'password': {
                 'write_only': True,
                 'validators': [validators.PasswordValidator()]
