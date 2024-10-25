@@ -1,39 +1,95 @@
-version: '2'
+version: '3'
+
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
     container_name: elasticsearch
-    ports:
-      - 9200:9200
-      - 9300:9300
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
     environment:
-      discovery.type: single-node
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - KIBANA_SYSTEM_PASSWORD=${KIBANA_PASSWORD}
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_USERNAME=elastic
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -u elastic:lol123 http://localhost:9200/_cat/health >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
     networks:
-      - efk
+      - elk
+    restart: always
+
+  setup_kibana:
+    image: curlimages/curl:latest
+    volumes:
+      - ./tools/init-kibana.sh:/init-kibana.sh
+    command: ["sh", "/init-kibana.sh"]
+    networks:
+      - elk
+    env_file:
+      - .env
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.10.1
+    container_name: logstash
+    ports:
+      - "50000:50000"
+      - "9600:9600"
+    volumes:
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    command: logstash -f /usr/share/logstash/pipeline/logstash.conf
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk
+
   kibana:
-      image: docker.elastic.co/kibana/kibana:7.8.0
-      ports:
-        - 5601:5601
-      networks:
-        - efk
-      links:
-        - elasticsearch
-      depends_on:
-        - elasticsearch
-  filebeat:
-      image: docker.elastic.co/beats/filebeat:7.8.0
-      volumes:
-        - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-        - ../srcs/api/:/usr/share/filebeat/logs
-      environment:
-        ELASTICSEARCH_URL: http://elasticsearch:9200
-      networks:
-        - efk
-      links:
-        - kibana
-        - elasticsearch
-      depends_on:
-        - elasticsearch
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:8.10.1
+    depends_on:
+      setup_kibana:
+        condition: service_completed_successfully
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      - ELASTICSEARCH_SSL_VERIFICATIONMODE=none
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - "5601:5601"
+    networks:
+      - elk
+    # image: docker.elastic.co/kibana/kibana:8.10.1
+    # container_name: kibana
+    # environment:
+    #   - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    #   - ELASTICSEARCH_USERNAME=kibana_system
+    #   - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+    # volumes:
+    #   - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    # ports:
+    #   - "5601:5601"
+    # depends_on:
+    #   - elasticsearch
+    # networks:
+    #   - elk
+
+volumes:
+  es_data:
+    driver: local
+
 networks:
-  efk:
+  elk:
     driver: bridge
