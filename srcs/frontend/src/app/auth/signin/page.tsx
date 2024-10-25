@@ -9,21 +9,27 @@ import { AxiosError } from 'axios';
 import Image from 'next/image.js';
 import loginPlayer from '../../../../assets/loginPlayer.svg'
 import { useRouter } from 'next/navigation';
+import OtpForLogin from '../../../components/OtpForLogin/OtpForLogin.tsx';
 
 
 interface Errors{
+  details: string;
   username: string;
   password: string;
+  otp: string;
 }
 
 const SignUpPage: React.FC = () => {
 
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [code, setCode] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Errors>({
+    details: '',
     username: '',
     password: '',
+    otp: '',
   });
 
   const router = useRouter();
@@ -31,8 +37,10 @@ const SignUpPage: React.FC = () => {
   const handleSubmit = async (event : React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     setErrors(() => ({
+        details: '', 
         username: '',
         password: '',
+        otp: '',
     }));
     setIsLoading(true);
     
@@ -43,15 +51,16 @@ const SignUpPage: React.FC = () => {
             "username": username,
             "password": password,
         });
-        console.log("tst");
-        router.push("/user/home");
+        router.push("/users/home");
         setIsLoading(false);
     } catch (err) {
         console.error("test");
-        console.error("Error response:", err);
+        console.error("Error response:", err.response);
         setErrors(() => ({
+        details: "username of password is not correct",
         username: err.response?.data?.username ? err.response.data.username[0] : "",
         password: err.response?.data?.password ? err.response.data.password[0] : "",
+        otp: err.response?.data?.otp_code[0] ? err.response?.data?.otp_code[0] : "",
       })); 
       setIsLoading(false);
     }
@@ -71,7 +80,7 @@ const SignUpPage: React.FC = () => {
                     id="username"
                     name="username"
                     value={username}
-                    onChange={(event) => setUsername(event.target.value)}
+                    onChange={(event) => {setUsername(event.target.value) ;setErrors(() => ({details: '', username: '',password: '',}));}}
                     error={errors.username}
                 />
                 <InputField
@@ -80,11 +89,17 @@ const SignUpPage: React.FC = () => {
                     id="password"
                     name="password"
                     value={password}
-                    onChange={(event) => setPassword(event.target.value)}
+                    onChange={(event) => {setPassword(event.target.value) ;setErrors(() => ({details: '', username: '',password: '',}));}}
                     error={errors.password}
                 />
-                <input type='submit' value="sign in" className={classes.submitButton}/>
+                {errors.otp && <OtpForLogin setErrors={setErrors} errors={errors} username={username} password={password}/>}
+
+                <p className={classes.error}>{errors.details}</p>
+                <input type='submit' value={!isLoading ? "signin" : "loading"} className={classes.submitButton} disabled={isLoading}/>
                 </form>
+                <div className={classes.message}>
+                  <p>if you dont have an account <button className={classes.link} onClick={() =>  router.push("/auth/signup")}>Sign Up</button></p>
+                </div>
             </div>
             <div className={classes.rightSide}>
                 <Image className={classes.image} src={loginPlayer} alt="My SVG Image"  />

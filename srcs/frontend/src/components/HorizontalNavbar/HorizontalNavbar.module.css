@@ -26,7 +26,7 @@
             height: 40px;
             width: 40px;
             border-radius: 50%;
-            background-color: #F5F5F5;
+            background-color: #E0E0E0;
             border: 1px solid #CCCCCC;
             display: flex;
             align-items: center;
@@ -37,9 +37,6 @@
                 height: 20px;
             }
         }
-
-
-
         @media screen and (min-width: 420px) {
             display: none;
         }
@@ -59,7 +56,7 @@
             height: 40px;
             width: 40px;
             border-radius: 50%;
-            background-color: #F5F5F5;
+            background-color: #E0E0E0;
             border: 1px solid #CCCCCC;
             display: flex;
             align-items: center;
@@ -104,6 +101,13 @@
                 border: 1px solid #CCCCCC;
             }
             cursor: pointer;
+
+            .image{
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                border: 1px solid #CCCCCC;
+            }
         }
         .profileSearchActive{
             
@@ -143,4 +147,8 @@
         }
 
     }
+}
+
+.displayNone{
+    display: none;
 }

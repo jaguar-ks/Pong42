@@ -161,6 +161,9 @@ const SignUpPage: React.FC = () => {
               />
               <input type='submit' value="submit" className={classes.submitButton}/>
             </form>
+            <div className={classes.message}>
+                  <p>if you already have an account <button className={classes.link} onClick={() =>  router.push("/auth/signin")}>Sign In</button></p>
+                </div>
           </div>
           <div className={classes.rightSide}>
           <Image className={classes.image} src={loginPlayer} alt="My SVG Image"  />
