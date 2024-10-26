@@ -3,6 +3,7 @@ images=$(shell docker image ls -aq)
 all: build
 
 build:
+	docker network create elk_net
 	docker-compose -f docker-compose.yml build
 
 up: build
