@@ -1,6 +1,8 @@
 from config.env import BASE_DIR, env
 import os
 import logstash
+from pythonjsonlogger import jsonlogger
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
@@ -9,7 +11,6 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -157,39 +158,34 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
         'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
+            'format': '%(levelname)s %(message)s'
         },
     },
     'handlers': {
         'logstash': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logstash.TCPLogstashHandler',
-            'host': 'localhost',  # or the IP of your Logstash instance
-            'port': 5000,         # The port you configured in Logstash
-            'version': 1,         # Logstash format version
-            'message_type': 'django',  # Optional
-            'fqdn': False,        # Fully qualified domain name
-            'tags': ['django'],   # Optional tags
+            'host': os.getenv('LOGSTASH_HOST', 'logstash'),
+            'port': int(os.getenv('LOGSTASH_PORT', 50000)),
+            'version': 1,
+            'message_type': 'django',
+            'fqdn': False,
+            'tags': ['django']
         },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
+            'formatter': 'simple'
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'logstash'],
+            'handlers': ['logstash', 'console'],
             'level': 'DEBUG',
             'propagate': True,
         },
-    },
+    }
 }
 
 from config.settings.rest_framework import *
