@@ -1,4 +1,5 @@
 from config.env import BASE_DIR, env
+import os
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
@@ -7,7 +8,6 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -129,3 +129,4 @@ AUTH_USER_MODEL = 'users.User'
 from config.settings.rest_framework import *
 from config.settings.simplejwt import *
 from config.settings.drf_spectacular import *
+from config.settings.logstash import *

@@ -21,9 +21,10 @@ services:
         build:
             context: ./srcs/api/
         volumes:
-            - backend_files:/var/www/
+            - ./srcs/api/:/var/www/
         networks:
             - transcendance_net
+            - elk_net
         ports:
             - 8000:8000
         depends_on:
@@ -49,3 +50,6 @@ volumes:
 
 networks:
     transcendance_net:
+    elk_net:
+        external: true
+        name: elk_net
