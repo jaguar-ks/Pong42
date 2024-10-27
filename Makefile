@@ -1,9 +1,17 @@
 images=$(shell docker image ls -aq)
 
+elk_net=$(shell docker network ls -qf name="elk_net")
+
 all: build
 
-build:
-	docker network create elk_net
+create_net:
+	if [ -n "$(elk_net)" ];\
+		then echo "Network elk_net already exists";\
+	else\
+		docker network create elk_net;\
+	fi
+
+build: create_net
 	docker-compose -f docker-compose.yml build
 
 up: build
@@ -28,6 +36,6 @@ delete_images:
 fclean: down ELK_down delete_images
 	docker system prune -a --force
 
-.PHONY: all build up down delete_images fclean ELK
+.PHONY: all build up down delete_images fclean ELK ELK_down create_net
 
-.SILENT: all build up down delete_images fclean
+.SILENT: all build up down delete_images fclean create_net ELK ELK_down
