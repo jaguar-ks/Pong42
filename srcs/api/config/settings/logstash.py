@@ -18,7 +18,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logstash.TCPLogstashHandler',
             'host': env('LOGSTASH_HOST', default='logstash'),
-            'port': env.int('LOGSTASH_PORT', default=50000)),
+            'port': env.int('LOGSTASH_PORT', default=50000),
             'version': 1,
             'message_type': 'django',
             'fqdn': False,
