@@ -42,3 +42,4 @@ htmlcov/
 # Migrations
 **/migrations/*
 !**/migrations/__init__.py
+*todo*
