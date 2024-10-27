@@ -1,8 +1,5 @@
 from config.env import BASE_DIR, env
 import os
-import logstash
-from pythonjsonlogger import jsonlogger
-
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
@@ -127,67 +124,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
-
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'simple': {
-#             'format': '[%(asctime)s] %(levelname)s | %(funcName)s | %(name)s | %(message)s',
-#             'datefmt': '%Y-%m-%d %H:%M:%S',
-#         },
-#     },
-#     'handlers': {
-#         'logger': {
-#             'level': 'DEBUG',
-#             'class': 'logging.handlers.RotatingFileHandler',
-#             'filename': os.path.join(BASE_DIR, 'django_server.log'),
-#             'formatter': 'simple',
-#         }
-#     },
-#     'loggers': {
-#         'signal': {
-#             'handlers': ['logger'],
-#             'level': 'DEBUG',
-#         }
-#     }
-# }
-
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
-    },
-    'handlers': {
-        'logstash': {
-            'level': 'DEBUG',
-            'class': 'logstash.TCPLogstashHandler',
-            'host': os.getenv('LOGSTASH_HOST', 'logstash'),
-            'port': int(os.getenv('LOGSTASH_PORT', 50000)),
-            'version': 1,
-            'message_type': 'django',
-            'fqdn': False,
-            'tags': ['django']
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['logstash', 'console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    }
-}
-
 from config.settings.rest_framework import *
 from config.settings.simplejwt import *
 from config.settings.drf_spectacular import *
+from config.settings.logstash import *
