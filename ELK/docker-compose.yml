@@ -48,6 +48,8 @@ services:
     ports:
       - "50000:50000"
       - "9600:9600"
+    env_file:
+      - .env
     environment:
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTICSEARCH_USERNAME=elastic
