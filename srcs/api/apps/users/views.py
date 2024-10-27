@@ -1,39 +1,44 @@
 from rest_framework import generics, filters
-from .serializers import AuthUserSerializer, SignUpSerializer
 from rest_framework.permissions import AllowAny
 from .models import User
+from rest_framework.response import Response
 
-class   SignUpView(generics.CreateAPIView):
-    serializer_class = SignUpSerializer
-    permission_classes = [AllowAny]
-
+from . import serializers
 
 class   AuthUserView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = AuthUserSerializer
+
+    def get_serializer_class(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            return serializers.UpdateAuthUserSerializer
+        return serializers.AuthUserSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        request.user.is_active = False
+        request.user.save()
+        return Response({'detail': 'successfully deleted your account'})
 
     def get_object(self):
         return self.request.user
 
+class   UserRetriveView(generics.RetrieveAPIView):
+    serializer_class = serializers.UserSerializer
+    queryset = User.objects.filter(is_active=True)
+    lookup_field = 'id'
+
 class   ListUserView(generics.ListAPIView):
-    serializer_class = AuthUserSerializer
+    serializer_class = serializers.UserSerializer
 
     def get_queryset(self):
-        return User.objects.all()
+        return User.objects.filter(is_active=True)
 
 class LeaderBoardView(generics.ListAPIView):
-    serializer_class = AuthUserSerializer
+    serializer_class = serializers.UserSerializer
 
     def get_queryset(self):
-        return User.objects.all().order_by('-rating')
+        return User.objects.filter(is_active=True).order_by('-rating')
 
 class   UserSearchView(generics.ListAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects.filter(is_active=True)
     filter_backends = [filters.SearchFilter]
-    serializer_class = AuthUserSerializer
+    serializer_class = serializers.UserSerializer
     search_fields = ['username', 'email', 'first_name', 'last_name']
-
-
-"""
-/api/users/me
-/api/users/{user_id}
-"""

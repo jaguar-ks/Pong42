@@ -1,0 +1,46 @@
+.Friends{
+    display: flex;
+    flex-direction: column;
+    background-color: #E0E0E0;
+    border: 1px solid #B0B0B0;
+    height: 100%;
+    border-radius: 5px;
+
+    .buttons{
+        display: flex;
+        justify-content: space-around;
+        margin: 17px;
+
+        .button{
+            width: 90px;
+            height: 50px;
+            border:none;
+            background-color: #ffffff;
+            color: #000000;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 22px;
+        }
+        .buttonClicked{
+            width: 90px;
+            height: 50px;
+            border:none;
+            background-color: #000000;
+            color: #ffffff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 22px;
+        }
+    }
+}
+.Online{
+    display: flex;
+    align-items: center;
+    .image{
+        border-radius: 50%;
+        margin: 7px;
+    }
+    &:hover{
+        background-color: #00000024;
+    }
+}

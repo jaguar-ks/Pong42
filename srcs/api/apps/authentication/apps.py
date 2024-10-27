@@ -5,4 +5,4 @@ class   AuthenticationAppConfig(AppConfig):
     name = 'apps.authentication'
     
     def ready(self) -> None:
-        import apps.authentication.signals
+        from .openapi_extensions import OpenApiAuthenticationExtension
