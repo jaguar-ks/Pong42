@@ -20,7 +20,7 @@ up: build
 down:
 	docker-compose -f docker-compose.yml down
 
-ELK:
+ELK: create_net
 	docker-compose -f ./ELK/docker-compose.yml up
 
 ELK_down:
