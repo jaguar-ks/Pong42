@@ -9,10 +9,12 @@ services:
         networks:
             - transcendance_net
         restart: always
-        environment:
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_USER: ${POSTGRES_USER}
+        env_file:
+            - .env.example
+        # environment:
+        #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        #     POSTGRES_DB: ${POSTGRES_DB}
+        #     POSTGRES_USER: ${POSTGRES_USER}
 
 
     backend:
@@ -29,15 +31,30 @@ services:
             - 8000:8000
         depends_on:
             - pgdb
+        env_file:
+            - .env.example
         restart: on-failure
-        environment:
-            DEBUG: True # ['True', 'False']
-            DJANGO_SETTING_MODULE: config.django.local
-            DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgdb:5432/${POSTGRES_DB}
-            DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
-            DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
-            DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
+        # environment:
+        #     DEBUG: True # ['True', 'False']
+        #     DJANGO_SETTING_MODULE: config.django.local
+        #     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgdb:5432/${POSTGRES_DB}
+        #     DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
+        #     DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
+        #     DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
 
+    frontend:
+        build: ./srcs/frontend
+        container_name: nextJs
+        ports:
+            - "3000:3000"  # Map host port 3000 to container port 3000
+        # volumes:
+        #     - ./frontend:/app
+        # - ./frontend/node_modules:/app/node_modules  # Optional: Prevent rebuilding on node_modules changes
+        depends_on:
+            - backend
+        networks:
+            - transcendance_net
+        restart: on-failure
 
 volumes:
     postgres_data:
