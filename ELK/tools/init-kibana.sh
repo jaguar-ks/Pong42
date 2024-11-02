@@ -9,7 +9,7 @@ while true; do
 done
 
 echo "Setting up kibana_system user..."
-echo "${ELASTIC_PASSWORD} ${KIBANA_PASSWORD}"
+# echo "${ELASTIC_PASSWORD} ${KIBANA_PASSWORD}"
 curl -X POST -u elastic:${ELASTIC_PASSWORD} "elasticsearch:9200/_security/user/kibana_system/_password" -H "Content-Type: application/json" -d"
 {
   \"password\": \"${KIBANA_PASSWORD}\"
