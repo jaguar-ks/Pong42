@@ -28,7 +28,7 @@ INSTALLED_APPS += [
     'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
     'channels',
-    'corsheaders'
+    'corsheaders',
 ]
 
 # local apps
@@ -40,6 +40,7 @@ INSTALLED_APPS += [ f'apps.{app}' for app in [
 ]]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,6 +50,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'apps.authentication.middleware.JWTAuthenticationMiddleware',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
 
 ROOT_URLCONF = 'config.urls'
 
