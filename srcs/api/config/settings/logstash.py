@@ -10,7 +10,7 @@ LOGGING = {
             '()': 'logstash.formatter.LogstashFormatterVersion1',
         },
         'simple': {
-            'format': '[%(levelname)s] %(message)s'
+            'format': '[%(asctime)s][%(levelname)s][%(name)s] %(message)s '
         },
     },
     'handlers': {
@@ -26,7 +26,7 @@ LOGGING = {
             'formatter': 'logstash',
         },
         'console': {
-            'level': 'INFO',
+            # 'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
@@ -34,7 +34,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['logstash', 'console'],
-            'level': 'DEBUG',
+            # 'level': 'INFO',
             'propagate': True,
         },
     }
