@@ -46,13 +46,19 @@ const SignUpPage: React.FC = () => {
     
     console.log("username:", username);
     try {
-        
-        const res = await axios.post("http://localhost:8000/api/auth/sign-in/",{
-            "username": username,
-            "password": password,
-        });
-        router.push("/users/home");
-        setIsLoading(false);
+      const res = await axios.post("http://localhost:8000/api/auth/sign-in/", {
+          "username": username,
+          "password": password,
+      }, {
+          withCredentials: true,
+      }).catch(err => {
+        console.error("Sign-in error:", err);
+      });
+  
+      if (res.status === 200) { // Check if the response is OK
+          router.push("/users/home");
+          setIsLoading(false);
+      }
     } catch (err) {
         console.error("test");
         console.error("Error response:", err.response);
