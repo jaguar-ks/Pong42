@@ -47,9 +47,8 @@ services:
         container_name: nextJs
         ports:
             - "3000:3000"  # Map host port 3000 to container port 3000
-        # volumes:
-        #     - ./frontend:/app
-        # - ./frontend/node_modules:/app/node_modules  # Optional: Prevent rebuilding on node_modules changes
+        volumes:
+            - ./srcs/frontend/src/:/app/src/
         depends_on:
             - backend
         networks:
