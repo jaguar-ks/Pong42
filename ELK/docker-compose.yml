@@ -10,6 +10,7 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=true
       - ELASTIC_USERNAME=elastic
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
     healthcheck:
       test: ["CMD-SHELL", "curl -s -u elastic:lol123 http://localhost:9200/_cat/health >/dev/null || exit 1"]
       interval: 30s
