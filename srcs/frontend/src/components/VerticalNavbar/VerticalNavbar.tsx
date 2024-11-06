@@ -40,7 +40,9 @@ const VerticalNavbar = () => {
     
         const fetchData = async () =>{
             try {
-                const res = await axios.get("http://localhost:8000/api/users/me/",);
+                const res = await axios.get("http://localhost:8000/api/users/me/", {
+                    withCredentials: true
+                  });
                 console.log("res");
                 console.log(res.data);
                 updateUserData({
