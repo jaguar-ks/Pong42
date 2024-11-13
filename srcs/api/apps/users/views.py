@@ -1,5 +1,5 @@
 from rest_framework import generics, filters
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from .models import User
 from rest_framework.response import Response
 
@@ -7,8 +7,6 @@ from . import serializers
 
 class   AuthUserView(generics.RetrieveUpdateDestroyAPIView):
 
-    permission_classes = [IsAuthenticated]
-    
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
             return serializers.UpdateAuthUserSerializer

@@ -38,9 +38,6 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({ setCurrentPage }) => {
       const res = await axios.patch(
         "http://localhost:8000/api/users/me/",
         { username: newUsername },
-        {
-          withCredentials: true,
-        }
       );
       console.log(res.data);
       updateUserData({ ...userData, username: newUsername });

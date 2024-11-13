@@ -38,14 +38,7 @@ const Logout: React.FC = () => {
       deleteAllCookies();
 
       // Call the sign-out API
-      await axios.post("http://localhost:8000/api/auth/sign-out/",
-        {},
-        {
-          withCredentials: true,
-        }
-      ).catch(err => {
-        console.error("Sign-in error:", err);
-      });
+      await axios.post("http://localhost:8000/api/auth/sign-out/");
 
       router.push('/auth/signin');
     } catch (error) {
