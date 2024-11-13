@@ -48,18 +48,28 @@ const SignInPage: React.FC = () => {
     setIsLoading(true);
     
     try {
-      await axios.post("http://localhost:8000/api/auth/sign-in/", formData,{withCredentials: true});
-
-      router.push("/users/home");
-    } catch (err: any) {
-      console.log("there is some errors");
-      console.error("Error:", err.response);
-      setErrors({
-        details: "Username or password is not correct",
-        username: err.response?.data?.username?.[0] || "",
-        password: err.response?.data?.password?.[0] || "",
-        otp: err.response?.data?.otp_code?.[0] || "",
+      const res = await axios.post("http://localhost:8000/api/auth/sign-in/", {
+          "username": formData.username,
+          "password": formData.password,
+      }, {
+          withCredentials: true,
+      }).catch(err => {
+        console.error("Sign-in error:", err);
       });
+  
+      if (res.status === 200) { // Check if the response is OK
+          router.push("/users/home");
+          setIsLoading(false);
+      }
+    } catch (err) {
+        console.error("test");
+        console.error("Error response:", err.response);
+        setErrors(() => ({
+        details: "username of password is not correct",
+        username: err.response?.data?.username ? err.response.data.username[0] : "",
+        password: err.response?.data?.password ? err.response.data.password[0] : "",
+        otp: err.response?.data?.otp_code[0] ? err.response?.data?.otp_code[0] : "",
+      })); 
       setIsLoading(false);
     } finally {
     }

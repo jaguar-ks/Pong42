@@ -1,4 +1,5 @@
 from config.env import BASE_DIR, env
+import os
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('DJANGO_SECRET_KEY')
@@ -7,7 +8,6 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -28,7 +28,7 @@ INSTALLED_APPS += [
     'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
     'channels',
-    'corsheaders'
+    'corsheaders',
 ]
 
 # local apps
@@ -40,6 +40,7 @@ INSTALLED_APPS += [ f'apps.{app}' for app in [
 ]]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -48,6 +49,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'apps.authentication.middleware.JWTAuthenticationMiddleware',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -129,3 +136,4 @@ AUTH_USER_MODEL = 'users.User'
 from config.settings.rest_framework import *
 from config.settings.simplejwt import *
 from config.settings.drf_spectacular import *
+from config.settings.logstash import *
