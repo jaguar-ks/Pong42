@@ -6,13 +6,11 @@ class   AuthUserSerializer(serializers.ModelSerializer):
     otp_uri = serializers.SerializerMethodField(method_name='get_otp_uri', read_only=True)
     class   Meta:
         model = get_user_model()
-        exclude = ('password', 'groups', 'user_permissions')
+        exclude = ('password', )
 
     def get_otp_uri(self, user) -> str:
         if user.two_fa_enabled:
             return ""
-        else:
-            user.rotate_otp()
         return user.otp_uri
 
 class   UserSerializer(serializers.ModelSerializer):
