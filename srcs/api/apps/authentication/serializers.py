@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.serializers import TokenObtainSlidingSerializer
 from rest_framework.validators import UniqueValidator
 
 from apps.utils import validators
@@ -22,11 +22,11 @@ class   TwoFASerializer(serializers.Serializer):
         return {'detail': f"successfully {self.context['action']}d two factor authentication"}
 
 
-class   Token2FaObtainPairSerializer(TokenObtainPairSerializer):
+class   ObtainSlidingTokenSerializer(TokenObtainSlidingSerializer):
     otp_code = serializers.CharField(max_length=6, min_length=6, required=False, write_only=True)
-    
+
     def validate(self, attrs):
-        data = TokenObtainPairSerializer.validate(self, attrs)
+        data = super().validate(attrs)
         if self.user.two_fa_enabled:
             if 'otp_code' not in attrs:
                 raise serializers.ValidationError({'otp_code': 'this field is required'})
@@ -62,11 +62,10 @@ class   SignUpSerializer(serializers.ModelSerializer):
             if data['first_name'].lower() == data['last_name'].lower():
                 raise serializers.ValidationError("First name and last name should not be the same.")
         return data
-    
+
     def create(self, validated_data):
         user = get_user_model()(**validated_data)
         user.full_clean()
         user.set_password(validated_data['password'])
         user.save()
         return user
-

@@ -1,9 +1,8 @@
 from rest_framework import generics, permissions, views
 from rest_framework.response import Response
-from rest_framework.serializers import Serializer
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainSlidingView
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample, OpenApiTypes
-
+from rest_framework_simplejwt.tokens import SlidingToken
 from . import serializers
 
 class   TwoFaBaseView(generics.GenericAPIView):
@@ -71,7 +70,7 @@ class   SignUpView(generics.CreateAPIView):
     serializer_class = serializers.SignUpSerializer
     permission_classes = [permissions.AllowAny]
 
-class   SignInView(TokenObtainPairView):
+class   SignInView(TokenObtainSlidingView):
     @extend_schema(
         summary="User Sign-In",
         description="Signs In user by set jwt tokens [access_token, refresh_token] in cookies",
@@ -92,20 +91,12 @@ class   SignInView(TokenObtainPairView):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
             response.set_cookie(
-                key='refresh_token',
-                value=response.data['refresh'],
+                key='token',
+                value=response.data['token'],
                 httponly=True,  # Makes the cookie inaccessible to JavaScript
                 # samesite='Lax',  # Provides some CSRF protection
                 # secure=True,  # Ensures the cookie is only sent over HTTPS
                 # max_age=3600 * 24 * 14  # 14 days
-            )
-            response.set_cookie(
-                key='access_token',
-                value=response.data['access'],
-                httponly=True,
-                # samesite='Lax',
-                # secure=True,
-                # max_age=3600  # 1 hour
             )
             response.data = {
                 'detail': 'Successfully signed in.',
@@ -113,7 +104,7 @@ class   SignInView(TokenObtainPairView):
         return response
 
 class SignOutView(views.APIView):
-    
+
     @extend_schema(
         summary="User Sign-Out",
         description="Signs out the user by deleting the refresh and access token cookies.",
@@ -133,6 +124,7 @@ class SignOutView(views.APIView):
     )
     def post(self, request):
         res = Response({'detail': 'Signed out successfully'})
-        res.delete_cookie('refresh_token')
-        res.delete_cookie('access_token')
+        token = SlidingToken(request.COOKIES['token'])
+        token.blacklist()
+        res.delete_cookie('token')
         return res
