@@ -36,6 +36,9 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ setCurrentPage }) => {
         const res = await axios.patch(
           "http://localhost:8000/api/users/me/",
           { password: newPassword },
+          {
+            withCredentials: true,
+          }
         );
         console.log(res.data);
         updateUserData({ ...userData, password: newPassword });

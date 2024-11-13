@@ -24,7 +24,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/");
+        const res = await axios.get("http://localhost:8000/api/users/me/", {
+            withCredentials: true
+          });
         console.log(res.data.avatar_url);
         setNewImage(res.data.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png");
       } catch (err: any) {
@@ -103,6 +105,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
             Authorization: `Bearer ${localStorage.getItem("access")}`,
             "Content-Type": "application/json",
           },
+          withCredentials: true,
         }
       );
       console.log(res.data);

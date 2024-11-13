@@ -48,10 +48,9 @@ const SignInPage: React.FC = () => {
     setIsLoading(true);
     
     try {
-<<<<<<< HEAD
       const res = await axios.post("http://localhost:8000/api/auth/sign-in/", {
-          "username": username,
-          "password": password,
+          "username": formData.username,
+          "password": formData.password,
       }, {
           withCredentials: true,
       }).catch(err => {
@@ -71,20 +70,6 @@ const SignInPage: React.FC = () => {
         password: err.response?.data?.password ? err.response.data.password[0] : "",
         otp: err.response?.data?.otp_code[0] ? err.response?.data?.otp_code[0] : "",
       })); 
-=======
-      await axios.post("http://localhost:8000/api/auth/sign-in/", formData,{withCredentials: true});
-
-      router.push("/users/home");
-    } catch (err: any) {
-      console.log("there is some errors");
-      console.error("Error:", err.response);
-      setErrors({
-        details: "Username or password is not correct",
-        username: err.response?.data?.username?.[0] || "",
-        password: err.response?.data?.password?.[0] || "",
-        otp: err.response?.data?.otp_code?.[0] || "",
-      });
->>>>>>> e22fa24a4d32583c70d318b665443f473c72eaa2
       setIsLoading(false);
     } finally {
     }
