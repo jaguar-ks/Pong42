@@ -22,9 +22,7 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
     const fetchData = async () => {
       setIsloading(true);
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/", {
-            withCredentials: true
-          });
+        const res = await axios.get("http://localhost:8000/api/users/me/");
         setBoolIsActive(res.data.two_fa_enabled);
         setToggleActive(res.data.two_fa_enabled);
       } catch (err: any) {
@@ -40,9 +38,7 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
       setIsloading(true);
       setToggleActive(!toggleActive);
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/", {
-            withCredentials: true
-          });
+        const res = await axios.get("http://localhost:8000/api/users/me/");
         setCode(res.data.otp_uri);
       } catch (err: any) {
         console.log("Error in fetching OTP URI", err);
@@ -56,9 +52,6 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
     try {
       const res = await axios.post("http://localhost:8000/api/auth/2fa/enable/", {
         "otp_code": inputCode,
-      },
-      {
-        withCredentials: true
       });
 
       // Navigate back after success
@@ -72,9 +65,6 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
       const res = await axios.patch(
         "http://localhost:8000/api/users/me/",
         { last_name: newLastName },
-        {
-          withCredentials: true,
-        }
       );
       console.log(res.data);
       updateUserData({ ...userData, last_name: newLastName });
