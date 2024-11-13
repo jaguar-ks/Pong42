@@ -36,6 +36,47 @@ const VerticalNavbar = () => {
         updateCurrentPage(page);
     };
 
+    useEffect(() => {
+    
+        const fetchData = async () =>{
+            try {
+                const res = await axios.get("http://localhost:8000/api/users/me/", {
+                    withCredentials: true
+                  });
+                console.log("res");
+                console.log(res.data);
+                updateUserData({
+                    id: res.data.id,
+                    otp_uri: res.data.otp_uri,
+                    last_login: res.data.last_login,
+                    is_superuser: res.data.is_superuser,
+                    username: res.data.username,
+                    first_name: res.data.first_name,
+                    last_name: res.data.last_name,
+                    email: res.data.email,
+                    is_staff: res.data.is_staff,
+                    is_active: res.data.is_active,
+                    date_joined: res.data.date_joined,
+                    two_fa_enabled: res.data.two_fa_enabled,
+                    is_online: res.data.is_online,
+                    avatar_url: res.data.avatar_url ,
+                    wins: res.data.wins,
+                    loses: res.data.loses,
+                    rating: res.data.rating,
+                })
+
+
+            } catch (err) {
+                console.log("test");
+            }
+        }
+
+        fetchData();
+      }, []);
+    
+
+
+
     return (
         <nav className={classes.navbar}>
             <div className={classes.logo}>
