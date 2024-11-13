@@ -36,6 +36,9 @@ const ChangeLastname: React.FC<ChangeLastnameProps> = ({ setCurrentPage }) => {
         const res = await axios.patch(
           "http://localhost:8000/api/users/me/",
           { last_name: newLastName },
+          {
+            withCredentials: true,
+          }
         );
         console.log(res.data);
         updateUserData({ ...userData, last_name: newLastName });
