@@ -9,12 +9,10 @@ services:
         networks:
             - transcendance_net
         restart: always
-        env_file:
-            - .env.example
-        # environment:
-        #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        #     POSTGRES_DB: ${POSTGRES_DB}
-        #     POSTGRES_USER: ${POSTGRES_USER}
+        environment:
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
 
 
     backend:
@@ -23,37 +21,23 @@ services:
         build:
             context: ./srcs/api/
         volumes:
-            - ./srcs/api/:/var/www/
+            - backend_files:/var/www/
         networks:
             - transcendance_net
-            - elk_net
         ports:
             - 8000:8000
         depends_on:
             - pgdb
-        env_file:
-            - .env.example
         restart: on-failure
-        # environment:
-        #     DEBUG: True # ['True', 'False']
-        #     DJANGO_SETTING_MODULE: config.django.local
-        #     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgdb:5432/${POSTGRES_DB}
-        #     DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
-        #     DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
-        #     DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
+        environment:
+            DEBUG: True # ['True', 'False']
+            DJANGO_SETTING_MODULE: config.django.local
+            DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgdb:5432/${POSTGRES_DB}
+            DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
+            DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
+            DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
+            DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
 
-    frontend:
-        build: ./srcs/frontend
-        container_name: nextJs
-        ports:
-            - "3000:3000"  # Map host port 3000 to container port 3000
-        volumes:
-            - ./srcs/frontend/src/:/app/src/
-        depends_on:
-            - backend
-        networks:
-            - transcendance_net
-        restart: on-failure
 
 volumes:
     postgres_data:
@@ -66,6 +50,3 @@ volumes:
 
 networks:
     transcendance_net:
-    elk_net:
-        external: true
-        name: elk_net
