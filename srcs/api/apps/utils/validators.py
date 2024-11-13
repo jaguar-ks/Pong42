@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 import re
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -46,6 +47,8 @@ class UsernameValidator:
         if any(bad in value for bad in ["__", "--", "_-", "-_"]):
             errors.append("Username cannot contain consecutive special characters like '__', '_-', or similar.")
         reserved_usernames = ['admin', 'root', 'superuser']
+        if get_user_model().objects.filter(username=value).exists():
+            errors.append("A user with that username already exists.")
         if value.lower() in reserved_usernames:
             errors.append("This username is reserved and cannot be used.")
         if errors:
