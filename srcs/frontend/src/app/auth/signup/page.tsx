@@ -84,9 +84,7 @@ const SignUpPage: React.FC = () => {
         email: formData.email,
         first_name: formData.firstname,
         last_name: formData.lastname
-      },
-      {withCredentials: true},
-    );
+      });
       setIsSuccess(true);
     } catch (err: any) {
       console.error("Error:", err.response?.data);
