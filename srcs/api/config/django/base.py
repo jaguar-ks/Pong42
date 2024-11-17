@@ -127,6 +127,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
-from config.settings.rest_framework import *
-from config.settings.simplejwt import *
-from config.settings.drf_spectacular import *
+
+from config.settings import *
