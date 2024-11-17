@@ -4,29 +4,41 @@ import pyotp
 
 
 class   UserManager(BaseUserManager):
-    def create_user(self, username: str, **kwargs):
-        kwargs['is_active'] = False
-        if username:
-            raise ValueError("Users must have an email address")
-        user = self.model(username=username, **kwargs)
-        user.set_password(kwargs['password'])
-        user.save(self._db)
-        return user
+    def create_user(self, username, email, password=None, **kwargs):
 
-    def create_superuser(self, username: str, **kwargs):
-        kwargs['is_active'] = True
-        kwargs['is_admin'] = True
+        kwargs.setdefault('is_active', True)
+        kwargs.setdefault('is_email_verified', False)
+        kwargs.setdefault('is_admin', False)
+
+        if not username:
+            raise ValueError('username is required')
+        if not email:
+            raise ValueError('email address is required')
+
         user = self.model(
             username=username,
+            email=email,
             **kwargs
         )
-        user.set_password(kwargs['password'])
-        user.save()
+        user.set_password(password)
+        user.full_clean()
+        user.save(using=self._db)
         return user
+
+    def create_superuser(self, username, email, password=None, **kwargs):
+        kwargs.setdefault('is_active', True)
+        kwargs.setdefault('is_email_verified', True)
+        kwargs.setdefault('is_admin', True)
+        return self.create_user(
+            username=username,
+            email=email,
+            password=password,
+            **kwargs
+        )
 
 class   User(AbstractBaseUser):
     username = models.CharField(max_length=100, unique=True)
-    email = models.EmailField(max_length=150)
+    email = models.EmailField(max_length=150, unique=True)
     first_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100, null=True, blank=True)
     otp_secret = models.CharField(max_length=32, default=pyotp.random_base32)
@@ -37,8 +49,9 @@ class   User(AbstractBaseUser):
     loses = models.PositiveSmallIntegerField(default=0)
     rating = models.PositiveIntegerField(default=0)
     rank = models.PositiveIntegerField(default=500)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    is_email_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
@@ -61,10 +74,6 @@ class   User(AbstractBaseUser):
 
     def __str__(self) -> str:
         return self.username
-
-    @property
-    def is_staff(self):
-        return self.is_admin
 
     def has_perm(self, perm, obj=None):
         return True
