@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainSlidingSerializer
 from rest_framework.validators import UniqueValidator
+from rest_framework.exceptions import AuthenticationFailed
 
 from apps.utils import validators
 
@@ -29,6 +30,8 @@ class   ObtainSlidingTokenSerializer(TokenObtainSlidingSerializer):
 
     def validate(self, attrs):
         data = super().validate(attrs)
+        if not self.user.is_email_verified:
+            raise AuthenticationFailed('email address is not verified')
         if self.user.two_fa_enabled:
             if 'otp_code' not in attrs:
                 raise serializers.ValidationError({'otp_code': 'this field is required'})
@@ -74,3 +77,9 @@ class   SignUpSerializer(serializers.ModelSerializer):
         )
         send_verification_email.delay(user=user)
         return user
+
+    def to_representation(self, instance):
+        return {
+            'detail': 'account created successfully, check your email for confirmation',
+            **super().to_representation(instance)
+        }
