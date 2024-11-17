@@ -5,6 +5,8 @@ from rest_framework.validators import UniqueValidator
 
 from apps.utils import validators
 
+
+user_model = get_user_model()
 class   TwoFASerializer(serializers.Serializer):
     otp_code = serializers.CharField(max_length=6, min_length=6, required=True, write_only=True)
 
@@ -37,12 +39,12 @@ class   ObtainSlidingTokenSerializer(TokenObtainSlidingSerializer):
 class   SignUpSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True, validators=[validators.EmailValidator()])
     class   Meta:
-        model = get_user_model()
+        model = user_model
         fields = ('id', 'username', 'password', 'email', 'first_name', 'last_name')
         extra_kwargs = {
             'username': {
                 'validators': [
-                    UniqueValidator(queryset=get_user_model().objects.all()),
+                    UniqueValidator(queryset=user_model.objects.all()),
                     validators.UsernameValidator()
                 ],
             },
@@ -64,8 +66,11 @@ class   SignUpSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        user = get_user_model()(**validated_data)
-        user.full_clean()
-        user.set_password(validated_data['password'])
-        user.save()
+        user = user_model.objects.create_user(
+            username=validated_data.pop('username'),
+            email=validated_data.pop('email'),
+            password=validated_data.pop('password'),
+            **validated_data
+        )
+        send_verification_email.delay(user=user)
         return user
