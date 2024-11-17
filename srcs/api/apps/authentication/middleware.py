@@ -2,6 +2,7 @@ from django.utils.functional import SimpleLazyObject
 from rest_framework_simplejwt.tokens import SlidingToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 User = get_user_model()
 
@@ -24,7 +25,7 @@ class JWTAuthenticationMiddleware:
         return response
 
     def _authenticate(self, request):
-        access_token = request.COOKIES.get('token')
+        access_token = request.COOKIES.get(settings.AUTH_TOKEN_NAME)
 
         if not access_token:
             return None

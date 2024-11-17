@@ -91,7 +91,7 @@ class   SignInView(TokenObtainSlidingView):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
             response.set_cookie(
-                key='token',
+                key=settings.AUTH_TOKEN_NAME,
                 value=response.data['token'],
                 httponly=True,  # Makes the cookie inaccessible to JavaScript
                 # samesite='Lax',  # Provides some CSRF protection
