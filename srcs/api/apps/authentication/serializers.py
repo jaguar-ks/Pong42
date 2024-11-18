@@ -13,7 +13,7 @@ class   TwoFASerializer(serializers.Serializer):
 
     def validate(self, attrs):
         self.user = self.context['request'].user
-        if self.user.verify_otp(attrs['otp_code']):
+        if not self.user.verify_otp(attrs['otp_code']):
             raise serializers.ValidationError({'otp_code':'Invalid OTP code!'})
 
         match self.context['action']:
