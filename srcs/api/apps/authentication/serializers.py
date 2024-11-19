@@ -5,6 +5,7 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.exceptions import AuthenticationFailed
 
 from apps.utils import validators
+from .tasks import send_verification_email, send_sign_in_email
 
 
 user_model = get_user_model()
@@ -60,7 +61,6 @@ class   SignUpSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
-        print(data)
         if 'email' not in data:
             raise serializers.ValidationError({'email': 'this field is required'})
         if data.get('first_name') and data.get('last_name'):
@@ -75,7 +75,7 @@ class   SignUpSerializer(serializers.ModelSerializer):
             password=validated_data.pop('password'),
             **validated_data
         )
-        send_verification_email.delay(user=user)
+        send_verification_email(user=user)
         return user
 
     def to_representation(self, instance):
@@ -83,3 +83,29 @@ class   SignUpSerializer(serializers.ModelSerializer):
             'detail': 'account created successfully, check your email for confirmation',
             **super().to_representation(instance)
         }
+
+
+class   SendEmailSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=['verification', 'sign_in'], required=True, write_only=True)
+    email = serializers.EmailField(max_length=150, required=True, write_only=True)
+
+    def validate(self, attrs):
+        try:
+            user = user_model.objects.get(email=attrs['email'])
+            match attrs['type']:
+                case 'verification':
+                    send_verification_email(user)
+                case 'sign_in':
+                    send_sign_in_email(user)
+                case _:
+                    raise serializers.ValidationError({'type': f'Invalid type {attrs['type']}'})
+
+        except user_model.DoesNotExist:
+            raise serializers.ValidationError({'email': 'this email does not exist'})
+        return attrs
+
+    def create(self, validated_data):
+        return validated_data
+
+class   EmailSignInSerializer(TokenObtainSlidingSerializer):
+    email = serializers.CharField(max_length=150)
