@@ -79,7 +79,7 @@ class   SignUpView(generics.CreateAPIView):
 class   SignInView(TokenObtainSlidingView):
     @extend_schema(
         summary="User Sign-In",
-        description="Signs In user by set jwt tokens [access_token, refresh_token] in cookies",
+        description="Signs In user by set jwt token access_token in cookies",
         responses={
             200: OpenApiResponse(
                 response=OpenApiTypes.OBJECT,
@@ -154,6 +154,23 @@ class   EmailVerifyView(views.APIView):
 class   EmailSignInView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        summary="endpoint to sign using the credentials sent to user email",
+        description="Signs In user by set jwt token access_token in cookies",
+        request=None,  # No request body required
+        responses={
+            200: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                examples=[
+                    OpenApiExample(
+                        name="Success Example",
+                        value={"detail": "Signed out successfully"},
+                        response_only=True
+                    )
+                ]
+            )
+        }
+    )
     def get(self, request, uid, token):
         user = validate_token_and_uid(uid=uid, token=token)
         access_token = SlidingToken.for_user(user=user)
