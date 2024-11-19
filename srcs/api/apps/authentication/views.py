@@ -181,8 +181,11 @@ class   EmailSignInView(views.APIView):
         )
         return res
 
+class   TestAuthView(views.APIView):
+    permission_classes = [permissions.AllowAny]
 
-
+    def get(self, request):
+        return Response({'success': True})
 class   SendEmailView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = serializers.SendEmailSerializer
