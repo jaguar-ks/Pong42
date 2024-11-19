@@ -3,7 +3,13 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainSlidingView
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample, OpenApiTypes
 from rest_framework_simplejwt.tokens import SlidingToken
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
+from django.conf import settings
+
 from . import serializers
+from apps.utils import validate_token_and_uid
 
 class   TwoFaBaseView(generics.GenericAPIView):
     serializer_class = serializers.TwoFASerializer
@@ -124,7 +130,42 @@ class SignOutView(views.APIView):
     )
     def post(self, request):
         res = Response({'detail': 'Signed out successfully'})
-        token = SlidingToken(request.COOKIES['token'])
+        token = SlidingToken(request.COOKIES[settings.AUTH_TOKEN_NAME])
         token.blacklist()
         res.delete_cookie('token')
         return res
+
+class   EmailVerifyView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, uid, token):
+        try:
+            user = validate_token_and_uid(uid=uid,token=token)
+            if user:
+                user.is_email_verified = True
+                user.save()
+                return Response({'detail': 'email verified successfully'})
+        except:
+            pass
+
+        return Response({'detail': 'invalid verification link'})
+
+
+class   EmailSignInView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, uid, token):
+        user = validate_token_and_uid(uid=uid, token=token)
+        access_token = SlidingToken.for_user(user=user)
+        res = Response({"detail": "Signed In successfully"})
+        res.set_cookie(
+            key=settings.AUTH_TOKEN_NAME,
+            value=access_token
+        )
+        return res
+
+
+
+class   SendEmailView(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = serializers.SendEmailSerializer

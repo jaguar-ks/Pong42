@@ -127,5 +127,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
+WEBSITE_DOMAIN_NAME = env('DOMAIN_NAME')
+WEBSITE_NAME = env('WEBSITE_NAME')
 
 from config.settings import *
