@@ -98,7 +98,7 @@ class   SendEmailSerializer(serializers.Serializer):
                 case 'sign_in':
                     send_sign_in_email(user)
                 case _:
-                    raise serializers.ValidationError({'type': f'Invalid type {attrs['type']}'})
+                    raise serializers.ValidationError({'type': f'Invalid type {attrs["type"]}'})
 
         except user_model.DoesNotExist:
             raise serializers.ValidationError({'email': 'this email does not exist'})
