@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 import pyotp
+from django.core.exceptions import ValidationError
 
 
 class   UserManager(BaseUserManager):
@@ -80,3 +81,25 @@ class   User(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+
+
+class   Connection(models.Model):
+    PENDING, FRIENDS, BLOCKED = 'friends', 'pending', 'blocked'
+    CONNECTION_CHOICES = (
+        (FRIENDS, 'friends'),
+        (PENDING, 'pending'),
+        (BLOCKED, 'blocked'),
+    )
+
+    initiator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='as_initiator')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='as_recipient')
+    status = models.CharField(max_length=7, choices=CONNECTION_CHOICES, default=PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class   Meta:
+        unique_together = ('initiator', 'recipient')
+
+    def clean(self) -> None:
+        if self.initiator.pk == self.recipient.pk:
+            raise ValidationError("initiator and recipient should not be the same")
