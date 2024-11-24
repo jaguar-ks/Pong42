@@ -57,7 +57,7 @@ class   UpdateAuthUserSerializer(serializers.ModelSerializer):
 
 class ConnectionSerializer(serializers.Serializer):
     # Input
-    recipient = serializers.IntegerField(write_only=True, required=True)
+    recipient_id = serializers.IntegerField(write_only=True, required=True)
 
     # Output
     id = serializers.IntegerField(read_only=True)
@@ -113,14 +113,3 @@ class ConnectionSerializer(serializers.Serializer):
             initiator=self.context['request'].user,
             recipient=self.context['recipient'],
         )
-
-
-class   BlockConnectionSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField(write_only=True, required=True)
-
-    def validate(self, attrs):
-        user = self.context['request'].user
-
-        if user.id == attrs['user_id'].id:
-            raise serializers.ValidationError("You cannot block with yourself")
-        

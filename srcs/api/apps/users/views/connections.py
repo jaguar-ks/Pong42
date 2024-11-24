@@ -1,13 +1,13 @@
-
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from django.shortcuts import get_object_or_404
-
+from django.http import Http404
+from django.db.models import Q
 
 from apps.users import serializers
-from apps.users.models import Connection
+from apps.users.models import Connection, User
 
 
 class ConnectionViewSet(viewsets.GenericViewSet,
@@ -54,7 +54,7 @@ class ConnectionViewSet(viewsets.GenericViewSet,
         """Set the initiator to the current user when creating a connection"""
         serializer.save(initiator=self.request.user, status=Connection.PENDING)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['get'])
     def accept(self, request, pk=None):
         """Accept a pending connection request"""
         connection, user = self.get_connection()
@@ -73,52 +73,51 @@ class ConnectionViewSet(viewsets.GenericViewSet,
         })
 
     @action(detail=False, methods=['post'])
-    def block(self, request, pk=None):
-        """Block a user"""
-        connection, user = self.get_connection()
+    def block(self, request):
+        """
+        Block a user by user_id
+        Expects: {"user_id": <id>}
+        """
+        user_id = request.data.get('recipient_id')
+        if not user_id:
+            raise ValidationError("user_id is required")
 
-        # If there's an existing connection, modify it
-        if connection.status == Connection.BLOCKED and connection.initiator == user:
-            raise ValidationError("User is already blocked")
+        user_to_block = get_object_or_404(User, id=user_id)
+        current_user = request.user
 
-        # If user is recipient in existing connection, create new blocked connection
-        if connection.recipient == user:
-            # Delete existing connection and create new one with user as initiator
-            connection.delete()
-            connection = Connection.objects.create(
-                initiator=user,
-                recipient=connection.initiator,
-                status=Connection.BLOCKED
-            )
-        else:
-            connection.status = Connection.BLOCKED
-            connection.save()
+        if user_to_block == current_user:
+            raise ValidationError("You cannot block yourself")
+
+        # find any existing connection between the users
+        connection = Connection.objects.filter(
+            (Q(initiator=current_user) & Q(recipient=user_to_block)) |
+            (Q(initiator=user_to_block) & Q(recipient=current_user))
+        ).first()
+
+        if connection.status == Connection.BLOCKED:
+            if connection.recipient == current_user:
+                raise PermissionDenied("Failed to perform this action")
+            return Response({
+                'message': 'Connection already blocked',
+                'connection': self.get_serializer(connection).data
+            })
+
+        connection.delete()
+
+        new_conn = Connection.objects.create(
+            initiator=current_user,
+            recipient=user_to_block,
+            status=Connection.BLOCKED
+        )
 
         return Response({
             "message": "User blocked",
-            "connection": self.get_serializer(connection).data
+            "connection": self.get_serializer(new_conn).data
         })
 
-    @action(detail=True, methods=['post'])
-    def unblock(self, request, pk=None):
-        """Unblock a user"""
-        connection, user = self.get_connection()
-
-        if connection.status != Connection.BLOCKED:
-            raise ValidationError("Connection is not blocked")
-        if connection.initiator != user:
-            raise PermissionDenied("Only the blocker can unblock")
-
-        connection.status = Connection.PENDING
-        connection.save()
-
-        return Response({
-            "message": "User unblocked",
-            "connection": self.get_serializer(connection).data
-        })
 
     def destroy(self, request, *args, **kwargs):
-        """Handle reject/cancel/remove actions by deleting the connection"""
+        """Handle reject/cancel/remove/unblock actions by deleting the connection"""
         connection, user = self.get_connection()
 
         if connection.status == Connection.BLOCKED and connection.recipient == user:
