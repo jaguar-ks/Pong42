@@ -1,11 +1,13 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 from apps.utils import validators
+from django.db.models import Q
+
+from .models import Connection, User
 
 class   AuthUserSerializer(serializers.ModelSerializer):
     otp_uri = serializers.SerializerMethodField(method_name='get_otp_uri', read_only=True)
     class   Meta:
-        model = get_user_model()
+        model = User
         exclude = ('password', )
 
     def get_otp_uri(self, user) -> str:
@@ -15,13 +17,19 @@ class   AuthUserSerializer(serializers.ModelSerializer):
 
 class   UserSerializer(serializers.ModelSerializer):
     class   Meta:
-        model = get_user_model()
-        fields = ('id', 'username', 'first_name', 'last_name', 'is_online', \
-            'avatar_url', 'wins', 'loses', 'rating', 'rank')
+        model = User
+        fields = ('id', 'username', 'avatar_url', 'is_online')
+
+class   UserDetailSerializer(UserSerializer):
+    class   Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + (
+            'first_name', 'last_name', 'wins', 'loses', 'rating', 'rank'
+        )
+
 
 class   UpdateAuthUserSerializer(serializers.ModelSerializer):
     class   Meta:
-        model = get_user_model()
+        model = User
         fields = ('id', 'first_name', 'last_name', 'username', 'avatar_url', 'password')
         extra_kwargs = {
             'username': {
