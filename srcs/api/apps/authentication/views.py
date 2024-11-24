@@ -98,15 +98,13 @@ class   SignInView(TokenObtainSlidingView):
         if response.status_code == 200:
             response.set_cookie(
                 key=settings.AUTH_TOKEN_NAME,
-                value=response.data['token'],
+                value=response.data.pop('token'),
                 httponly=True,  # Makes the cookie inaccessible to JavaScript
                 # samesite='Lax',  # Provides some CSRF protection
                 # secure=True,  # Ensures the cookie is only sent over HTTPS
                 # max_age=3600 * 24 * 14  # 14 days
             )
-            response.data = {
-                'detail': 'Successfully signed in.',
-            }
+            response.data['detail'] = 'Successfully signed in.'
         return response
 
 class SignOutView(views.APIView):

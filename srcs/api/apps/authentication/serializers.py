@@ -6,7 +6,7 @@ from rest_framework.exceptions import AuthenticationFailed
 
 from apps.utils import validators
 from .tasks import send_verification_email, send_sign_in_email
-
+from apps.users.serializers import UserSerializer
 
 user_model = get_user_model()
 class   TwoFASerializer(serializers.Serializer):
@@ -38,6 +38,7 @@ class   ObtainSlidingTokenSerializer(TokenObtainSlidingSerializer):
                 raise serializers.ValidationError({'otp_code': 'this field is required'})
             if not self.user.verify_otp(attrs['otp_code']):
                 raise serializers.ValidationError({'otp_code':'Invalid OTP code!'})
+        data['user'] = UserSerializer(self.user).data
         return data
 
 class   SignUpSerializer(serializers.ModelSerializer):
