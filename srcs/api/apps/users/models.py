@@ -122,3 +122,64 @@ class   Connection(models.Model):
 
     def __str__(self) -> str:
         return f"{self.initiator} 🤝 {self.recipient}"
+
+
+    @classmethod
+    def get_user_connections(cls, user):
+        """
+        Get all active connections for a user where they are not blocked.
+        Returns connections where user is either initiator or recipient,
+        excluding ones where they are blocked by someone else.
+        """
+        return cls.objects.filter(
+            # User is either initiator or recipient
+            (Q(initiator=user) | Q(recipient=user)) &
+            # For blocked connections, user must be initiator (they did the blocking)
+            (~Q(status=cls.BLOCKED) | Q(status=cls.BLOCKED, initiator=user))
+        ).select_related('initiator', 'recipient')
+
+    @classmethod
+    def get_friends(cls, user):
+        """
+        Get all confirmed friends for a user.
+        """
+        return cls.objects.filter(
+            (Q(initiator=user) | Q(recipient=user)) &
+            Q(status=cls.FRIENDS)
+        ).select_related('initiator', 'recipient')
+
+    @classmethod
+    def get_pending_requests(cls, user):
+        """
+        Get all pending connection requests for a user.
+        """
+        return cls.objects.filter(
+            recipient=user,
+            status=cls.PENDING
+        ).select_related('initiator')
+
+    @classmethod
+    def get_sent_requests(cls, user):
+        """
+        Get all connection requests sent by a user.
+        """
+        return cls.objects.filter(
+            initiator=user,
+            status=cls.PENDING
+        ).select_related('recipient')
+
+    @classmethod
+    def get_blocked_users(cls, user):
+        """
+        Get all users blocked by this user.
+        """
+        return cls.objects.filter(
+            initiator=user,
+            status=cls.BLOCKED
+        ).select_related('recipient')
+
+    def get_other_user(self, user):
+        """
+        Get the other user in the connection.
+        """
+        return self.recipient if self.initiator == user else self.initiator
