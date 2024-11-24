@@ -66,7 +66,7 @@ class ConnectionSerializer(serializers.Serializer):
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
 
-    def validate_recipient(self, value):
+    def validate_recipient_id(self, value):
         user = self.context['request'].user
         try:
             if user.id == value:

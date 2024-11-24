@@ -94,15 +94,16 @@ class ConnectionViewSet(viewsets.GenericViewSet,
             (Q(initiator=user_to_block) & Q(recipient=current_user))
         ).first()
 
-        if connection.status == Connection.BLOCKED:
+        if connection and connection.status == Connection.BLOCKED:
             if connection.recipient == current_user:
                 raise PermissionDenied("Failed to perform this action")
             return Response({
                 'message': 'Connection already blocked',
                 'connection': self.get_serializer(connection).data
             })
-
-        connection.delete()
+        
+        if connection:
+            connection.delete()
 
         new_conn = Connection.objects.create(
             initiator=current_user,
