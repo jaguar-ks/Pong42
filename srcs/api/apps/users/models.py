@@ -109,3 +109,16 @@ class   Connection(models.Model):
     def clean(self) -> None:
         if self.initiator.pk == self.recipient.pk:
             raise ValidationError("initiator and recipient should not be the same")
+        # Check for existing reverse connection
+        if Connection.objects.filter(
+            initiator=self.recipient,
+            recipient=self.initiator
+        ).exists():
+            raise ValidationError("A connection already exists between these users")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.initiator} 🤝 {self.recipient}"
