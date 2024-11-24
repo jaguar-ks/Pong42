@@ -1,8 +1,11 @@
-from rest_framework import generics, filters
+from rest_framework import generics, filters, viewsets, mixins
 from rest_framework.permissions import AllowAny
-from .models import User
 from rest_framework.response import Response
+from rest_framework.decorators import action
+from django.db.models import Q
+from rest_framework.exceptions import ValidationError, PermissionDenied
 
+from ..models import User, Connection
 from . import serializers
 
 class   AuthUserView(generics.RetrieveUpdateDestroyAPIView):
@@ -21,7 +24,7 @@ class   AuthUserView(generics.RetrieveUpdateDestroyAPIView):
         return self.request.user
 
 class   UserRetriveView(generics.RetrieveAPIView):
-    serializer_class = serializers.UserSerializer
+    serializer_class = serializers.UserDetailSerializer
     queryset = User.objects.filter(is_active=True)
     lookup_field = 'id'
 
