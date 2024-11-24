@@ -6,3 +6,4 @@ from .user import (
     UserSearchView,
 )
 
+from .connections import ConnectionViewSet
