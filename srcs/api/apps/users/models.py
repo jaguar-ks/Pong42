@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 import pyotp
 from django.core.exceptions import ValidationError
-
+from django.db.models import Q
 
 class   UserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **kwargs):
@@ -82,18 +82,24 @@ class   User(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
+    def get_all_permissions(self):
+        return []
+
 
 class   Connection(models.Model):
-    PENDING, FRIENDS, BLOCKED = 'friends', 'pending', 'blocked'
-    CONNECTION_CHOICES = (
-        (FRIENDS, 'friends'),
-        (PENDING, 'pending'),
-        (BLOCKED, 'blocked'),
-    )
+    PENDING = 'pending'
+    FRIENDS = 'friends'
+    BLOCKED = 'blocked'
 
-    initiator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='as_initiator')
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='as_recipient')
-    status = models.CharField(max_length=7, choices=CONNECTION_CHOICES, default=PENDING)
+    STATUS_CHOICES = [
+        (PENDING, 'Pending'),
+        (FRIENDS, 'Friends'),
+        (BLOCKED, 'Blocked'),
+    ]
+
+    initiator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='as_initiator', null=False, blank=False)
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='as_recipient', null=False, blank=False)
+    status = models.CharField(max_length=7, choices=STATUS_CHOICES, default=PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
