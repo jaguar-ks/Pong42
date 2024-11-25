@@ -1,52 +1,43 @@
-from apps.users.models import User
 from rest_framework import serializers
-import requests
 from rest_framework_simplejwt.tokens import SlidingToken
+from requests_oauthlib import OAuth2Session
+from django.conf import settings
+from django.http import Http404
 
-from apps.users.serializers import UserSerializer
 from apps.users.models import User
+from apps.users.serializers import UserSerializer
 
-class   BaseOauthSerializer(serializers.Serializer):
-    code = serializers.CharField(max_length=200, write_only=True)
-    token = serializers.CharField(read_only=True, max_length=200)
-    user = UserSerializer(read_only=True)
 
-    def exchange_code_with_token(self, code):
-        config = self.context['config']
-        params = {
-            'grant_type': 'authorization_code',
-            'client_id': config['client_id'],
-            'client_secret': config['client_secret'],
-            'code': code,
-            'redirect_uri': config['redirect_uri']
+PROVIDERS_SETTINGS = settings.OAUTH_PROVIDERS_SETTINGS
+
+class   OauthAuthorizeSerializer(serializers.Serializer):
+    authorization_url = serializers.CharField(max_length=250)
+
+    def to_representation(self, instance):
+        provider = self.context['provider']
+        config = PROVIDERS_SETTINGS.get(provider, None)
+        if not config:
+            raise Http404(f"provider {provider} not implemented")
+
+        oauth_session = OAuth2Session(
+            client_id=config['client_id'],
+            redirect_uri=config['redirect_uri'],
+            scope=config['scope'],
+        )
+
+        authorize_url, _ = oauth_session.authorization_url(
+            url=config['authorize_url'],
+        )
+        return {
+            'authorization_url': authorize_url
         }
 
-        token_response = requests.post(
-            url=config['token_url'],
-            params=params
-        )
-        if token_response.status_code != 200:
-            raise serializers.ValidationError('Failed to exchange code with token')
-        return token_response.json()['access_token']
 
-    def get_user_info(self, access_token):
-        user_info_response = requests.get(
-            url=self.context['config']['user_info_url'],
-            headers={
-                'Authorization': f'Bearer {access_token}',
-            }
-        )
-        if user_info_response.status_code != 200:
-            raise serializers.ValidationError('Failed to get user info from provider')
-        return user_info_response.json()
+class   OauthCallBackSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=200, write_only=True)
+    user = UserSerializer(read_only=True)
+    token = serializers.CharField(max_length=200, read_only=True)
 
-    def extract_user_info(self, provider_user_info):
-        raise NotImplemented("this method should be implemented in the derive class")
-
-    def validate(self, attrs):
-        access_token = self.exchange_code_with_token(code=attrs['code'])
-        user_info = self.get_user_info(access_token=access_token)
-        return self.extract_user_info(user_info)
 
     def generate_unique_username(self, first_name, last_name, username=None):
         """
@@ -61,20 +52,68 @@ class   BaseOauthSerializer(serializers.Serializer):
         base_username = username if username is not None else f'{first_name[0]}{last_name}'
 
         # Try initial username
-        test_username = base_username
+        unique_username = base_username
         counter = 1
 
-        while User.objects.filter(username=test_username).exists():
+        while User.objects.filter(username=unique_username).exists():
             # First try combinations of first name + last name
             if counter <= len(first_name):
-                test_username = f'{first_name[:counter]}{last_name}'
+                unique_username = f'{first_name[:counter]}{last_name}'
             else:
                 # If all name combinations are taken, append numbers
-                test_username = f'{base_username}{counter - len(first_name)}'
+                unique_username = f'{base_username}{counter - len(first_name)}'
             counter += 1
 
-        return test_username
+        return  unique_username
 
+    def validate(self, attrs):
+        provider = self.context['provider']
+        config = PROVIDERS_SETTINGS.get(provider)
+        if not config:
+            raise Http404(f"provider {provider} not implemented")
+
+        # Create new OAuth session for token exchange
+        oauth_session = OAuth2Session(
+            client_id=config['client_id'],
+            redirect_uri=config['redirect_uri'],
+            scope=config['scope']
+        )
+
+        try:
+            oauth_session.fetch_token(
+                token_url=config['token_url'],
+                code=attrs['code'],
+                client_secret=config['client_secret'],
+                include_client_id=True
+            )
+        except Exception as e:
+            raise serializers.ValidationError(f'Token exchange failed: {str(e)}')
+        # Fetch user info
+        try:
+            user_info_response = oauth_session.get(config['user_info_url'])
+            user_info_response.raise_for_status()
+            user_info = user_info_response.json()
+            return self.extract_user_info(user_info, config['user_info_kwargs'])
+        except Exception as e:
+            raise serializers.ValidationError(f'Failed to fetch user info: {str(e)}')
+
+    def extract_user_info(self, user_info, keys):
+        data = {}
+
+        for attr, key in keys:
+            # Handle nested keys with dot notation
+            value = user_info
+            for part in key.split('.'):
+                try:
+                    value = value.get(part)
+                    if value is None:
+                        break
+                except (AttributeError, KeyError):
+                    value = None
+                    break
+            data[attr] = value
+
+        return data
 
     def create(self, validated_data: dict):
         validated_data.setdefault('is_active', True)
@@ -97,14 +136,3 @@ class   BaseOauthSerializer(serializers.Serializer):
             }
         except:
             raise serializers.ValidationError("sign-in failed please try another way")
-
-
-class   FortyTwoOauthSerializer(BaseOauthSerializer):
-    def extract_user_info(self, provider_user_info):
-        return {
-            'email': provider_user_info['email'],
-            'username': provider_user_info['login'],
-            'first_name': provider_user_info['first_name'],
-            'last_name': provider_user_info['first_name'],
-            'avatar_url': provider_user_info['image']['link'],
-        }
