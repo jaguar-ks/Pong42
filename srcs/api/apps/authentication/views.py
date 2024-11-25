@@ -9,7 +9,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.conf import settings
 
 from . import serializers
-from apps.utils import validate_token_and_uid
+from apps.utils import validate_token_and_uid, sing_in_response
 
 class   TwoFaBaseView(generics.GenericAPIView):
     serializer_class = serializers.TwoFASerializer
@@ -66,8 +66,6 @@ class Enable2FaView(TwoFaBaseView):
 class   Disable2FaView(TwoFaBaseView):
     context = {'action': 'disable'}
 
-
-
 @extend_schema(
     summary="User Sign-Up",
     description="Allows a new user to sign up by providing the necessary information.",
@@ -96,14 +94,7 @@ class   SignInView(TokenObtainSlidingView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
-            response.set_cookie(
-                key=settings.AUTH_TOKEN_NAME,
-                value=response.data.pop('token'),
-                httponly=True,  # Makes the cookie inaccessible to JavaScript
-                # samesite='Lax',  # Provides some CSRF protection
-                # secure=True,  # Ensures the cookie is only sent over HTTPS
-                # max_age=3600 * 24 * 14  # 14 days
-            )
+            sing_in_response(response, response.data.pop('token'))
             response.data['detail'] = 'Successfully signed in.'
         return response
 
@@ -173,10 +164,7 @@ class   EmailSignInView(views.APIView):
         user = validate_token_and_uid(uid=uid, token=token)
         access_token = SlidingToken.for_user(user=user)
         res = Response({"detail": "Signed In successfully"})
-        res.set_cookie(
-            key=settings.AUTH_TOKEN_NAME,
-            value=access_token
-        )
+        sing_in_response(res, str(access_token))
         return res
 
 class   TestAuthView(views.APIView):
@@ -184,6 +172,7 @@ class   TestAuthView(views.APIView):
 
     def get(self, request):
         return Response({'success': True})
+
 class   SendEmailView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = serializers.SendEmailSerializer

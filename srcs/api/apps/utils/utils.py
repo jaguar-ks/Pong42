@@ -6,6 +6,7 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.conf import settings
 import logging
+from rest_framework.response import Response
 
 logger = logging.getLogger(__name__)
 
@@ -58,3 +59,9 @@ def send_template_email(subject, template_name, context, recipient_email):
     except Exception as e:
         logger.error(f"Failed to send email to {recipient_email}: {e}")
         return 0
+
+def sing_in_response(response: Response, token):
+    response.set_cookie(
+        key=settings.AUTH_TOKEN_NAME,
+        value=token,
+    )
