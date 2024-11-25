@@ -64,4 +64,5 @@ def sing_in_response(response: Response, token):
     response.set_cookie(
         key=settings.AUTH_TOKEN_NAME,
         value=token,
+        httponly=True
     )
