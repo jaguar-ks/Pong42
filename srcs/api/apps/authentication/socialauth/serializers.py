@@ -123,6 +123,12 @@ class   OauthCallBackSerializer(serializers.Serializer):
         validated_data.setdefault('is_active', True)
         validated_data.setdefault('is_email_verified', True)
 
+        if 'full_name' in validated_data:
+            full_name = validated_data.pop('full_name')
+            first_name, last_name = full_name.split(' ', 1)
+            validated_data['first_name'] = first_name.strip()
+            validated_data['last_name'] = last_name.strip()
+
         # generate unique username
         validated_data['username'] = self.generate_unique_username(
             first_name=validated_data['first_name'],

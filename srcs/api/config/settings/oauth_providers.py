@@ -47,8 +47,7 @@ OAUTH_PROVIDERS_SETTINGS = {
         'user_info_kwargs': [
             ('username', 'login'),
             ('email', 'email'),
-            ('first_name', 'name'),
-            ('last_name', 'name'),
+            ('full_name', 'name'),
             ('avatar_url', 'avatar_url'),
         ]
     }
