@@ -116,6 +116,10 @@ class   OauthCallBackSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data: dict):
+        email = validated_data.pop('email', None)
+        if not email:
+            raise serializers.ValidationError(f"Your provider {self.context['provider']} does not provide email")
+
         validated_data.setdefault('is_active', True)
         validated_data.setdefault('is_email_verified', True)
 
@@ -126,7 +130,6 @@ class   OauthCallBackSerializer(serializers.Serializer):
             username=validated_data.pop('username', None)
         )
 
-        email = validated_data.pop('email')
         try:
             user, _ = User.objects.get_or_create(email=email, defaults=validated_data)
             token = SlidingToken.for_user(user=user)
@@ -134,5 +137,5 @@ class   OauthCallBackSerializer(serializers.Serializer):
                 'token': str(token),
                 'user': UserSerializer(user).data
             }
-        except:
-            raise serializers.ValidationError("sign-in failed please try another way")
+        except Exception:
+            raise serializers.ValidationError("sign-in failed please try another way, or contact support")

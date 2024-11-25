@@ -35,5 +35,21 @@ OAUTH_PROVIDERS_SETTINGS = {
             ('last_name', 'family_name'),
             ('avatar_url', 'picture')
         ]
+    },
+    'github': {
+        'client_id': env('GITHUB_OAUTH_CLIENT_ID'),
+        'client_secret': env('GITHUB_OAUTH_CLIENT_SECRET'),
+        'redirect_uri': env('GITHUB_OAUTH_REDIRECT_URI'),
+        'token_url': 'https://github.com/login/oauth/access_token',
+        'authorize_url': 'https://github.com/login/oauth/authorize',
+        'user_info_url': 'https://api.github.com/user',
+        'scope': 'user:email',
+        'user_info_kwargs': [
+            ('username', 'login'),
+            ('email', 'email'),
+            ('first_name', 'name'),
+            ('last_name', 'name'),
+            ('avatar_url', 'avatar_url'),
+        ]
     }
 }
