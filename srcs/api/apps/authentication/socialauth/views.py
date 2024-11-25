@@ -1,4 +1,5 @@
 from rest_framework.generics import GenericAPIView
+from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from django.http import Http404
 from rest_framework.response import Response
@@ -8,10 +9,13 @@ from .serializers import (
     BaseOauthSerializer,
     FortyTwoOauthSerializer,
 )
+from .utils import (
+    fortytwo_authorize_url,
+)
 
 PROVIDERS_SETTINGS = settings.OAUTH_PROVIDERS_SETTINGS
 
-class SocialAuthView(GenericAPIView):
+class OauthCallbackView(GenericAPIView):
     serializer_class = BaseOauthSerializer
     permission_classes = [AllowAny]
 
@@ -45,3 +49,17 @@ class SocialAuthView(GenericAPIView):
             httponly=True,
         )
         return response
+
+
+class   OauthAuthorizeView(APIView):
+    permission_classes = [AllowAny]
+    PROVIDERS = {
+        '42': fortytwo_authorize_url,
+    }
+
+    def get(self, request, provider):
+        config = PROVIDERS_SETTINGS.get(provider, None)
+        url_generator = self.PROVIDERS.get(provider, None)
+        if not config or not url_generator:
+            raise Http404(f"provider {provider} not implemented")
+        return Response({'authorize_url': url_generator(config)})
