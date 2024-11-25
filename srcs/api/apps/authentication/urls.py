@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .socialauth.views import SocialAuthView
 
 urlpatterns = [
     # 2Fa
@@ -15,4 +16,6 @@ urlpatterns = [
     path('email/verify/<str:uid>/<str:token>/', views.EmailVerifyView.as_view(), name='verify_email'),
     path('email/sign-in/<str:uid>/<str:token>/', views.EmailSignInView.as_view(), name='email_sign_in' ),
     path('email/send_email/', views.SendEmailView.as_view(), name='send_email'),
+
+    path('social/<str:provider>/callback/', SocialAuthView.as_view(), name='social_auth_callback')
 ]
