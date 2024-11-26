@@ -1,4 +1,4 @@
-from drf_spectacular.utils import OpenApiResponse, OpenApiRequest, OpenApiParameter
+from drf_spectacular.utils import OpenApiResponse, OpenApiParameter
 from rest_framework import status
 
 from . import serializers
@@ -174,6 +174,7 @@ SIGN_IN_SCHEMA = {
 SIGN_OUT_SCHEMA = {
     "summary": "sign out",
     "description": "sign out the user by blacklisting the token and deleting the token from cookies",
+    'request': {},
     "responses": {
         status.HTTP_200_OK: OpenApiResponse(
             description="signed out successfully",
