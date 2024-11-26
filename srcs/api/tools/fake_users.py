@@ -10,18 +10,18 @@ users = []
 emails_set = set()
 usernames_set = set()
 
-num_of_fake_users = env.int('num_of_fake_users', 100)
+num_of_fake_users = env.int("num_of_fake_users", 100)
 
 
-fake_password = make_password('123')
+fake_password = make_password("123")
 
 while len(users) < num_of_fake_users:
     username = f.user_name()
     while username in usernames_set:
         username = f.user_name()
-    email = f.email(domain='example.com')
+    email = f.email(domain="example.com")
     while email in emails_set:
-        email = f.email(domain='example.com')
+        email = f.email(domain="example.com")
     usernames_set.add(username)
     emails_set.add(email)
 
@@ -34,7 +34,7 @@ while len(users) < num_of_fake_users:
             last_name=f.last_name(),
             is_email_verified=True,
             is_active=True,
-            avatar_url=f.image_url(width=300, height=300)
+            avatar_url=f.image_url(width=300, height=300),
         )
     )
 

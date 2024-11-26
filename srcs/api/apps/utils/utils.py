@@ -10,6 +10,7 @@ from rest_framework.response import Response
 
 logger = logging.getLogger(__name__)
 
+
 # Utility to generate token and UID for user
 def generate_token_and_uid(user):
     """
@@ -20,6 +21,7 @@ def generate_token_and_uid(user):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     return token, uid
 
+
 def validate_token_and_uid(uid, token):
     try:
         id = urlsafe_base64_decode(uid).decode()
@@ -29,6 +31,8 @@ def validate_token_and_uid(uid, token):
             return user
     except:
         pass
+
+
 #     return None
 
 
@@ -54,15 +58,12 @@ def send_template_email(subject, template_name, context, recipient_email):
             from_email=settings.EMAIL_HOST_USER,
             to=[recipient_email],
         )
-        email.content_subtype = 'html'  # Render as HTML
+        email.content_subtype = "html"  # Render as HTML
         return email.send()
     except Exception as e:
         logger.error(f"Failed to send email to {recipient_email}: {e}")
         return 0
 
+
 def sing_in_response(response: Response, token):
-    response.set_cookie(
-        key=settings.AUTH_TOKEN_NAME,
-        value=token,
-        httponly=True
-    )
+    response.set_cookie(key=settings.AUTH_TOKEN_NAME, value=token, httponly=True)

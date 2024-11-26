@@ -9,104 +9,125 @@ from .tasks import send_verification_email, send_sign_in_email
 from apps.users.serializers import UserSerializer
 
 user_model = get_user_model()
-class   TwoFASerializer(serializers.Serializer):
-    otp_code = serializers.CharField(max_length=6, min_length=6, required=True, write_only=True)
+
+
+class TwoFASerializer(serializers.Serializer):
+    otp_code = serializers.CharField(
+        max_length=6, min_length=6, required=True, write_only=True
+    )
 
     def validate(self, attrs):
-        self.user = self.context['request'].user
-        if not self.user.verify_otp(attrs['otp_code']):
-            raise serializers.ValidationError({'otp_code':'Invalid OTP code!'})
+        self.user = self.context["request"].user
+        if not self.user.verify_otp(attrs["otp_code"]):
+            raise serializers.ValidationError({"otp_code": "Invalid OTP code!"})
 
-        match self.context['action']:
-            case 'enable':
+        match self.context["action"]:
+            case "enable":
                 self.user.two_fa_enabled = True
-            case 'disable':
+            case "disable":
                 self.user.two_fa_enabled = False
         self.user.save()
-        return {'detail': f"successfully {self.context['action']}d two factor authentication"}
+        return {
+            "detail": f"successfully {self.context['action']}d two factor authentication"
+        }
 
 
-class   ObtainSlidingTokenSerializer(TokenObtainSlidingSerializer):
-    otp_code = serializers.CharField(max_length=6, min_length=6, required=False, write_only=True)
+class ObtainSlidingTokenSerializer(TokenObtainSlidingSerializer):
+    otp_code = serializers.CharField(
+        max_length=6, min_length=6, required=False, write_only=True
+    )
 
     def validate(self, attrs):
         data = super().validate(attrs)
         if not self.user.is_email_verified:
-            raise AuthenticationFailed('email address is not verified')
+            raise AuthenticationFailed("email address is not verified")
         if self.user.two_fa_enabled:
-            if 'otp_code' not in attrs:
-                raise serializers.ValidationError({'otp_code': 'this field is required'})
-            if not self.user.verify_otp(attrs['otp_code']):
-                raise serializers.ValidationError({'otp_code':'Invalid OTP code!'})
-        data['user'] = UserSerializer(self.user).data
+            if "otp_code" not in attrs:
+                raise serializers.ValidationError(
+                    {"otp_code": "this field is required"}
+                )
+            if not self.user.verify_otp(attrs["otp_code"]):
+                raise serializers.ValidationError({"otp_code": "Invalid OTP code!"})
+        data["user"] = UserSerializer(self.user).data
         return data
 
-class   SignUpSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True, validators=[validators.EmailValidator()])
-    class   Meta:
+
+class SignUpSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(
+        required=True, validators=[validators.EmailValidator()]
+    )
+
+    class Meta:
         model = user_model
-        fields = ('id', 'username', 'password', 'email', 'first_name', 'last_name')
+        fields = ("id", "username", "password", "email", "first_name", "last_name")
         extra_kwargs = {
-            'username': {
-                'validators': [
+            "username": {
+                "validators": [
                     UniqueValidator(queryset=user_model.objects.all()),
-                    validators.UsernameValidator()
+                    validators.UsernameValidator(),
                 ],
             },
-            'password': {
-                'write_only': True,
-                'validators': [validators.PasswordValidator()]
+            "password": {
+                "write_only": True,
+                "validators": [validators.PasswordValidator()],
             },
-            'first_name': {'validators': [validators.NameValidator('First name')]},
-            'last_name': {'validators': [validators.NameValidator('Last name')]}
+            "first_name": {"validators": [validators.NameValidator("First name")]},
+            "last_name": {"validators": [validators.NameValidator("Last name")]},
         }
 
     def validate(self, data):
-        if 'email' not in data:
-            raise serializers.ValidationError({'email': 'this field is required'})
-        if data.get('first_name') and data.get('last_name'):
-            if data['first_name'].lower() == data['last_name'].lower():
-                raise serializers.ValidationError("First name and last name should not be the same.")
+        if "email" not in data:
+            raise serializers.ValidationError({"email": "this field is required"})
+        if data.get("first_name") and data.get("last_name"):
+            if data["first_name"].lower() == data["last_name"].lower():
+                raise serializers.ValidationError(
+                    "First name and last name should not be the same."
+                )
         return data
 
     def create(self, validated_data):
         user = user_model.objects.create_user(
-            username=validated_data.pop('username'),
-            email=validated_data.pop('email'),
-            password=validated_data.pop('password'),
-            **validated_data
+            username=validated_data.pop("username"),
+            email=validated_data.pop("email"),
+            password=validated_data.pop("password"),
+            **validated_data,
         )
         send_verification_email(user=user)
         return user
 
     def to_representation(self, instance):
         return {
-            'detail': 'account created successfully, check your email for confirmation',
-            **super().to_representation(instance)
+            "detail": "account created successfully, check your email for confirmation",
+            **super().to_representation(instance),
         }
 
 
-class   SendEmailSerializer(serializers.Serializer):
-    type = serializers.ChoiceField(choices=['verification', 'sign_in'], required=True, write_only=True)
+class SendEmailSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(
+        choices=["verification", "sign_in"], required=True, write_only=True
+    )
     email = serializers.EmailField(max_length=150, required=True, write_only=True)
 
     def validate(self, attrs):
         try:
-            user = user_model.objects.get(email=attrs['email'])
-            match attrs['type']:
-                case 'verification':
+            user = user_model.objects.get(email=attrs["email"])
+            match attrs["type"]:
+                case "verification":
                     send_verification_email(user)
-                case 'sign_in':
+                case "sign_in":
                     send_sign_in_email(user)
                 case _:
-                    raise serializers.ValidationError({'type': f'Invalid type {attrs["type"]}'})
+                    raise serializers.ValidationError(
+                        {"type": f'Invalid type {attrs["type"]}'}
+                    )
 
         except user_model.DoesNotExist:
-            raise serializers.ValidationError({'email': 'this email does not exist'})
+            raise serializers.ValidationError({"email": "this email does not exist"})
         return attrs
 
     def create(self, validated_data):
         return validated_data
 
-class   EmailSignInSerializer(TokenObtainSlidingSerializer):
+
+class EmailSignInSerializer(TokenObtainSlidingSerializer):
     email = serializers.CharField(max_length=150)
