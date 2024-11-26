@@ -124,6 +124,8 @@ LEADER_BOARD_SCHEMA = USER_LIST_SCHEMA.copy()
 LEADER_BOARD_SCHEMA['summary'] = 'get users leader board'
 LEADER_BOARD_SCHEMA['description'] = 'get users leader sorted by rating in descending order'
 
+
+
 USER_SEARCH_SCHEMA = {
     **USER_LIST_SCHEMA,
     'summary': 'search users',
@@ -137,3 +139,100 @@ USER_SEARCH_SCHEMA = {
         )
     ]
 }
+
+
+# connections schema's
+
+CONNECTIONS_LIST_SCHEMA = {
+    'summary': 'Get user connections',
+    'description': 'Retrieve connections with optional status filtering',
+    'parameters': [
+        OpenApiParameter(
+            name='status',
+            description='Filter connections by status',
+            required=False,
+            type=str,
+            enum=['all', 'friends', 'pending', 'sent_requests', 'blocked']
+        )
+    ],
+    'responses': {
+        status.HTTP_200_OK: OpenApiResponse(
+            description='List of connections',
+            response=serializers.ConnectionSerializer(many=True)
+        ),
+        status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+            description='Invalid status parameter'
+        )
+    },
+    'tags': ['AUTH USER CONNECTIONS']
+}
+
+# Create Connection Schema
+CONNECTIONS_CREATE_SCHEMA = {
+    'summary': 'Create a new connection request',
+    'description': 'Send a connection request to another user',
+    'responses': {
+        status.HTTP_201_CREATED: OpenApiResponse(
+            description='Connection request created successfully',
+            response=serializers.ConnectionSerializer
+        ),
+        status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+            description='Invalid connection data'
+        )
+    },
+    'tags': ['AUTH USER CONNECTIONS']
+}
+
+# Accept Connection Schema
+CONNECTIONS_ACCEPT_SCHEMA = {
+    'summary': 'Accept a connection request',
+    'description': 'Accept a pending connection request',
+    'responses': {
+        status.HTTP_200_OK: OpenApiResponse(
+            description='Connection request accepted',
+            response=serializers.ConnectionSerializer
+        ),
+        status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+            description='Cannot accept non-pending connection'
+        ),
+        status.HTTP_403_FORBIDDEN: OpenApiResponse(
+            description='Permission denied to accept this connection'
+        )
+    },
+    'tags': ['AUTH USER CONNECTIONS']
+}
+
+# Block Connection Schema
+CONNECTIONS_BLOCK_SCHEMA = {
+    'summary': 'Block a user',
+    'description': 'Block a user by their ID',
+    'responses': {
+        status.HTTP_200_OK: OpenApiResponse(
+            description='User blocked successfully',
+            response=serializers.ConnectionSerializer
+        ),
+        status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+            description='Invalid block request'
+        ),
+        status.HTTP_403_FORBIDDEN: OpenApiResponse(
+            description='Cannot block yourself'
+        )
+    },
+    'tags': ['AUTH USER CONNECTIONS']
+}
+
+# Destroy (Remove/Unblock) Connection Schema
+CONNECTIONS_DESTROY_SCHEMA = {
+    'summary': 'Remove or unblock a connection',
+    'description': 'Remove an existing connection or unblock a user',
+    'responses': {
+        status.HTTP_204_NO_CONTENT: OpenApiResponse(
+            description='Connection removed successfully'
+        ),
+        status.HTTP_403_FORBIDDEN: OpenApiResponse(
+            description='Permission denied to remove this connection'
+        )
+    },
+    'tags': ['AUTH USER CONNECTIONS']
+}
+

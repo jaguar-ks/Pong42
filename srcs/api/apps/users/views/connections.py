@@ -4,9 +4,17 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from drf_spectacular.utils import extend_schema
 
 from apps.users import serializers
 from apps.users.models import Connection, User
+from apps.users.docs import (
+    CONNECTIONS_LIST_SCHEMA,
+    CONNECTIONS_ACCEPT_SCHEMA,
+    CONNECTIONS_BLOCK_SCHEMA,
+    CONNECTIONS_CREATE_SCHEMA,
+    CONNECTIONS_DESTROY_SCHEMA,
+)
 
 
 class ConnectionViewSet(
@@ -57,6 +65,17 @@ class ConnectionViewSet(
         """Set the initiator to the current user when creating a connection"""
         serializer.save(initiator=self.request.user, status=Connection.PENDING)
 
+    @extend_schema(**CONNECTIONS_LIST_SCHEMA)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+
+    @extend_schema(**CONNECTIONS_CREATE_SCHEMA)
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+
+    @extend_schema(**CONNECTIONS_ACCEPT_SCHEMA)
     @action(detail=True, methods=["get"])
     def accept(self, request, pk=None):
         """Accept a pending connection request"""
@@ -77,6 +96,7 @@ class ConnectionViewSet(
             }
         )
 
+    @extend_schema(**CONNECTIONS_BLOCK_SCHEMA)
     @action(detail=False, methods=["post"])
     def block(self, request):
         """
@@ -123,6 +143,7 @@ class ConnectionViewSet(
             }
         )
 
+    @extend_schema(**CONNECTIONS_DESTROY_SCHEMA)
     def destroy(self, request, *args, **kwargs):
         """Handle reject/cancel/remove/unblock actions by deleting the connection"""
         connection, user = self.get_connection()
