@@ -126,6 +126,3 @@ class SendEmailSerializer(serializers.Serializer):
     def create(self, validated_data):
         return validated_data
 
-
-class EmailSignInSerializer(TokenObtainSlidingSerializer):
-    email = serializers.CharField(max_length=150)
