@@ -23,7 +23,7 @@ class ConnectionViewSet(
         "all": lambda user: Connection.get_user_connections(user=user),
         "friends": lambda user: Connection.get_friends(user=user),
         "pending": lambda user: Connection.get_pending_requests(user=user),
-        "send_requests": lambda user: Connection.get_sent_requests(user=user),
+        "sent_requests": lambda user: Connection.get_sent_requests(user=user),
         "blocked": lambda user: Connection.get_blocked_users(user=user),
     }
 
@@ -37,7 +37,7 @@ class ConnectionViewSet(
             if status_param not in self.STATUS_QUERIESETS:
                 valid_status = ", ".join(self.STATUS_QUERIESETS.keys())
                 raise ValidationError(
-                    f"Invalid status {status_param}. valid options are: {valid_status}"
+                    {"detail": f"Invalid status {status_param}. valid options are: {valid_status}"}
                 )
             return self.STATUS_QUERIESETS[status_param](user=user)
         return self.queryset

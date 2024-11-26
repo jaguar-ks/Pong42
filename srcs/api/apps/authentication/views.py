@@ -57,30 +57,14 @@ class SignOutView(views.APIView):
 
 class EmailVerifyView(views.APIView):
     permission_classes = [permissions.AllowAny]
+    serializer_class = serializers.EmailVerifySerializer
 
-    def get(self, request, uid, token):
-        try:
-            user = validate_token_and_uid(uid=uid, token=token)
-            if user:
-                user.is_email_verified = True
-                user.save()
-                return Response({"message": "email verified successfully"})
-        except:
-            pass
-
-        return Response({"detail": "invalid verification link"})
-
-
-class EmailSignInView(views.APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def get(self, request, uid, token):
-        user = validate_token_and_uid(uid=uid, token=token)
-        access_token = SlidingToken.for_user(user=user)
-        res = Response({"message": "Signed In successfully"})
-        sing_in_response(res, str(access_token))
-        return res
-
+    def get(self, request):
+        serializer = self.serializer_class(
+            data=request.GET,
+        )
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data)
 
 class TestAuthView(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -89,6 +73,6 @@ class TestAuthView(views.APIView):
         return Response({"success": True})
 
 
-class SendEmailView(generics.CreateAPIView):
+class ResendVerifyEmailView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
-    serializer_class = serializers.SendEmailSerializer
+    serializer_class = serializers.ResendVerifyEmailSerializer

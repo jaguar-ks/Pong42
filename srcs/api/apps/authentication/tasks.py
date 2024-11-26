@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.urls import reverse
+from urllib.parse import urlencode
 
 from apps.utils import generate_token_and_uid, send_template_email
 
@@ -12,7 +13,7 @@ def send_verification_email(user):
     """
     token, uid = generate_token_and_uid(user)
 
-    verification_url = f"{settings.WEBSITE_DOMAIN_NAME}{reverse('verify_email', kwargs={'uid': uid, 'token': token})}"
+    verification_url = f"{settings.WEBSITE_DOMAIN_NAME}{reverse('verify_email')}?{urlencode({'uid': uid, 'token': token})}"
 
     context = {
         "website_name": settings.WEBSITE_NAME,
@@ -35,7 +36,7 @@ def send_sign_in_email(user):
 
     token, uid = generate_token_and_uid(user)
 
-    sign_in_url = f"{settings.WEBSITE_DOMAIN_NAME}{reverse('email_sign_in', kwargs={'uid': uid, 'token': token})}"
+    sign_in_url = f"{settings.WEBSITE_DOMAIN_NAME}{reverse('verify_email')}?{urlencode({'uid': uid, 'token': token})}"
 
     context = {
         "website_name": settings.WEBSITE_NAME,

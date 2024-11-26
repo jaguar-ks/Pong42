@@ -12,16 +12,11 @@ urlpatterns = [
     path("sign-out/", views.SignOutView.as_view(), name="sign_out"),
     path("test_auth/", views.TestAuthView.as_view(), name="test_auth_view"),
     path(
-        "email/verify/<str:uid>/<str:token>/",
+        "email/verify/",
         views.EmailVerifyView.as_view(),
         name="verify_email",
     ),
-    path(
-        "email/sign-in/<str:uid>/<str:token>/",
-        views.EmailSignInView.as_view(),
-        name="email_sign_in",
-    ),
-    path("email/send_email/", views.SendEmailView.as_view(), name="send_email"),
+    path("email/resend_verify_email/", views.ResendVerifyEmailView.as_view(), name="send_email"),
     path(
         "social/<str:provider>/authorize/",
         OauthAuthorizeView.as_view(),
