@@ -7,6 +7,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 import logging
 from rest_framework.response import Response
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -63,4 +64,9 @@ def send_template_email(subject, template_name, context, recipient_email):
 
 
 def sing_in_response(response: Response, token):
-    response.set_cookie(key=settings.AUTH_TOKEN_NAME, value=token, httponly=True)
+    response.set_cookie(
+        key=settings.AUTH_TOKEN_NAME,
+        value=token,
+        httponly=True,
+        expires=int((datetime.now() + settings.AUTH_TOKEN_LIFETIME).timestamp()),
+    )
