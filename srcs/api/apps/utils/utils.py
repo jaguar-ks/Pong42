@@ -33,9 +33,6 @@ def validate_token_and_uid(uid, token):
         pass
 
 
-#     return None
-
-
 # Utility to send an email
 def send_template_email(subject, template_name, context, recipient_email):
     """
