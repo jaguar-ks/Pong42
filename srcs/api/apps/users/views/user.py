@@ -1,5 +1,6 @@
 from rest_framework import generics, filters
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema_view
 
 from apps.users.models import User
 from apps.users.serializers import (
@@ -8,19 +9,17 @@ from apps.users.serializers import (
     UserSerializer,
     UserDetailSerializer,
 )
+from apps.users.docs import AUTH_USER_VIEW_SCHEMA
 
 
+
+@extend_schema_view(**AUTH_USER_VIEW_SCHEMA)
 class AuthUserView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_serializer_class(self):
         if self.request.method in ["PUT", "PATCH"]:
             return UpdateAuthUserSerializer
         return AuthUserSerializer
-
-    def destroy(self, request, *args, **kwargs):
-        request.user.is_active = False
-        request.user.save()
-        return Response({"detail": "successfully deleted your account"})
 
     def get_object(self):
         return self.request.user
