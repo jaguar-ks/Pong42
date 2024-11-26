@@ -1,13 +1,25 @@
 from drf_spectacular.utils import OpenApiResponse, OpenApiParameter
 from rest_framework import status
+from django.conf import settings
 
 from . import serializers
+
+
+OAUTH_PARAM = OpenApiParameter(
+    name="provider",
+    type=str,
+    location=OpenApiParameter.QUERY,
+    description="oauth provider name",
+    required=True,
+    enum=[provider for provider in settings.OAUTH_PROVIDERS_SETTINGS],
+)
 
 
 OAUTH_CALLBACK_SCHEMA = {
     "summary": "social auth callback",
     "description": "social auth callback view for oauth providers like google, facebook, etc.",
     "request": serializers.OauthCallBackSerializer,
+    'parameters': [OAUTH_PARAM],
     "responses": {
         status.HTTP_200_OK: OpenApiResponse(
             description="singed in successfully",
@@ -64,6 +76,7 @@ OAUTH_CALLBACK_SCHEMA = {
 OAUTH_AUTHORIZE_SCHEMA = {
     'summary': 'social auth authorize',
     'description': 'get authorize url for oauth providers',
+    'parameters': [OAUTH_PARAM],
     'responses': {
         status.HTTP_200_OK: OpenApiResponse(
             description='authorize url',
