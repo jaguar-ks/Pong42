@@ -26,7 +26,7 @@ class TwoFASerializer(serializers.Serializer):
                 self.user.two_fa_enabled = False
         self.user.save()
         return {
-            "detail": f"successfully {self.context['action']}d two factor authentication"
+            "message": f"successfully {self.context['action']}d two factor authentication"
         }
 
 
@@ -95,7 +95,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return {
-            "detail": "account created successfully, check your email for confirmation",
+            "message": "account created successfully, check your email for confirmation",
             **super().to_representation(instance),
         }
 
@@ -125,4 +125,3 @@ class SendEmailSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return validated_data
-

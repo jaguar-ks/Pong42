@@ -41,17 +41,17 @@ class SignInView(TokenObtainSlidingView):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
             sing_in_response(response, response.data.pop("token"))
-            response.data["detail"] = "Successfully signed in."
+            response.data["message"] = "Successfully signed in."
         return response
 
 
 class SignOutView(views.APIView):
 
     def post(self, request):
-        res = Response({"detail": "Signed out successfully"})
+        res = Response({"message": "Signed out successfully"})
         token = SlidingToken(request.COOKIES[settings.AUTH_TOKEN_NAME])
         token.blacklist()
-        res.delete_cookie("token")
+        res.delete_cookie(settings.AUTH_TOKEN_NAME)
         return res
 
 
@@ -64,7 +64,7 @@ class EmailVerifyView(views.APIView):
             if user:
                 user.is_email_verified = True
                 user.save()
-                return Response({"detail": "email verified successfully"})
+                return Response({"message": "email verified successfully"})
         except:
             pass
 
@@ -77,7 +77,7 @@ class EmailSignInView(views.APIView):
     def get(self, request, uid, token):
         user = validate_token_and_uid(uid=uid, token=token)
         access_token = SlidingToken.for_user(user=user)
-        res = Response({"detail": "Signed In successfully"})
+        res = Response({"message": "Signed In successfully"})
         sing_in_response(res, str(access_token))
         return res
 
