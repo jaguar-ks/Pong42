@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainSlidingSerializer
 from rest_framework.validators import UniqueValidator
 from rest_framework.exceptions import AuthenticationFailed
@@ -7,8 +6,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from apps.utils import validators
 from .tasks import send_verification_email, send_sign_in_email
 from apps.users.serializers import UserSerializer
-
-user_model = get_user_model()
+from apps.users.models import User
 
 
 class TwoFASerializer(serializers.Serializer):
@@ -58,12 +56,12 @@ class SignUpSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = user_model
+        model = User
         fields = ("id", "username", "password", "email", "first_name", "last_name")
         extra_kwargs = {
             "username": {
                 "validators": [
-                    UniqueValidator(queryset=user_model.objects.all()),
+                    UniqueValidator(queryset=User.objects.all()),
                     validators.UsernameValidator(),
                 ],
             },
@@ -86,7 +84,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        user = user_model.objects.create_user(
+        user = User.objects.create_user(
             username=validated_data.pop("username"),
             email=validated_data.pop("email"),
             password=validated_data.pop("password"),
@@ -110,7 +108,7 @@ class SendEmailSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         try:
-            user = user_model.objects.get(email=attrs["email"])
+            user = User.objects.get(email=attrs["email"])
             match attrs["type"]:
                 case "verification":
                     send_verification_email(user)
@@ -121,7 +119,7 @@ class SendEmailSerializer(serializers.Serializer):
                         {"type": f'Invalid type {attrs["type"]}'}
                     )
 
-        except user_model.DoesNotExist:
+        except User.DoesNotExist:
             raise serializers.ValidationError({"email": "this email does not exist"})
         return attrs
 

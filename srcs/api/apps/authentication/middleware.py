@@ -1,10 +1,9 @@
 from django.utils.functional import SimpleLazyObject
 from rest_framework_simplejwt.tokens import SlidingToken
 from rest_framework_simplejwt.exceptions import TokenError
-from django.contrib.auth import get_user_model
 from django.conf import settings
 
-User = get_user_model()
+from apps.users.models import User
 
 
 class JWTAuthenticationMiddleware:
