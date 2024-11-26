@@ -4,7 +4,7 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.exceptions import AuthenticationFailed
 
 from apps.utils import validators
-from .tasks import send_verification_email, send_sign_in_email
+from .tasks import send_verification_email
 from apps.users.serializers import UserSerializer
 from apps.users.models import User
 from apps.utils import validate_token_and_uid

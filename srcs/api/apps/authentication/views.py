@@ -3,9 +3,14 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainSlidingView
 from rest_framework_simplejwt.tokens import SlidingToken
 from django.conf import settings
+from drf_spectacular.utils import extend_schema
 
 from . import serializers
-from apps.utils import validate_token_and_uid, sing_in_response
+from apps.utils import sing_in_response
+from .docs import (
+    ENABLE_2FA_SCHEMA,
+    DISABLE_2FA_SCHEMA,
+)
 
 
 class TwoFaBaseView(generics.GenericAPIView):
@@ -21,11 +26,12 @@ class TwoFaBaseView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data)
 
-
+@extend_schema(**ENABLE_2FA_SCHEMA)
 class Enable2FaView(TwoFaBaseView):
     context = {"action": "enable"}
 
 
+@extend_schema(**DISABLE_2FA_SCHEMA)
 class Disable2FaView(TwoFaBaseView):
     context = {"action": "disable"}
 
