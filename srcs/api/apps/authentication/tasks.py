@@ -3,11 +3,7 @@ from django.urls import reverse
 
 from apps.utils import generate_token_and_uid, send_template_email
 
-
-# TODO: make send mail functions shared task with celery and redis
-
-
-def send_verification_email(user, retries=1):
+def send_verification_email(user):
     """
     Task to send a verification email to the user.
 
@@ -29,7 +25,7 @@ def send_verification_email(user, retries=1):
     )
 
 
-def send_sign_in_email(self, user):
+def send_sign_in_email(user):
     """
     Task to send a sign-in email to the user.
 
