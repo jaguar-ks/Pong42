@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainSlidingSerializer
 from rest_framework.validators import UniqueValidator
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 
 from apps.utils import validators
 from .tasks import send_verification_email
@@ -52,13 +52,22 @@ class ObtainSlidingTokenSerializer(TokenObtainSlidingSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
+    message = serializers.CharField(max_length=100, read_only=True)
     email = serializers.EmailField(
         required=True, validators=[validators.EmailValidator()]
     )
 
     class Meta:
         model = User
-        fields = ("id", "username", "password", "email", "first_name", "last_name")
+        fields = (
+            "message",
+            "id",
+            "username",
+            "password",
+            "email",
+            "first_name",
+            "last_name",
+        )
         extra_kwargs = {
             "username": {
                 "validators": [
@@ -75,13 +84,6 @@ class SignUpSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
-        if "email" not in data:
-            raise serializers.ValidationError({"email": "this field is required"})
-        if data.get("first_name") and data.get("last_name"):
-            if data["first_name"].lower() == data["last_name"].lower():
-                raise serializers.ValidationError(
-                    "First name and last name should not be the same."
-                )
         return data
 
     def create(self, validated_data):
@@ -101,7 +103,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         }
 
 
-class   ResendVerifyEmailSerializer(serializers.Serializer):
+class ResendVerifyEmailSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=150, required=True, write_only=True)
     message = serializers.CharField(max_length=100, read_only=True)
 
@@ -111,29 +113,24 @@ class   ResendVerifyEmailSerializer(serializers.Serializer):
             if not send_verification_email(user):
                 raise serializers.ValidationError("Failed to send verification")
         except User.DoesNotExist:
-            raise serializers.ValidationError("this email does not exist")
+            raise serializers.ValidationError(
+                {"email": "no user found with this email"}
+            )
         return {}
 
     def create(self, validated_data):
-        return {
-            "message": "email sent successfully check you inbox"
-        }
+        return {"message": "email sent successfully check you inbox"}
 
 
-class   EmailVerifySerializer(serializers.Serializer):
+class EmailVerifySerializer(serializers.Serializer):
     uid = serializers.CharField(max_length=50, write_only=True)
     token = serializers.CharField(max_length=150, write_only=True)
     message = serializers.CharField(max_length=100, read_only=True)
 
     def validate(self, attrs):
-        user = validate_token_and_uid(
-            uid=attrs['uid'],
-            token=attrs['token']
-        )
+        user = validate_token_and_uid(uid=attrs["uid"], token=attrs["token"])
         if not user:
-            raise serializers.ValidationError(
-                f"Link is invalid or expired"
-            )
+            raise PermissionDenied(f"Link is invalid or expired")
         return {
-            'message': "email verified successfully",
+            "message": "email verified successfully",
         }

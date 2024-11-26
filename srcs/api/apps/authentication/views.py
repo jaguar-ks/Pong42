@@ -10,6 +10,12 @@ from apps.utils import sing_in_response
 from .docs import (
     ENABLE_2FA_SCHEMA,
     DISABLE_2FA_SCHEMA,
+    SIGN_UP_SCHEMA,
+    SIGN_IN_SCHEMA,
+    SIGN_OUT_SCHEMA,
+    EMAIL_VERIFY_SCHEMA,
+    TEST_AUTH_SCHEMA,
+    RESEND_VERIFY_EMAIL_SCHEMA,
 )
 
 
@@ -26,6 +32,7 @@ class TwoFaBaseView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data)
 
+
 @extend_schema(**ENABLE_2FA_SCHEMA)
 class Enable2FaView(TwoFaBaseView):
     context = {"action": "enable"}
@@ -36,11 +43,13 @@ class Disable2FaView(TwoFaBaseView):
     context = {"action": "disable"}
 
 
+@extend_schema(**SIGN_UP_SCHEMA)
 class SignUpView(generics.CreateAPIView):
     serializer_class = serializers.SignUpSerializer
     permission_classes = [permissions.AllowAny]
 
 
+@extend_schema(**SIGN_IN_SCHEMA)
 class SignInView(TokenObtainSlidingView):
 
     def post(self, request, *args, **kwargs):
@@ -51,6 +60,7 @@ class SignInView(TokenObtainSlidingView):
         return response
 
 
+@extend_schema(**SIGN_OUT_SCHEMA)
 class SignOutView(views.APIView):
 
     def post(self, request):
@@ -61,6 +71,7 @@ class SignOutView(views.APIView):
         return res
 
 
+@extend_schema(**EMAIL_VERIFY_SCHEMA)
 class EmailVerifyView(views.APIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = serializers.EmailVerifySerializer
@@ -72,6 +83,8 @@ class EmailVerifyView(views.APIView):
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data)
 
+
+@extend_schema(**TEST_AUTH_SCHEMA)
 class TestAuthView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -79,6 +92,7 @@ class TestAuthView(views.APIView):
         return Response({"success": True})
 
 
+@extend_schema(**RESEND_VERIFY_EMAIL_SCHEMA)
 class ResendVerifyEmailView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = serializers.ResendVerifyEmailSerializer
