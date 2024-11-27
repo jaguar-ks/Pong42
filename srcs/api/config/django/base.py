@@ -39,6 +39,7 @@ INSTALLED_APPS += [
     for app in [
         "users",
         "authentication",
+        "pongue",
     ]
 ]
 
@@ -73,8 +74,6 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = "config.wsgi.application"
 
 ASGI_APPLICATION = "config.asgi.application"
 
