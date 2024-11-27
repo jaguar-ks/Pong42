@@ -127,7 +127,7 @@ USER_SEARCH_SCHEMA = {
     "parameters": [
         OpenApiParameter(
             name="search",
-            type="string",
+            type=str,
             location=OpenApiParameter.QUERY,
             description="search users by [username, email, first name, last name]",
         )
