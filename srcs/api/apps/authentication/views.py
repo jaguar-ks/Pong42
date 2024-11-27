@@ -1,16 +1,30 @@
 from rest_framework import generics, permissions, views
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainSlidingView
-from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample, OpenApiTypes
 from rest_framework_simplejwt.tokens import SlidingToken
-from . import serializers
+from django.conf import settings
+from drf_spectacular.utils import extend_schema
 
-class   TwoFaBaseView(generics.GenericAPIView):
+from . import serializers
+from apps.utils import sing_in_response
+from .docs import (
+    ENABLE_2FA_SCHEMA,
+    DISABLE_2FA_SCHEMA,
+    SIGN_UP_SCHEMA,
+    SIGN_IN_SCHEMA,
+    SIGN_OUT_SCHEMA,
+    EMAIL_VERIFY_SCHEMA,
+    TEST_AUTH_SCHEMA,
+    RESEND_VERIFY_EMAIL_SCHEMA,
+)
+
+
+class TwoFaBaseView(generics.GenericAPIView):
     serializer_class = serializers.TwoFASerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        self.context['request'] = request
+        self.context["request"] = request
         serializer = self.serializer_class(
             data=request.data,
             context=self.context,
@@ -19,112 +33,66 @@ class   TwoFaBaseView(generics.GenericAPIView):
         return Response(serializer.validated_data)
 
 
-@extend_schema(
-    summary="Enable Two-Factor Authentication",
-    description="Enable 2FA for the authenticated user by verifying the OTP and activating 2FA.",
-    request=serializers.TwoFASerializer,
-    responses={
-        200: OpenApiResponse(
-            response=OpenApiTypes.OBJECT,
-            examples=[
-                OpenApiExample(
-                    name="Success Example",
-                    value={"detail": "2FA enabled successfully"},
-                    response_only=True
-                )
-            ]
-        )
-    }
-)
+@extend_schema(**ENABLE_2FA_SCHEMA)
 class Enable2FaView(TwoFaBaseView):
-    context = {'action': 'enable'}
+    context = {"action": "enable"}
 
 
-@extend_schema(
-    summary="Disable Two-Factor Authentication",
-    description="Disable 2FA for the authenticated user by verifying the OTP and deactivating 2FA.",
-    request=serializers.TwoFASerializer,
-    responses={
-        200: OpenApiResponse(
-            response=OpenApiTypes.OBJECT,
-            examples=[
-                OpenApiExample(
-                    name="Success Example",
-                    value={"detail": "2FA disabled successfully"},
-                    response_only=True
-                )
-            ]
-        )
-    }
-)
-class   Disable2FaView(TwoFaBaseView):
-    context = {'action': 'disable'}
+@extend_schema(**DISABLE_2FA_SCHEMA)
+class Disable2FaView(TwoFaBaseView):
+    context = {"action": "disable"}
 
 
-
-@extend_schema(
-    summary="User Sign-Up",
-    description="Allows a new user to sign up by providing the necessary information.",
-)
-class   SignUpView(generics.CreateAPIView):
+@extend_schema(**SIGN_UP_SCHEMA)
+class SignUpView(generics.CreateAPIView):
     serializer_class = serializers.SignUpSerializer
     permission_classes = [permissions.AllowAny]
 
-class   SignInView(TokenObtainSlidingView):
-    @extend_schema(
-        summary="User Sign-In",
-        description="Signs In user by set jwt tokens [access_token, refresh_token] in cookies",
-        responses={
-            200: OpenApiResponse(
-                response=OpenApiTypes.OBJECT,
-                examples=[
-                    OpenApiExample(
-                        name="Success Example",
-                        value={"detail": "Signed In successfully"},
-                        response_only=True
-                    )
-                ]
-            )
-        }
-    )
+
+@extend_schema(**SIGN_IN_SCHEMA)
+class SignInView(TokenObtainSlidingView):
+
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
-            response.set_cookie(
-                key='token',
-                value=response.data['token'],
-                httponly=True,  # Makes the cookie inaccessible to JavaScript
-                # samesite='Lax',  # Provides some CSRF protection
-                # secure=True,  # Ensures the cookie is only sent over HTTPS
-                # max_age=3600 * 24 * 14  # 14 days
-            )
-            response.data = {
-                'detail': 'Successfully signed in.',
-            }
+            sing_in_response(response, response.data.pop("token"))
+            response.data["message"] = "Successfully signed in."
         return response
 
+
+@extend_schema(**SIGN_OUT_SCHEMA)
 class SignOutView(views.APIView):
 
-    @extend_schema(
-        summary="User Sign-Out",
-        description="Signs out the user by deleting the refresh and access token cookies.",
-        request=None,  # No request body required
-        responses={
-            200: OpenApiResponse(
-                response=OpenApiTypes.OBJECT,
-                examples=[
-                    OpenApiExample(
-                        name="Success Example",
-                        value={"detail": "Signed out successfully"},
-                        response_only=True
-                    )
-                ]
-            )
-        }
-    )
     def post(self, request):
-        res = Response({'detail': 'Signed out successfully'})
-        token = SlidingToken(request.COOKIES['token'])
+        res = Response({"message": "Signed out successfully"})
+        token = SlidingToken(request.COOKIES[settings.AUTH_TOKEN_NAME])
         token.blacklist()
-        res.delete_cookie('token')
+        res.delete_cookie(settings.AUTH_TOKEN_NAME)
         return res
+
+
+@extend_schema(**EMAIL_VERIFY_SCHEMA)
+class EmailVerifyView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = serializers.EmailVerifySerializer
+
+    def get(self, request):
+        serializer = self.serializer_class(
+            data=request.GET,
+        )
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data)
+
+
+@extend_schema(**TEST_AUTH_SCHEMA)
+class TestAuthView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        return Response({"success": True})
+
+
+@extend_schema(**RESEND_VERIFY_EMAIL_SCHEMA)
+class ResendVerifyEmailView(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = serializers.ResendVerifyEmailSerializer

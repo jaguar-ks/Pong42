@@ -3,9 +3,6 @@ FROM python:3.11-slim-bullseye
 # Set the working directory in the container
 WORKDIR /var/www/
 
-# Install PostgreSQL client libraries and build tools
-# RUN apt-get update && apt-get install -y libpq-dev gcc
-
 # Copy the requirements file into the container
 COPY requirements.txt .
 

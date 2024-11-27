@@ -7,5 +7,6 @@ python3 manage.py migrate
 
 
 python3 manage.py shell < tools/create_superuser.py
+python3 manage.py shell < tools/fake_users.py
 
 python manage.py runserver 0.0.0.0:8000

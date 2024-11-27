@@ -1,32 +1,40 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 import pyotp
+from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 
-class   UserManager(BaseUserManager):
-    def create_user(self, username: str, **kwargs):
-        kwargs['is_active'] = False
-        if username:
-            raise ValueError("Users must have an email address")
-        user = self.model(username=username, **kwargs)
-        user.set_password(kwargs['password'])
-        user.save(self._db)
+class UserManager(BaseUserManager):
+    def create_user(self, username, email, password=None, **kwargs):
+
+        kwargs.setdefault("is_active", True)
+        kwargs.setdefault("is_email_verified", False)
+        kwargs.setdefault("is_admin", False)
+
+        if not username:
+            raise ValueError("username is required")
+        if not email:
+            raise ValueError("email address is required")
+
+        user = self.model(username=username, email=email, **kwargs)
+        user.set_password(password)
+        user.full_clean()
+        user.save(using=self._db)
         return user
 
-    def create_superuser(self, username: str, **kwargs):
-        kwargs['is_active'] = True
-        kwargs['is_admin'] = True
-        user = self.model(
-            username=username,
-            **kwargs
+    def create_superuser(self, username, email, password=None, **kwargs):
+        kwargs.setdefault("is_active", True)
+        kwargs.setdefault("is_email_verified", True)
+        kwargs.setdefault("is_admin", True)
+        return self.create_user(
+            username=username, email=email, password=password, **kwargs
         )
-        user.set_password(kwargs['password'])
-        user.save()
-        return user
 
-class   User(AbstractBaseUser):
+
+class User(AbstractBaseUser):
     username = models.CharField(max_length=100, unique=True)
-    email = models.EmailField(max_length=150)
+    email = models.EmailField(max_length=150, unique=True)
     first_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100, null=True, blank=True)
     otp_secret = models.CharField(max_length=32, default=pyotp.random_base32)
@@ -37,12 +45,12 @@ class   User(AbstractBaseUser):
     loses = models.PositiveSmallIntegerField(default=0)
     rating = models.PositiveIntegerField(default=0)
     rank = models.PositiveIntegerField(default=500)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    is_email_verified = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
-
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email"]
 
     objects = UserManager()
 
@@ -53,7 +61,8 @@ class   User(AbstractBaseUser):
     @property
     def otp_uri(self):
         return pyotp.TOTP(self.otp_secret).provisioning_uri(
-            name=str(self.username), issuer_name='transcendance',
+            name=str(self.username),
+            issuer_name="transcendance",
         )
 
     def verify_otp(self, otp_code) -> bool:
@@ -62,12 +71,117 @@ class   User(AbstractBaseUser):
     def __str__(self) -> str:
         return self.username
 
-    @property
-    def is_staff(self):
-        return self.is_admin
-
     def has_perm(self, perm, obj=None):
         return True
 
     def has_module_perms(self, app_label):
         return True
+
+    def get_all_permissions(self):
+        return []
+
+
+class Connection(models.Model):
+    PENDING = "pending"
+    FRIENDS = "friends"
+    BLOCKED = "blocked"
+
+    STATUS_CHOICES = [
+        (PENDING, "Pending"),
+        (FRIENDS, "Friends"),
+        (BLOCKED, "Blocked"),
+    ]
+
+    initiator = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="as_initiator",
+        null=False,
+        blank=False,
+    )
+    recipient = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="as_recipient",
+        null=False,
+        blank=False,
+    )
+    status = models.CharField(max_length=7, choices=STATUS_CHOICES, default=PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("initiator", "recipient")
+
+    def clean(self) -> None:
+        if self.initiator.pk == self.recipient.pk:
+            raise ValidationError("initiator and recipient should not be the same")
+        # Check for existing reverse connection
+        if Connection.objects.filter(
+            initiator=self.recipient, recipient=self.initiator
+        ).exists():
+            raise ValidationError("A connection already exists between these users")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.initiator} 🤝 {self.recipient}"
+
+    @classmethod
+    def get_user_connections(cls, user):
+        """
+        Get all active connections for a user where they are not blocked.
+        Returns connections where user is either initiator or recipient,
+        excluding ones where they are blocked by someone else.
+        """
+        return cls.objects.filter(
+            # User is either initiator or recipient
+            (Q(initiator=user) | Q(recipient=user))
+            &
+            # For blocked connections, user must be initiator (they did the blocking)
+            (~Q(status=cls.BLOCKED) | Q(status=cls.BLOCKED, initiator=user))
+        ).select_related("initiator", "recipient")
+
+    @classmethod
+    def get_friends(cls, user):
+        """
+        Get all confirmed friends for a user.
+        """
+        return cls.objects.filter(
+            (Q(initiator=user) | Q(recipient=user)) & Q(status=cls.FRIENDS)
+        ).select_related("initiator", "recipient")
+
+    @classmethod
+    def get_pending_requests(cls, user):
+        """
+        Get all pending connection requests for a user.
+        """
+        return cls.objects.filter(recipient=user, status=cls.PENDING).select_related(
+            "initiator"
+        )
+
+    @classmethod
+    def get_sent_requests(cls, user):
+        """
+        Get all connection requests sent by a user.
+        """
+        return cls.objects.filter(initiator=user, status=cls.PENDING).select_related(
+            "recipient"
+        )
+
+    @classmethod
+    def get_blocked_users(cls, user):
+        """
+        Get all users blocked by this user.
+        """
+        return cls.objects.filter(initiator=user, status=cls.BLOCKED).select_related(
+            "recipient"
+        )
+
+    def get_other_user(self, user):
+        """
+        Get the other user in the connection.
+        """
+        return self.recipient if self.initiator == user else self.initiator
