@@ -45,7 +45,9 @@ class ConnectionViewSet(
             if status_param not in self.STATUS_QUERIESETS:
                 valid_status = ", ".join(self.STATUS_QUERIESETS.keys())
                 raise ValidationError(
-                    {"detail": f"Invalid status {status_param}. valid options are: {valid_status}"}
+                    {
+                        "detail": f"Invalid status {status_param}. valid options are: {valid_status}"
+                    }
                 )
             return self.STATUS_QUERIESETS[status_param](user=user)
         return self.queryset
@@ -69,11 +71,9 @@ class ConnectionViewSet(
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-
     @extend_schema(**CONNECTIONS_CREATE_SCHEMA)
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
-
 
     @extend_schema(**CONNECTIONS_ACCEPT_SCHEMA)
     @action(detail=True, methods=["get"])

@@ -29,6 +29,7 @@ class AuthUserView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         return self.request.user
 
+
 @extend_schema_view(**USER_RETRIEVE_SCHEMA)
 class UserRetriveView(generics.RetrieveAPIView):
     serializer_class = UserDetailSerializer
