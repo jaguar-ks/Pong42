@@ -24,6 +24,7 @@ class UserListView(AllUsersMixins, generics.ListAPIView):
     def get_queryset(self):
         return self.get_unblocked_users()
 
+
 @extend_schema_view(**AUTH_USER_VIEW_SCHEMA)
 class AuthUserView(generics.RetrieveUpdateDestroyAPIView):
 
@@ -39,11 +40,10 @@ class AuthUserView(generics.RetrieveUpdateDestroyAPIView):
 @extend_schema_view(**USER_RETRIEVE_SCHEMA)
 class UserRetriveView(AllUsersMixins, generics.RetrieveAPIView):
     serializer_class = UserDetailSerializer
+    lookup_field = "id"
 
     def get_queryset(self):
         return self.get_unblocked_users()
-
-    lookup_field = "id"
 
 
 @extend_schema(**USER_LIST_SCHEMA)
