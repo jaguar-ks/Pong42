@@ -1,5 +1,4 @@
 from rest_framework import generics, filters
-from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema_view, extend_schema
 
 from apps.users.models import User
@@ -16,7 +15,14 @@ from apps.users.docs import (
     LEADER_BOARD_SCHEMA,
     USER_SEARCH_SCHEMA,
 )
+from apps.utils.mixins import AllUsersMixins
 
+
+class UserListView(AllUsersMixins, generics.ListAPIView):
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return self.get_unblocked_users()
 
 @extend_schema_view(**AUTH_USER_VIEW_SCHEMA)
 class AuthUserView(generics.RetrieveUpdateDestroyAPIView):
@@ -31,31 +37,36 @@ class AuthUserView(generics.RetrieveUpdateDestroyAPIView):
 
 
 @extend_schema_view(**USER_RETRIEVE_SCHEMA)
-class UserRetriveView(generics.RetrieveAPIView):
+class UserRetriveView(AllUsersMixins, generics.RetrieveAPIView):
     serializer_class = UserDetailSerializer
-    queryset = User.objects.filter(is_active=True)
+
+    def get_queryset(self):
+        return self.get_unblocked_users()
+
     lookup_field = "id"
 
 
 @extend_schema(**USER_LIST_SCHEMA)
-class ListUserView(generics.ListAPIView):
+class ListUserView(AllUsersMixins, generics.ListAPIView):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        return User.objects.filter(is_active=True)
+        return self.get_unblocked_users()
 
 
 @extend_schema(**LEADER_BOARD_SCHEMA)
-class LeaderBoardView(generics.ListAPIView):
+class LeaderBoardView(AllUsersMixins, generics.ListAPIView):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        return User.objects.filter(is_active=True).order_by("-rating")
+        return self.get_unblocked_users().order_by("-rating")
 
 
 @extend_schema(**USER_SEARCH_SCHEMA)
-class UserSearchView(generics.ListAPIView):
-    queryset = User.objects.filter(is_active=True)
+class UserSearchView(AllUsersMixins, generics.ListAPIView):
     filter_backends = [filters.SearchFilter]
     serializer_class = UserSerializer
     search_fields = ["username", "email", "first_name", "last_name"]
+
+    def get_queryset(self):
+        return self.get_unblocked_users()
