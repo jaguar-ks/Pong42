@@ -69,7 +69,7 @@ const options = {
 const Rate = () => {
   return (
     <div className={classes.container}>
-      <Line data={data} options={options} plugins={[ChartDataLabels]} />
+      <  Line data={data} options={options} plugins={[ChartDataLabels]} />
     </div>
   );
 }

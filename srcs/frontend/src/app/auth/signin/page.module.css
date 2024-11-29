@@ -1,136 +1,226 @@
-.container {
+.pageContainer {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    width: 100vw;
-    height: 100vh;
-    background-color: #FFFFFF;
+    background-color: white;
+  }
+  
+  .main {
+    flex-grow: 1;
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px; 
-
-    .title {
-        font-size: 32px; /* Slightly larger title */
-        color: #000000;
-        margin-bottom: 15px; /* Adjusted margin for better spacing */
+    background-color: #ffffff;
+    padding: 3rem 1rem;
+  }
+  
+  .contentContainer {
+    max-width: 64rem;
+    width: 100%;
+    /* background-color: #e53e3e; */
+    background-color: #3040D3;
+    clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
+  }
+  
+  .title {
+    text-align: center;
+    font-size: 1.875rem;
+    font-weight: 800;
+    color: #1a202c;
+    margin-bottom: 2rem;
+  }
+  
+  .formContainer {
+    background-color: white;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    /* border-radius: 0.5rem; */
+    clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
+  
+    background-color: #3040D3;
+  } 
+  
+  .formContent {
+    display: flex;
+    border: 2px solid #3040D3;
+    background-color: white;
+    clip-path: polygon(42px 0, 100% 0, 100% calc(100% - 42px), calc(100% - 42px) 100%, 0 100%, 0 42px);
+  }
+  
+  .formSection {
+    width: 100%;
+    padding: 2rem;
+  }
+  .formSectionSuccess {
+    width: 100%;
+    padding: 2rem;
+  }
+  
+  @media (min-width: 768px) {
+    .formSection {
+      width: 50%;
     }
-
-    .container2 {
-        max-width: 1000px;
-        height: 500px;
-        display: flex;
-        border: 1px solid black;
-        border-radius: 10px; /* Rounded corners for a softer look */
-        overflow: hidden; /* Ensure content doesn't overflow the container */
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    }
-
-    .leftSide {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* Center items horizontally */
-        justify-content: flex-start; /* Default to aligning items to the top */
-        text-align: center;
-        max-width: 500px;
-        height: 100%; /* Ensure it takes the full height of its parent */
-        overflow-y: auto; /* Allow vertical scrolling if content exceeds the height */
-        padding: 20px; /* Add padding for better spacing */
-
-        /* Media query for screens with height less than or equal to 457px */
-        @media (max-height: 457px) {
-            justify-content: flex-start; /* Align items to the top */
-        }
-
-        /* Media query for screens with height greater than 457px */
-        @media (min-height: 460px) {
-            justify-content: center; /* Center items vertically */
-        }
-            
-        
-        /* Inner styles */
-        .welcomeMsg {
-            font-size: 28px; /* Adjusted font size for welcome message */
-            color: #000000;
-            margin-bottom: 20px; /* More space below the message */
-        }
-        
-        .form {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            width: 100%;
-
-            .error{
-                color : red;
-                margin: 5px;
-            }
-        }
-
-        .p {
-            font-size: 16px; /* Slightly smaller font size */
-            color: rgba(0, 0, 0, 0.7); /* Darker gray for better readability */
-            margin: 10px 0; /* Margin above and below the paragraph */
-        }
-
-        .submitButton {
-            max-width: 160px; /* Slightly wider button */
-            height: 50px; /* Increased height for a more comfortable click area */
-            border: none;
-            background-color: #E0E0E0;
-            padding: 10px 15px; /* Padding adjusted for better appearance */
-            border-radius: 25px; /* Rounded corners for the button */
-            cursor: pointer;
-            border: 1px solid #CCCCCC;
-            font-size: 16px; /* Font size for button text */
-            transition: background-color 0.3s, border-color 0.3s; /* Smooth transitions */
-        }
-
-        .submitButton:hover {
-            background-color: #E0E0E0; /* Change background color on hover */
-            border-color: #B0B0B0; /* Darker border on hover */
-        }
-        .message{
-            display: flex;
-            width: 100%;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            margin-top: 5px;
-            .link{
-                color: hsl(216.38deg 44.76% 41.18%);
-                border: none;
-                border-bottom: 2px solid hsl(216.38deg 44.76% 41.18%);
-                background-color: transparent;
-                font-size: 16px;
-                cursor: pointer;
-            }
-        }
-    }
-
-    @media (max-width: 1000px) {
-        .rightSide {
-            display: none;
-        }
-    }
-
     
-    .rightSide {
-        flex: 1;
-        max-width: 500px;
-        background-color: #E0E0E0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        
-        .image {
-            max-width: 100%; /* Ensure the image fits within the container */
-            height: auto; /* Maintain aspect ratio */
-        }
+  
+  }
+  @media (max-width: 768px) {
+  
+    .imageSection{
+      display: none;
     }
-    @media (max-width: 1000px) {
-        .rightSide {
-            display: none;
-        }
+    
+  
+  }
+  
+  .subtitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .description {
+    margin-bottom: 1.5rem;
+    color: #4a5568;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .errorText {
+    color: #e53e3e;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .submitButtonContainer {
+    display: inline-block;
+    max-width: 500px;
+    position: relative;
+    background-color: black;
+    clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .submitButton {
+    position: relative;
+    padding: 10px 20px;
+    width: 100%;
+    height: 100%;
+    background-color: #3040D3;
+    color: white;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+    /* border: 1px solid black; */
+    max-width: 500px;
+    font-weight: bold;
+  }
+  
+  .submitButton:hover {
+    background-color: #dd6b20;
+  }
+  
+  .submitButton:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(237, 137, 54, 0.5);
+  }
+  
+  .submitButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .signInText {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #4a5568;
+  }
+  
+  .signInLink {
+    font-weight: 500;
+    color: #3040D3;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: underline;
+  }
+  
+  .signInLink:hover {
+    color: #dd6b20;
+  }
+  
+  .successMessage {
+    text-align: center;
+  }
+  
+  .imageSection {
+    display: none;
+    width: 50%;
+    /* background-color: #285a7; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* border: 1px solid black; */
+    @media (max-width: 768px){
+      display: none;
     }
-}
+    
+  }
+  
+  /* @media (max-width: 768px) {
+    .imageSection {
+      width: 100%;
+    }
+  } */
+  .containerImage{
+    display: flex;align-items: center;
+    justify-content: center;
+    height: 100%;
+    
+    
+  }
+  .ImageContainer{
+    object-fit: fill;
+    width: 80%;
+    height: 80%;
+    /* border: 1px solid #3040D3; */
+    background-color: #3040D3;
+    clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
+    max-width: 400px;
+  }
+  .image {
+    object-fit: fill;
+    border: 2px solid #3040D3;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    clip-path: polygon(42px 0, 100% 0, 100% calc(100% - 42px), calc(100% - 42px) 100%, 0 100%, 0 42px);
+    
+  }
+  
+  
+  .submitContainer{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .error{
+    color: red;
+    width: 100%;
+    text-align: center;
+  }
+
+  .noError{
+    color: transparent;
+  }

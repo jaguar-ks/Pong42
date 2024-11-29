@@ -3,8 +3,9 @@
     flex: 1;
     justify-content: center;
     justify-content: center;
-
-
+    /* background-color: rgb(178, 255, 127); */
+    height: calc(100vh - 55px);
+    /* padding-bottom: 30px; */
     .container{
 
         display: flex;
@@ -17,6 +18,7 @@
         scrollbar-width: thin; /* Firefox */
         scrollbar-color: rgba(0, 0, 0, 0.111) #00000000; /* Firefox */
         padding-top: 20px;
+        padding-bottom: 20px;
         max-width: 1220px;
 
         /* Scrollbar styling for WebKit browsers (Chrome, Safari) */
@@ -25,11 +27,9 @@
         }
         &::-webkit-scrollbar-track {
             background: #00000000; /* Background of the scrollbar track */
-            border-radius: 6px; /* Rounded corners for the track */
         }
         &::-webkit-scrollbar-thumb {
             background: rgba(0, 0, 0, 0.111); /* Color of the scrollbar thumb */
-            border-radius: 6px; /* Rounded corners for the thumb */
         }
         &::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 0, 0, 0.2); /* Hover state for the thumb */
@@ -51,10 +51,17 @@
 
         .box1, .box2, .box3 {
             height: 236px;
+            clip-path: polygon(28px 0, 100% 0, 100% calc(100% - 28px), calc(100% - 28px) 100%, 0 100%, 0 28px);
+            background-color: #3040D3;
         }
+
+
+
 
         .box4, .box5, .box6 {
             height: 512px;
+            clip-path: polygon(28px 0, 100% 0, 100% calc(100% - 28px), calc(100% - 28px) 100%, 0 100%, 0 28px);
+            background-color: #3040D3;
         }
 
         .line {
@@ -64,6 +71,8 @@
                 width: 100%;
             }
             box-shadow: rgba(149, 157, 165, 0.1) 0px 4px 4px;
+           
+            background-color: #3040D3;
         }
 
         .box6 {

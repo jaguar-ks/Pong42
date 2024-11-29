@@ -19,7 +19,9 @@ const Home = () => {
     updateCurrentPage("home");
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/");
+        const res = await axios.get("http://localhost:8000/api/users/me/", { withCredentials: true });
+        console.log(res.data);
+        
         // console.log(res.data.avatar_url);
         updateUserData({
           id: res.data.id,
@@ -53,7 +55,9 @@ const Home = () => {
   return (
     <div className={classes.home}>
       <div className={classes.container}>
-        <div className={classes.box1}><PlayerInfos/></div>
+        <div className={classes.box1}>
+          <PlayerInfos/>
+          </div>
         <div className={classes.box2}><WeeklyAttendance/></div>
         <div className={classes.box3}><Rate/></div>
         <div className={classes.line}><ProgressBar/></div>

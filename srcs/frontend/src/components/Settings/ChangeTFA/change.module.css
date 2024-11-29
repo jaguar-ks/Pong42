@@ -59,7 +59,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: flex-start;
-                background-color: #e0e0e0;
+                background-color: #EEEEE0;
                 cursor: pointer;
                 padding: 5px;
                 transition: justify-content 2s ease;
@@ -126,7 +126,7 @@
                 height: 45px;
                 width: 80px;
                 border-radius: 8px;
-                background-color: #e0e0e0;
+                background-color: #EEEEE0;
                 border: 1px solid #ccc;
                 cursor: pointer;
                 transition: transform 0.3s ease, background-color 0.3s ease;
