@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(req: NextRequest) {
-    // Get the "refresh_token" from cookies
-    const refreshToken = req.cookies.get('refresh_token')?.value;
+    // Get the "access_token" from cookies
+    const refreshToken = req.cookies.get('access_token')?.value;
 
     // Get the current URL path
     const { pathname } = req.nextUrl;

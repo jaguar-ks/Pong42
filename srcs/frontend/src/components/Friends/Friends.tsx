@@ -171,13 +171,15 @@ const Friends = () => {
         <div className={styles.friends}>
             <div className={styles.buttons}>
                 {buttons.map((item, index) => (
-                    <button
-                        key={index}
-                        onClick={() => handleClick(item)}
-                        className={clicked === item ? styles.buttonClicked : styles.button}
-                    >
-                        {item}
-                    </button>
+                    <div className={styles.buttonContainer}>
+                        <button
+                            key={index}
+                            onClick={() => handleClick(item)}
+                            className={clicked === item ? styles.buttonClicked : styles.button}
+                            >
+                            {item}
+                        </button>
+                    </div>
                 ))}
             </div>
             <div className={styles.data}>

@@ -4,6 +4,7 @@ import { useUserContext } from '../../context/UserContext'; // Import the custom
 import TimeDifference from '../TimeDifference/TimeDifference';
 import CopyToClipboard from '../CopyToClipboard/CopyToClipboard';
 import Image from 'next/image';
+import cornerImage from '../../../assets/Corner.svg'
 
 
 
@@ -57,6 +58,9 @@ const PlayerInfos = () => {
                     </div>
                 </div>
             </div>
+            {/* <div className={classes.zwak}>
+                <Image src={cornerImage} alt='corner image' width={10} height={100} />
+            </div> */}
         </div>
     );
 };

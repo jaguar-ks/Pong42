@@ -50,7 +50,7 @@ const Logout: React.FC = () => {
 
   return (
     <div className={classes.container}>
-      <p className={classes.question}>Are you sure you want to logout?</p>
+      <p className={classes.question}>Are you sure you ant to add header to logout?</p>
       <div className={classes.btnContainer}>
         <button 
           className={`${classes.btn} ${classes.yesBtn}`} 

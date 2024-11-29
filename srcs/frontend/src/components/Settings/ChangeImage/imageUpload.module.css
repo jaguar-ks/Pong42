@@ -39,7 +39,7 @@
         min-width: 300px;
         .nextImage{
             border-radius: 50%;
-            border: 1px solid #E0E0E0;
+            border: 1px solid #EEEEE0;
         }
 
         .inputFile {
@@ -102,7 +102,7 @@
                 border-radius: 6px;
                 border: none;
                 padding: 20px;
-                background-color: #E0E0E0;
+                background-color: #EEEEE0;
                 border: 1px solid #CCCCCC;
                 cursor: pointer;
                 transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
