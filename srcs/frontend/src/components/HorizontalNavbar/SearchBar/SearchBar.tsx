@@ -1,106 +1,156 @@
 "use client";
 
-import React, { useState, ChangeEvent } from "react";
-import classes from './SearchBar.module.css';
-import searchLogoBlack from '../../../../assets/SearchBlack.svg';
-import Image from "next/image";
-import avatarImage from '../../../../assets/player.png';
+import React, { useState, ChangeEvent, useEffect, useRef } from "react";
 import axios from "axios";
+import Image from "next/image";
 import { useRouter } from 'next/navigation';
 import { useUserContext } from "@/context/UserContext";
+import classes from './SearchBar.module.css';
+import searchLogoBlack from '../../../../assets/SearchBlack.svg';
 
-// Define the type for a single search result item
 interface SearchResult {
-    avatar_url: string;
-    first_name: string;
     id: number;
-    is_online: boolean;
-    last_name: string;
-    loses: number;
-    rank: number;
-    rating: number;
     username: string;
-    wins: number;
+    avatar_url: string | null;
+    is_online: boolean;
 }
 
-// Define the structure for paginated search results
-interface PaginatedSearchResults {
-    res: SearchResult[];
+interface SearchResponse {
+    count: number;
     next: string | null;
+    previous: string | null;
+    results: SearchResult[];
 }
 
-// Define the props type for SearchResultComponent
-interface SearchResultComponentProps {
-    searchResults: PaginatedSearchResults;
-}
-
-const SearchResultComponent: React.FC<SearchResultComponentProps> = ({ searchResults }) => {
+const SearchResultComponent: React.FC<{ 
+    searchResults: SearchResult[], 
+    hasMore: boolean,
+    onShowMore?: () => void 
+}> = ({ searchResults, hasMore, onShowMore }) => {
     const router = useRouter();
 
-    const handleClick = (result) => {
-
-        console.log(result);
-
-
+    const handleClick = (result: SearchResult) => {
         router.push(`/users/friend/${result.id}`);
     };
 
     return (
-        <div className={classes.resultContainer}>
-            {searchResults.res.map((result) => (
+        <>
+            {searchResults.map((result) => (
                 <button onClick={() => handleClick(result)} key={result.id} className={classes.resultItem}>
-                    <Image src={avatarImage} alt="Avatar Image" width={24} height={24} />
-                    <h2>{result.first_name} {result.last_name}</h2>
+                    <Image 
+                        src={result.avatar_url || "/default-avatar.png"} 
+                        alt={`${result.username}'s avatar`} 
+                        width={24} 
+                        height={24} 
+                        className={classes.avatarImage}
+                    />
+                    <span className={classes.username}>{result.username}</span>
+                    {result.is_online && <span className={classes.onlineStatus} aria-label="Online"></span>}
                 </button>
             ))}
-            {searchResults.next && <button className={classes.showAllBtn}>Show all results</button>}
-        </div>
+            {hasMore && onShowMore && (
+                <button onClick={onShowMore} className={classes.showAllBtn}>
+                    Show more results
+                </button>
+            )}
+        </>
     );
 };
 
 const SearchBar: React.FC = () => {
     const [searchVisible, setSearchVisible] = useState<boolean>(false);
-    const [searchResults, setSearchResults] = useState<PaginatedSearchResults>({ res: [], next: null });
+    const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+    const [hasMore, setHasMore] = useState<boolean>(false);
     const { search, updateSearch } = useUserContext();
-    
-    const getSearch = async (e: ChangeEvent<HTMLInputElement>) => {
-        const searchValue = e.target.value;
-        updateSearch(searchValue);
+    const [debouncedSearch, setDebouncedSearch] = useState(search);
+    const searchRef = useRef<HTMLDivElement>(null);
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+                setSearchVisible(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(search), 300);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    useEffect(() => {
+        if (debouncedSearch) {
+            fetchSearchResults();
+            setSearchVisible(true);
+        } else {
+            setSearchResults([]);
+            setHasMore(false);
+        }
+    }, [debouncedSearch]);
+
+    const fetchSearchResults = async (page = 1) => {
         try {
-            const res = await axios.get("http://localhost:8000/api/users/search/", {
+            const response = await axios.get<SearchResponse>("http://localhost:8000/api/users/search/", {
                 params: {
-                    page: 1,
-                    search: searchValue,
+                    page,
+                    search: debouncedSearch,
                 },
+                withCredentials: true,
             });
-            setSearchResults({ next: res.data.next, res: res.data.results });
+            console.log(response.data);
+            
+            if (page === 1) {
+                setSearchResults(response.data.results);
+            } else {
+                setSearchResults(prev => [...prev, ...response.data.results]);
+            }
+            setHasMore(!!response.data.next);
         } catch (error) {
             console.error("Error fetching search results:", error);
         }
     };
 
-    const handleImageClick = () => {
-        setSearchVisible(!searchVisible);
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        updateSearch(e.target.value);
+    };
+
+    const handleShowMore = () => {
+        fetchSearchResults(Math.ceil(searchResults.length / 10) + 1);
     };
 
     return (
-        <div className={`${classes.container} ${searchVisible ? classes.active : ''}`}>
-            <Image 
-                onClick={handleImageClick} 
-                className={classes.image} 
-                src={searchLogoBlack} 
-                alt="Search Logo"
-                width={15} 
-                height={15}
-            />
-            <input 
-                className={classes.input} 
-                placeholder="Search" 
-                onChange={getSearch} 
-                value={search}
-            />
-            {search && <SearchResultComponent searchResults={searchResults} />}
+        <div className={classes.searchWrapper}>
+            <div ref={searchRef} className={`${classes.container} ${searchVisible ? classes.active : ''}`}>
+                <Image 
+                    className={classes.image} 
+                    src={searchLogoBlack} 
+                    alt="Search Logo"
+                    width={15} 
+                    height={15}
+                />
+                <input 
+                    className={classes.input} 
+                    placeholder="Search" 
+                    onChange={handleInputChange} 
+                    value={search}
+                    onFocus={() => setSearchVisible(true)}
+                    aria-label="Search users"
+                />
+            </div>
+            {searchVisible && search && searchResults.length > 0 && (
+                <div className={classes.resultContainer}>
+                    <SearchResultComponent 
+                        searchResults={searchResults} 
+                        hasMore={hasMore}
+                        onShowMore={handleShowMore}
+                    />
+                </div>
+            )}
         </div>
     );
 };

@@ -38,14 +38,7 @@ const Logout: React.FC = () => {
       deleteAllCookies();
 
       // Call the sign-out API
-      await axios.post("http://localhost:8000/api/auth/sign-out/",
-        {},
-        {
-          withCredentials: true,
-        }
-      ).catch(err => {
-        console.error("Sign-in error:", err);
-      });
+      await axios.post("http://localhost:8000/api/auth/sign-out/");
 
       router.push('/auth/signin');
     } catch (error) {
@@ -57,7 +50,7 @@ const Logout: React.FC = () => {
 
   return (
     <div className={classes.container}>
-      <p className={classes.question}>Are you sure you want to logout?</p>
+      <p className={classes.question}>Are you sure you ant to add header to logout?</p>
       <div className={classes.btnContainer}>
         <button 
           className={`${classes.btn} ${classes.yesBtn}`} 

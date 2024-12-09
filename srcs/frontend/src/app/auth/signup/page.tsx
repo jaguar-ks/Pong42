@@ -1,159 +1,167 @@
 "use client"
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import axios from 'axios';
-import { schema } from "../../../schemas/validationSchema";
-import InputField from '../../../components/InputField/InputField';
-import classes from "./page.module.css";
-import loginPlayer from '../../../../assets/loginPlayer.svg';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import axios from 'axios'
+import { z } from 'zod'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
+import { InputField } from '@/components/InputField'
+import styles from './page.module.css'
+import imageee from '../../../../assets/syberPlayer.png'
 
-interface Errors {
-  firstname: string;
-  lastname: string;
-  email: string;
-  username: string;
-  password: string;
-  confermPassword: string;
-  non_field_errors: string;
-}
+const schema = z.object({
+  firstname: z.string().min(1, 'First name is required'),
+  lastname: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Invalid email address'),
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  confermPassword: z.string(),
+}).refine((data) => data.password === data.confermPassword, {
+  message: "Passwords don't match",
+  path: ["confermPassword"],
+})
 
-const SignUpPage: React.FC = () => {
-  const [formData, setFormData] = useState({
-    firstname: "",
-    lastname: "",
-    email: "",
-    username: "",
-    password: "",
-    confermPassword: "",
-    // non_field_errors: "",
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
-  const [errors, setErrors] = useState<Errors>({
+type FormData = z.infer<typeof schema>
+
+export default function SignUpPage() {
+  const [formData, setFormData] = useState<FormData>({
     firstname: '',
     lastname: '',
     email: '',
     username: '',
     password: '',
     confermPassword: '',
-    non_field_errors: '',
-  });
+  })
+  const [signedUp, setSignedUp] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [errors, setErrors] = useState<Partial<FormData> & { non_field_errors?: string }>({})
 
-  const router = useRouter();
+  const router = useRouter()
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = event.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    event.preventDefault();
-    setErrors({
-      firstname: '',
-      lastname: '',
-      email: '',
-      username: '',
-      password: '',
-      confermPassword: '',
-      non_field_errors: '',
-    });
-    setIsLoading(true);
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setErrors({})
+    setIsLoading(true)
 
-    const result = schema.safeParse(formData);
+    const result = schema.safeParse(formData)
     if (!result.success) {
-      const errorMsg = result.error.flatten().fieldErrors;
-      setErrors({
-        firstname: errorMsg.firstname?.[0] || '',
-        lastname: errorMsg.lastname?.[0] || '',
-        email: errorMsg.email?.[0] || '',
-        username: errorMsg.username?.[0] || '',
-        password: errorMsg.password?.[0] || '',
-        confermPassword: errorMsg.confermPassword?.[0] || '',
-        non_field_errors : errorMsg.non_field_errors?.[0] || ''
-      });
-      setIsLoading(false);
-      return;
+      setErrors(result.error.flatten().fieldErrors)
+      setIsLoading(false)
+      return
     }
 
     try {
-      await axios.post("http://localhost:8000/api/auth/sign-up/", {
+      await axios.post('http://localhost:8000/api/auth/sign-up/', {
         username: formData.username,
         password: formData.password,
         email: formData.email,
         first_name: formData.firstname,
-        last_name: formData.lastname
-      },
-      {withCredentials: true},
-    );
+        last_name: formData.lastname,
+      })
       setIsSuccess(true);
+      signedUp(true);
     } catch (err: any) {
-      console.error("Error:", err.response?.data);
-      setErrors(prev => ({
-        ...prev,
-        ...err.response?.data
-      }));
+      console.error('Error:', err.response?.data)
+      setErrors(err.response?.data || { non_field_errors: 'An error occurred' })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
-    <div className={classes.container}>
-      <h1 className={classes.title}>Sign Up</h1>
-      <div className={classes.container2}>
-        <div className={classes.leftSide}>
-          {!isSuccess ? (
-            <>
-              <p className={classes.welcomeMsg}>Welcome to the Ping Pong World</p>
-              <p className={classes.p}>Please create your account.</p>
-              <form className={classes.form} onSubmit={handleSubmit}>
-                {Object.entries(formData).map(([key, value]) => (
-                  <InputField
-                    key={key}
-                    label={key.charAt(0).toUpperCase() + key.slice(1)}
-                    type={key.includes('password') ? 'password' : 'text'}
-                    id={key}
-                    name={key}
-                    value={value}
-                    onChange={handleChange}
-                    error={errors[key as keyof Errors]}
-                  />
-                ))}
-                {errors.non_field_errors && <p className={classes.errorMsg}>Error: {errors.non_field_errors}</p>}
-                <input 
-                  type='submit' 
-                  value={isLoading ? "Loading..." : "Submit"} 
-                  className={classes.submitButton} 
-                  disabled={isLoading}
-                  style={{ backgroundColor: '#FF9B04' }}
-                />
-              </form>
-              <div className={classes.message}>
-                <p>If you already have an account <button className={classes.link} onClick={() => router.push("/auth/signin")}>Sign In</button></p>
+    <div className={styles.pageContainer}>
+      <Header forWhat="Sign Up"/>
+      <main className={styles.main}>
+        {/* <div className={styles.contentContainer}> */}
+          <div className={styles.formContainer}>
+            <div className={styles.formContent}>
+              <div className={!isSuccess ? styles.formSection : styles.formSectionSuccess}>
+                {!isSuccess ? (
+                  <>
+                    <h2 className={styles.subtitle}>Welcome to the Ping Pong World</h2>
+                    <p className={styles.description}>Please create your account.</p>
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                      {Object.entries(formData).map(([key, value]) => (
+                        <InputField
+                          key={key}
+                          label={key.charAt(0).toUpperCase() + key.slice(1)}
+                          type={key.includes('password') ? 'password' : 'text'}
+                          id={key}
+                          name={key}
+                          value={value}
+                          onChange={handleChange}
+                          error={errors[key as keyof FormData]}
+                        />
+                      ))}
+                      {errors.non_field_errors && (
+                        <p className={styles.errorText}>{errors.non_field_errors}</p>
+                      )}
+                      <div className={styles.submitContainer}>
+                        <div className={styles.submitButtonContainer}>
+                          <button
+                            type="submit"
+                            disabled={isLoading}
+                            className={styles.submitButton}
+                            >
+                            {isLoading ? 'Loading...' : 'Submit'}
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                    <p className={styles.signInText}>
+                      Already have an account?{' '}
+                      <button
+                        onClick={() => router.push('/auth/signin')}
+                        className={styles.signInLink}
+                      >
+                        Sign In
+                      </button>
+                    </p>
+                  </>
+                ) : (
+                  <div className={styles.successMessage}>
+                    <h2 className={styles.subtitle}>Sign Up Successful!</h2>
+                    <p className={styles.description}>please check your email to validate regestration.</p>
+                    <div className={styles.submitButtonContainer}>
+                      <button
+                        onClick={() => router.push('/auth/signin')}
+                        className={styles.submitButton}
+                      >
+                        Go to Login
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            </>
-          ) : (
-            <div className={classes.successMessage}>
-              <p className={classes.welcomeMsg}>Sign Up Successful!</p>
-              <p className={classes.p}>Your account has been created successfully.</p>
-              <button 
-                onClick={() => router.push("/auth/signin")} 
-                className={classes.submitButton}
-                style={{ backgroundColor: '#FF9B04', marginTop: '20px' }}
-              >
-                Go to Login
-              </button>
+              {!isSuccess && <div className={styles.imageSection}>
+                <div className={styles.containerImage}>
+                <div className={styles.ImageContainer}>
+                  
+                  <Image
+                    src={imageee}
+                    alt="Login Player"
+                    width={500}
+                    height={500}
+                    className={styles.image}
+                    />
+                    
+                </div>
+                  </div>
+              </div>}
             </div>
-          )}
-        </div>
-        <div className={classes.rightSide}>
-          <Image className={classes.image} src={loginPlayer} alt="Login Player"  />
-        </div>
-      </div>
+          </div>
+        {/* </div> */}
+      </main>
+      <Footer />
     </div>
-  );
-};
+  )
+}
 
-export default SignUpPage;
