@@ -1,16 +1,16 @@
 .container {
     display: flex;
-    border: 1px solid #CCCCCC;
     height: 40px;
     align-items: center;
     justify-content: flex-start;
     min-width: 200px;
     max-width: 400px;
     width: 90%;
-    border-radius: 20px;
-    background-color: #FFFFFF;
+    background-color: #EEEEE0;
     transition: all 0.3s ease;
     position: relative;
+    z-index: 1002;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
 }
 
 .container.active {
@@ -53,15 +53,16 @@
 
 .resultContainer {
     position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
+    top: 0px; left: 0px;
     background-color: #FFFFFF;
     border: 1px solid #CCCCCC;
     border-top: none;
     border-radius: 0 0 20px 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 10;
+    z-index: 999999;
+    max-height: 300px;
+    overflow-y: auto;
+    width: 100%;
 }
 
 .resultItem {
@@ -73,16 +74,40 @@
     border: none;
     background-color: transparent;
     width: 100%;
+    text-align: left;
 }
 
 .resultItem:hover {
     background-color: #F5F5F5;
 }
 
-.resultItem h2 {
-    margin-left: 10px;
+.avatarImage {
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.username {
     font-size: 14px;
     color: #000000;
+}
+
+.onlineStatus {
+    width: 8px;
+    height: 8px;
+    background-color: #4CAF50;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+.showAllBtn {
+    width: 100%;
+    height: 40px;
+    border: none;
+    background-color: transparent;
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 14px;
 }
 
 @media (max-width: 480px) {
@@ -91,12 +116,3 @@
     }
 }
 
-.showAllBtn{
-    width: 100%;
-    height: 40px;
-    border: none;
-    background-color: transparent;
-    color: blue;
-    text-decoration: underline;
-    cursor: pointer;
-}

@@ -39,6 +39,10 @@
     width: 20px;
     height: 20px;
 }
+.imageProfile {
+    width: 100%;
+    height: 100%;
+}
 
 .container2 {
     display: flex;
@@ -48,8 +52,15 @@
 }
 
 .iconsContainerSelected {
-    background-color: #333333;
-    border-color: #333333;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    background-color: #010101;
+    border: 1px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 .profile {
@@ -61,7 +72,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .X {
@@ -72,6 +83,76 @@
 
 .displayNone {
     display: none;
+}
+
+.dropdownWrapper {
+    position: relative;
+}
+
+.dropdownContent {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #EEEEE0;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    z-index: 1000;
+    padding: 10px;
+}
+
+.notificationItem,
+.messageItem {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #EEEEE0;
+}
+
+.notificationItem:last-child,
+.messageItem:last-child {
+    border-bottom: none;
+}
+
+.notificationImage,
+.messageImage {
+    margin-right: 10px;
+}
+
+.notificationText,
+.messageText {
+    flex: 1;
+}
+
+.notificationTime,
+.messageTime {
+    font-size: 12px;
+    color: #999999;
+}
+
+.messageSender {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.username {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.profileButton {
+    display: block;
+    width: 100%;
+    padding: 8px 0;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.profileButton:hover {
+    background-color: #f5f5f5;
 }
 
 @media screen and (max-width: 419px) {
@@ -88,3 +169,4 @@
         display: none;
     }
 }
+

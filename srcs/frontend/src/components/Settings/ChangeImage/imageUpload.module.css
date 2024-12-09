@@ -1,18 +1,47 @@
-.NotifNotif{
-    position: fixed;
+.NotifNotif {
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-
+    backdrop-filter: blur(2px);
 }
 
-.window{
+.bigWindowContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    background-color: #264D99;
+    clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
+    max-width: 400px;
+    min-width: 350px;
+    max-height: 80vh;
+    margin: auto;
+}
+
+.windowContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    border: 1px solid #264D99;
+    background-color: #ffffff;
+    clip-path: polygon(41px 0, 100% 0, 100% calc(100% - 41px), calc(100% - 41px) 100%, 0 100%, 0 41px);
+    max-width: 400px;
+    min-width: 350px;
+    padding: 20px;
+    max-height: 80vh;
+    margin: auto;
+}
+
+.window {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -20,104 +49,95 @@
     max-height: 100vh;
     overflow-y: scroll;
     scrollbar-width: none;
-    border-radius: 6px;
-    border: 1px solid black;
+    border: 1px solid #264D99;
     background-color: #ffffff;
+    clip-path: polygon(38px 0, 100% 0, 100% calc(100% - 38px), calc(100% - 38px) 100%, 0 100%, 0 40px);
     max-width: 400px;
     min-width: 350px;
-
-    .element{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 20px;
-        padding: 20px;
-        width: 100%;
-        border-radius: 6px;
-        max-width: 90vw;
-        min-width: 300px;
-        .nextImage{
-            border-radius: 50%;
-            border: 1px solid #EEEEE0;
-        }
-
-        .inputFile {
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            color: #000000; 
-            cursor: pointer; 
-            text-align: center;
-            transition: background-color 0.3s ease;
-            border: 1px solid rgba(0, 0, 0, 0.159);
-            
-          }
-          
-          .inputFile:hover {
-            background-color: #ffffff;
-            border-color: #F5F5F5;
-          }
-
-        .errors{
-            text-align: center;
-            color: red;
-            font-weight: bold;
-            margin-top: 5px;
-            font-size: 14px;
-        }
-
-        .label{
-            width: 100%;
-            font-size: 24px;
-            text-align: center;
-        }
-
-        .input{
-            border-radius: 6px;
-            border: none;
-            padding: 20px;
-            width: 400px;
-            font-size: 30px;
-            background-color: #F5F5F5;
-            transition: background-color 0.5s ease, transform 0.5s ease;
-            &:focus {
-                transform: scale(1.025);;
-            }
-        }
-
-        .buttonContainer{
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 10px;
-            gap: 20px;
-            .button{
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 50px;
-                width: 75px;
-                border-radius: 6px;
-                border: none;
-                padding: 20px;
-                background-color: #EEEEE0;
-                border: 1px solid #CCCCCC;
-                cursor: pointer;
-                transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
-                &:hover {
-                    transform: scale(1.025);
-                    background-color: #949494;
-                    color: white;
-                }
-            }
-        }
-    }
+    padding: 10px;
 }
 
-
-.Image{
-    width: 100px;
-    height: 100px;
+.element {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+    max-width: 90vw;
+    min-width: 300px;
 }
+
+.title {
+    font-size: 24px;
+    color: #264D99;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.nextImage {
+    border-radius: 50%;
+    border: 1px solid #EEEEE0;
+}
+
+.inputFile {
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #000000; 
+    cursor: pointer; 
+    text-align: center;
+    transition: background-color 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.159);
+}
+
+.inputFile:hover {
+    background-color: #ffffff;
+    border-color: #F5F5F5;
+}
+
+.errors {
+    text-align: center;
+    color: #ff3333;
+    font-weight: bold;
+    margin-top: 5px; 
+    font-size: 14px; 
+}
+
+.buttonContainer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    gap: 20px;
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    width: 75px;
+    border: none;
+    padding: 20px;
+    background-color: #264D99;
+    border: 1px solid #CCCCCC;
+    cursor: pointer;
+    transition: background-color 0.5s ease, transform 0.5s ease;
+    color: white;
+    font-weight: bold;
+}
+
+.button:hover {
+    transform: scale(1.025);
+    background-color: #1a3366;
+}
+
+.button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+

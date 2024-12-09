@@ -1,113 +1,163 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import classes from './change.module.css';
-import axios from 'axios';
-import { useUserContext } from '@/context/UserContext';
-import QRCode from 'react-qr-code';
+import axios from "axios";
+import { useUserContext } from "@/context/UserContext";
+import QRCode from "react-qr-code";
 
 interface ChangeTFAProps {
   setCurrentPage: (page: string) => void;
 }
 
 const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
-  const [boolIsActive, setBoolIsActive] = useState<boolean>(false);
-  const [isloading, setIsloading] = useState<boolean>(false);
-  const [toggleActive, setToggleActive] = useState<boolean>(false);
-  const [code, setCode] = useState<string>("");
-  const [inputCode, setInputCode] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const { userData } = useUserContext();
+  const [isActive, setIsActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showInput, setShowInput] = useState(false);
+  const [code, setCode] = useState("");
+  const [inputCode, setInputCode] = useState("");
+  const [error, setError] = useState("");
+  const { userData, updateUserData } = useUserContext();
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsloading(true);
+    const fetchUserData = async () => {
+      setIsLoading(true);
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/");
-        setBoolIsActive(res.data.two_fa_enabled);
-        setToggleActive(res.data.two_fa_enabled);
-      } catch (err: any) {
-        console.log("Error in fetching user data", err);
+        const res = await axios.get("http://localhost:8000/api/users/me/", { withCredentials: true });
+        setIsActive(res.data.two_fa_enabled);
+      } catch (err) {
+        console.error("Failed to fetch user data:", err);
       } finally {
-        setIsloading(false);
+        setIsLoading(false);
       }
     };
-    fetchData();
+    fetchUserData();
   }, []);
 
-  const handleActivateTFA = async () => {
-      setIsloading(true);
-      setToggleActive(!toggleActive);
+  const handleToggleTFA = async () => {
+    setError("");
+    if (isActive) {
+      setShowInput(true);
+    } else {
+      setIsLoading(true);
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/");
+        const res = await axios.get("http://localhost:8000/api/users/me/", { withCredentials: true });
         setCode(res.data.otp_uri);
-      } catch (err: any) {
-        console.log("Error in fetching OTP URI", err);
+        setShowInput(true);
+      } catch (err) {
+        setError("Failed to fetch QR code. Please try again.");
+        console.error("Error fetching QR code:", err);
       } finally {
-        setIsloading(false);
+        setIsLoading(false);
       }
+    }
   };
 
   const handleDone = async () => {
-    setIsloading(true);
+    setIsLoading(true);
+    setError("");
     try {
-      const res = await axios.post("http://localhost:8000/api/auth/2fa/enable/", {
-        "otp_code": inputCode,
-      });
-
-      // Navigate back after success
-      setCurrentPage("");
-    } catch (err: any) {
+      if (isActive) {
+        await axios.post(
+          "http://localhost:8000/api/auth/2fa/disable/",
+          { otp_code: inputCode },
+          { withCredentials: true }
+        );
+        updateUserData({ ...userData, two_fa_enabled: false });
+        setIsActive(false);
+      } else {
+        await axios.post(
+          "http://localhost:8000/api/auth/2fa/enable/",
+          { otp_code: inputCode },
+          { withCredentials: true }
+        );
+        updateUserData({ ...userData, two_fa_enabled: true });
+        setIsActive(true);
+      }
+      setShowInput(false);
+      setInputCode("");
+      setCode("");
+    } catch (err) {
       setError("Invalid OTP code. Please try again.");
+      console.error("Error handling OTP:", err);
     } finally {
-      setIsloading(false);
+      setIsLoading(false);
     }
-    try {
-      const res = await axios.patch(
-        "http://localhost:8000/api/users/me/",
-        { last_name: newLastName },
-      );
-      console.log(res.data);
-      updateUserData({ ...userData, last_name: newLastName });
+  };
+
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
       setCurrentPage("");
-    } catch (err: any) {
-      setError(err.response?.data?.last_name || []);
     }
   };
 
   return (
-    <div className={classes.NotifNotif}>
-      <div
-        className={classes.window}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-      >
-        <div className={classes.element}>
-          <div className={classes.toggleContainer}>
-            <button
-              className={toggleActive ? classes.toggleButtonActive : classes.toggleButton}
-              onClick={handleActivateTFA}
-            >
-              <div className={classes.dote}></div>
-            </button>
-          </div>
-           {(!boolIsActive && code) && <QRCode value={code} size={256} />}
-            <input
-              onChange={(e) => setInputCode(e.target.value)}
-              className={classes.codeInput}
-              type="text"
-              placeholder="_ _ _ _ _ _"
-              value={inputCode}
-            />
-          {error && <p className={classes.error}>{error}</p>}
-          <div className={classes.buttonContainer}>
-            <button className={classes.button} onClick={handleDone} disabled={isloading}>
-              {isloading ? "Loading..." : "Done"}
-            </button>
-            <button className={classes.button} onClick={() => setCurrentPage("")}>
-              Cancel
-            </button>
+    <div className={classes.NotifNotif} onClick={handleOverlayClick}>
+      <div className={classes.bigWindowContainer}>
+        <div className={classes.windowContainer}>
+          <div className={classes.window}>
+            <div className={classes.element}>
+              <h2 className={classes.title}>Two-Factor Authentication</h2>
+              <div className={classes.toggleContainer}>
+                <button
+                  className={classes.toggleButton}
+                  onClick={handleToggleTFA}
+                  disabled={isLoading || showInput}
+                >
+                  <div className={isActive ? classes.doteActive : classes.dote}>
+                    <p className={classes.buttonText}>{isActive ? "ON" : "OFF"}</p>
+                  </div>
+                </button>
+              </div>
+              {showInput && (
+                <div className={classes.inputContainer}>
+                  {!isActive && code && (
+                    <>
+                      <p className={classes.instructions}>
+                        Scan this QR code with your authenticator app, then enter the 6-digit code below:
+                      </p>
+                      <QRCode value={code} size={150} />
+                    </>
+                  )}
+                  {isActive && (
+                    <p className={classes.instructions}>
+                      Enter your current 2FA code to disable Two-Factor Authentication:
+                    </p>
+                  )}
+                  <input
+                    onChange={(e) => setInputCode(e.target.value)}
+                    className={classes.codeInput}
+                    type="text"
+                    placeholder="_ _ _ _ _ _"
+                    value={inputCode}
+                    disabled={isLoading}
+                    aria-label="Enter 2FA code"
+                  />
+                </div>
+              )}
+              {error && <p className={classes.errors}>{error}</p>}
+              <div className={classes.buttonContainer}>
+                {showInput && (
+                  <button 
+                    className={classes.button} 
+                    onClick={handleDone} 
+                    disabled={isLoading || inputCode.length !== 6}
+                  >
+                    {isLoading ? "Processing..." : "Done"}
+                  </button>
+                )}
+                <button 
+                  className={classes.button} 
+                  onClick={() => {
+                    setShowInput(false);
+                    setInputCode("");
+                    setCode("");
+                    setCurrentPage("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -116,3 +166,4 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
 };
 
 export default ChangeTFA;
+
