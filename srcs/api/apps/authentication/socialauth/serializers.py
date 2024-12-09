@@ -12,24 +12,35 @@ PROVIDERS_SETTINGS = settings.OAUTH_PROVIDERS_SETTINGS
 
 
 class OauthAuthorizeSerializer(serializers.Serializer):
-    authorization_url = serializers.CharField(max_length=250)
+    provider_name = serializers.CharField(max_length=20)
+    provider_icon = serializers.URLField()
+    provider_url = serializers.URLField()
 
-    def to_representation(self, instance):
-        provider = self.context["provider"]
-        config = PROVIDERS_SETTINGS.get(provider, None)
-        if not config:
-            raise Http404(f"provider {provider} not implemented")
 
-        oauth_session = OAuth2Session(
-            client_id=config["client_id"],
-            redirect_uri=config["redirect_uri"],
-            scope=config["scope"],
-        )
+class OauthProvidersUrls(serializers.Serializer):
+    providers = serializers.ListField(child=OauthAuthorizeSerializer())
 
-        authorize_url, _ = oauth_session.authorization_url(
-            url=config["authorize_url"],
-        )
-        return {"authorization_url": authorize_url}
+    def to_representation(self, instance=None):
+        providers = []
+
+        for provider, config in PROVIDERS_SETTINGS.items():
+            oauth_session = OAuth2Session(
+                client_id=config["client_id"],
+                redirect_uri=config["redirect_uri"],
+                scope=config["scope"],
+            )
+            authorize_url, _ = oauth_session.authorization_url(
+                url=config["authorize_url"],
+            )
+            providers.append(
+                {
+                    "provider_icon": config.get("icon", None),
+                    "provider_name": provider,
+                    "provider_url": authorize_url,
+                }
+            )
+
+        return {"providers": providers}
 
 
 class OauthCallBackSerializer(serializers.Serializer):
