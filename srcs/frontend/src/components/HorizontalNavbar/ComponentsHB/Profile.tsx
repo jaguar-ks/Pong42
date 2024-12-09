@@ -16,7 +16,7 @@ const Profile: React.FC<ProfileProps> = ({ username }) => {
   return (
     <div className={classes.dropdownContent}>
       <div className={classes.profileHeader}>
-        <Image src={userData.avatar_url} alt={username} width={60} height={60} className={classes.profileImage} />
+        <Image src={userData.avatar_url ||  "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} alt={username} width={60} height={60} className={classes.profileImage} />
         <div className={classes.profileInfo}>
           <p className={classes.username}>{username}</p>
           <span className={classes.viewProfile}>View Profile</span>
