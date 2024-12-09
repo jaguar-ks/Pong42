@@ -41,6 +41,7 @@
 .page-content {
   flex: 1;
   overflow: auto;
+  
 }
 
 @media screen and (max-width: 880px) {

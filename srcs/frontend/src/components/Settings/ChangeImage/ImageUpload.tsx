@@ -1,12 +1,8 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
-import { Image as CloudinaryImage } from "cloudinary-react";
-// import { UserContext } from "@/app/context/UserContext";
-import classes from "./imageUpload.module.css";
-// import loadMyData from "@/Components/LoadMyData";
-import NextImage from "next/image";
+import React, { useState, useEffect } from "react";
+import classes from './imageUpload.module.css';
+import Image from "next/image";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { useUserContext } from "@/context/UserContext";
 
 interface ImageUploadProps {
@@ -14,22 +10,18 @@ interface ImageUploadProps {
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
-  const [oldImage, setOldImage] = useState<string>("");
   const [newImage, setNewImage] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const router = useRouter();
-  const {userData, updateUserData} = useUserContext();
+  const { userData, updateUserData } = useUserContext();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await axios.get("http://localhost:8000/api/users/me/");
-        console.log(res.data.avatar_url);
         setNewImage(res.data.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png");
       } catch (err: any) {
         console.log("Error in fetching user data", err);
-      } finally {
       }
     };
 
@@ -98,59 +90,58 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
         {
           avatar_url: newImage,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access")}`,
-            "Content-Type": "application/json",
-          },
-        }
+        { withCredentials: true }
       );
       console.log(res.data);
-      // updateUserData({ ...UserData, avatar: newImage });
+      updateUserData({...userData, avatar_url: newImage});
       setCurrentPage("");
-      updateUserData({...userData, avatar_url: newImage})
     } catch (err) {
       console.error("Error updating user data:", err);
       setError("Failed to update avatar. Please try again.");
     } finally {
-      setIsLoading(false); // End loading
+      setIsLoading(false);
+    }
+  };
+
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      setCurrentPage("");
     }
   };
 
   return (
-    <div className={classes.NotifNotif}>
-      <div className={classes.window}>
-        <div className={classes.element}>
-          <label className={classes.label}>Change Profile Picture</label>
-          {newImage ? (
-            <NextImage className={classes.nextImage} alt="New Avatar" src={newImage} width={100} height={100} />
-          ) : (
-            <NextImage className={classes.nextImage} alt="Old Avatar" src={oldImage} width={100} height={100} />
-          )}
-          <input
-            type="file"
-            name="file"
-            placeholder="Upload an Image"
-            onChange={uploadImage}
-            disabled={isLoading}
-            className={classes.inputFile}
-          />
-          {error && <span className={classes.error}>{error}</span>}
-          <div className={classes.buttonContainer}>
-            <button
-              className={classes.button}
-              onClick={handleChangeAvatar}
-              disabled={isLoading || !newImage}
-            >
-              {isLoading ? "Updating..." : "Done"}
-            </button>
-            <button
-              className={classes.button}
-              onClick={() => setCurrentPage("")}
-              disabled={isLoading} 
-            >
-              Cancel
-            </button>
+    <div className={classes.NotifNotif} onClick={handleOverlayClick}>
+      <div className={classes.bigWindowContainer}>
+        <div className={classes.windowContainer}>
+          <div className={classes.window}>
+            <div className={classes.element}>
+              <h2 className={classes.title}>Change Profile Picture</h2>
+              <Image className={classes.nextImage} alt="Avatar" src={newImage || userData.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} width={100} height={100} />
+              <input
+                type="file"
+                name="file"
+                onChange={uploadImage}
+                disabled={isLoading}
+                className={classes.inputFile}
+              />
+              {error && <span className={classes.errors}>{error}</span>}
+              <div className={classes.buttonContainer}>
+                <button
+                  className={classes.button}
+                  onClick={handleChangeAvatar}
+                  disabled={isLoading || !newImage}
+                >
+                  {isLoading ? "Updating..." : "Update"}
+                </button>
+                <button
+                  className={classes.button}
+                  onClick={() => setCurrentPage("")}
+                  disabled={isLoading}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -159,3 +150,4 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
 };
 
 export default ImageUpload;
+
