@@ -19,7 +19,7 @@ OAUTH_CALLBACK_SCHEMA = {
     "summary": "social auth callback",
     "description": "social auth callback view for oauth providers like google, facebook, etc.",
     "request": serializers.OauthCallBackSerializer,
-    'parameters': [OAUTH_PARAM],
+    "parameters": [OAUTH_PARAM],
     "responses": {
         status.HTTP_200_OK: OpenApiResponse(
             description="singed in successfully",
@@ -51,7 +51,7 @@ OAUTH_CALLBACK_SCHEMA = {
                     },
                     "detail": {
                         "type": "string",
-                        "example": "you oauth provider is didn't provide an email"
+                        "example": "you oauth provider is didn't provide an email",
                     },
                 },
             },
@@ -74,34 +74,7 @@ OAUTH_CALLBACK_SCHEMA = {
 
 
 OAUTH_AUTHORIZE_SCHEMA = {
-    'summary': 'social auth authorize',
-    'description': 'get authorize url for oauth providers',
-    'parameters': [OAUTH_PARAM],
-    'responses': {
-        status.HTTP_200_OK: OpenApiResponse(
-            description='authorize url',
-            response={
-                'type': 'object',
-                'properties': {
-                    'authorize_url': {
-                        'type': 'string',
-                        'example': 'https://example.com/oauth/authorize?client_id=1234&redirect_uri=https://example.com/callback&scope=email',
-                    }
-                }
-            }
-        ),
-        status.HTTP_404_NOT_FOUND: OpenApiResponse(
-            description="Not found",
-            response={
-                "type": "object",
-                "properties": {
-                    "detail": {
-                        "type": "string",
-                        "example": "provider not implemented",
-                    },
-                },
-            },
-        ),
-    },
-    'tags': ['SOCIAL AUTH']
+    "summary": "social auth authorize urls",
+    "description": "get all implemented providers authorize url for oauth2.0",
+    "tags": ["SOCIAL AUTH"],
 }
