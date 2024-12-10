@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import Image from 'next/image';
 import axios from 'axios';
 import TestImage from '../../../assets/player.png'
-import styles from './Friends.module.css'
+import styles from './friends.module.css'
 
 const buttons: string[] = ["Online", "Request", "Blocked"];
 const OnlinePeople = [
