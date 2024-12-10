@@ -2,17 +2,25 @@
 
 services:
     pgdb:
-        image: postgres:14
+        image: postgres:15
         container_name: postgres
         volumes:
             - postgres_data:/var/lib/postgresql/data/
+            - ./srcs/postgres/logs/:/var/log/postgresql/
+            - ./srcs/postgres/tools/dump_logs.sh:/docker-entrypoint-initdb.d/dump_logs.sh
         networks:
             - transcendance_net
+            - elk
         restart: always
         environment:
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: "halla123"
+            POSTGRES_DB: "pgdb"
+            POSTGRES_USER: "postgres"
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
 
 
     backend:
@@ -24,29 +32,125 @@ services:
             - backend_files:/var/www/
         networks:
             - transcendance_net
+            - elk
         ports:
             - 8000:8000
         depends_on:
-            - pgdb
-        restart: on-failure
-        environment:
-            DEBUG: True # ['True', 'False']
-            DJANGO_SETTING_MODULE: config.django.local
-            DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgdb:5432/${POSTGRES_DB}
-            DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
-            DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
-            DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
-            DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+            pgdb:
+                condition: service_healthy
 
+        restart: on-failure
+        env_file:
+            - ./srcs/api/.env.example
+        # environment:
+        #     DEBUG: True # ['True', 'False']
+        #     DJANGO_SETTING_MODULE: config.django.local
+        #     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgdb:5432/${POSTGRES_DB}
+        #     DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
+        #     DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
+        #     DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
+        #     DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+    
+    frontend:
+        build: ./srcs/frontend
+        container_name: nextJs
+        ports:
+            - "3000:3000"  # Map host port 3000 to container port 3000
+        volumes:
+            - ./srcs/frontend/src/:/app/src/
+        depends_on:
+            - backend
+        networks:
+            - transcendance_net
+        restart: on-failure
+
+    elasticsearch:
+        container_name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
+        env_file:
+            - ./srcs/ELK/.env
+        environment:
+            - discovery.type=single-node
+            - xpack.security.enabled=true
+            - ELASTIC_USERNAME=elastic
+        healthcheck:
+            test: ["CMD-SHELL", "curl -s -u elastic:lol123 http://localhost:9200/_cat/health >/dev/null || exit 1"]
+            interval: 30s
+            timeout: 30s
+            retries: 3
+            start_period: 60s
+        volumes:
+            - ./srcs/ELK/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+            - es_data:/usr/share/elasticsearch/data
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        networks:
+            - elk
+        restart: always
+
+    setup_kibana:
+        image: curlimages/curl:latest
+        container_name: setup_kibana
+        volumes:
+            - ./srcs/ELK/tools/init-kibana.sh:/init-kibana.sh
+        command: ["sh", "/init-kibana.sh"]
+        networks:
+            - elk
+        env_file:
+            - ./srcs/ELK/.env
+        depends_on:
+            elasticsearch:
+                condition: service_healthy
+    
+    logstash:
+        container_name: logstash
+        image: docker.elastic.co/logstash/logstash:8.10.1
+        volumes:
+            - ./srcs/ELK/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+            - ./srcs/ELK/logstash/pipeline:/usr/share/logstash/pipeline
+            - ./srcs/postgres/logs/:/var/log/postgres/
+        ports:
+            - "50000:50000"
+            - "9600:9600"
+        env_file:
+            - ./srcs/ELK/.env
+        environment:
+            - ELASTICSEARCH_USERNAME=elastic
+            - LS_JAVA_OPTS=-Xms256m -Xmx256m
+            # - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+            # - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+        networks:
+            - elk
+        depends_on:
+            elasticsearch:
+                condition: service_healthy
+
+    kibana:
+        container_name: kibana
+        image: docker.elastic.co/kibana/kibana:8.10.1
+        depends_on:
+            setup_kibana:
+                condition: service_completed_successfully
+        env_file:
+            - ./srcs/ELK/.env
+        environment:
+            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+            - ELASTICSEARCH_USERNAME=kibana_system
+            - ELASTICSEARCH_SSL_VERIFICATIONMODE=none
+        volumes:
+            - ./srcs/ELK/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+        ports:
+            - "5601:5601"
+        networks:
+            - elk 
 
 volumes:
     postgres_data:
     backend_files:
-    #     driver: local
-    #     driver_opts:
-    #         type: none
-    #         o: bind
-    #         device: /Users/zel-bouz/transcendance/srcs/api
+    es_data:
+        driver: local
 
 networks:
     transcendance_net:
+    elk:
