@@ -14,6 +14,10 @@ vault server -config=/vault/config/vault.hcl &
 VAULT_PID=$!
 
 init_vault() {
+    READY=$(set +e; vault operator init -status &>/dev/null; echo $?)
+    if [ $READY -eq 0 ]; then
+        return
+    fi
     INIT_OUT=$(vault operator init -format=json)
     # Extract and store unseal keys and root token
     UNSEAL_KEY_1=$(echo $INIT_OUT | jq -r '.unseal_keys_b64[0]')
@@ -42,16 +46,13 @@ vault_login() {
         echo "[INFO] : logged successfully and vault is ready to use"
     else
         echo "[INFO] : vault is not initialized"
+        # init_vault
     fi
 }
 
-# Wait for Vault to respond
-for i in $(seq 1 $VAULT_READY_TIMEOUT); do
-    if curl -s "${VAULT_SERVER_ADDRESS}/v1/sys/health" | jq ".sealed == true"; then
-        break
-    fi
-    echo "Waiting... ($i/$VAULT_READY_TIMEOUT)"
-    sleep 1
+echo "Waiting for Vault to be ready..."
+while vault status | grep -qs 'connection refused'; do
+  sleep 5
 done
 
 if ! curl -s "${VAULT_SERVER_ADDRESS}/v1/sys/health" | jq ".sealed == true"; then
@@ -60,7 +61,18 @@ if ! curl -s "${VAULT_SERVER_ADDRESS}/v1/sys/health" | jq ".sealed == true"; the
     exit 1
 fi
 
-if [ -n $(vault status | grep "Initialized.*true") ]; then
+READY=$(set +e; vault operator init -status &>/dev/null; echo $?)
+
+# if [ -n "$READY" ]; then
+#     echo "[ZBIIIII]"
+#     vault status | grep "Initialized.*true"
+# else
+#     echo "[9ALAWI]"
+#     vault status | grep "Initialized.*true"
+# fi
+
+
+if [ $READY -eq 0 ]; then
     echo "[INFO] : vault is already initialized"
     vault_login
 else
