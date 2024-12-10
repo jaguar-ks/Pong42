@@ -44,5 +44,5 @@ htmlcov/
 !**/migrations/__init__.py
 
 #VAULT
-*vault/data*
-*vault/init*
+*/vault/data/*
+*/vault/init/*
