@@ -1,6 +1,9 @@
 # version: '3.8'
 
 services:
+    #################################################################
+    #                          WEB APP                              #
+    #################################################################
     pgdb:
         image: postgres:15
         container_name: postgres
@@ -22,7 +25,6 @@ services:
             timeout: 10s
             retries: 5
 
-
     backend:
         image: django:trns
         container_name: backend
@@ -42,15 +44,7 @@ services:
         restart: on-failure
         env_file:
             - ./srcs/api/.env.example
-        # environment:
-        #     DEBUG: True # ['True', 'False']
-        #     DJANGO_SETTING_MODULE: config.django.local
-        #     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgdb:5432/${POSTGRES_DB}
-        #     DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
-        #     DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
-        #     DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
-        #     DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
-    
+
     frontend:
         build: ./srcs/frontend
         container_name: nextJs
@@ -64,6 +58,11 @@ services:
             - transcendance_net
         restart: on-failure
 
+    #################################################################
+
+    #################################################################
+    #                         ELK stack                             #
+    #################################################################
     elasticsearch:
         container_name: elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
@@ -144,6 +143,32 @@ services:
             - "5601:5601"
         networks:
             - elk 
+    #################################################################
+
+    #################################################################
+    #                           VAULT & WAF                         #
+    #################################################################
+    vault:
+        image: hashicorp/vault:1.18
+        container_name: vault
+        ports:
+            - "8200:8200"
+        cap_add:
+            - IPC_LOCK
+        networks:
+            - elk
+            - transcendance_net
+        volumes:
+            - ./srcs/vault/data:/vault/data
+            - ./srcs/vault/init:/vault/init
+            - ./srcs/vault/config:/vault/config
+            - ./srcs/vault/tools/set_up.sh:/vault/set_up.sh
+        environment:
+            - VAULT_ADDR=http://127.0.0.1:8200
+        command: ["/bin/sh", "-c", "/vault/set_up.sh"]
+        restart: unless-stopped
+    #################################################################
+
 
 volumes:
     postgres_data:
