@@ -64,6 +64,10 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
         );
         updateUserData({ ...userData, two_fa_enabled: false });
         setIsActive(false);
+        setShowInput(false);
+        setInputCode("");
+        setCode("");
+        setCurrentPage("");
       } else {
         await axios.post(
           "http://localhost:8000/api/auth/2fa/enable/",
@@ -72,6 +76,10 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
         );
         updateUserData({ ...userData, two_fa_enabled: true });
         setIsActive(true);
+        setShowInput(false);
+        setInputCode("");
+        setCode("");
+        setCurrentPage("");
       }
       setShowInput(false);
       setInputCode("");

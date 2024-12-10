@@ -1,0 +1,71 @@
+.friends {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: #F5F5F5;
+    padding: 20px;
+    gap: 20px;
+    clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 30px);
+    border: 2px solid #3040D3;
+}
+
+.button {
+    flex: 1 1 calc(50% - 20px);
+    max-width: 200px;
+    min-width: 150px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #FFFFFF;
+    color: #3040D3;
+    border: 2px solid #3040D3;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    padding: 0 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.button:hover {
+    background-color: #3040D3;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.iconWrapper {
+    width: 40px;
+    height: 40px;
+    background-color: #F0F0F0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+}
+
+.icon {
+    transition: all 0.3s ease;
+}
+
+.button:hover .icon {
+    filter: brightness(0) invert(1);
+}
+
+.buttonText {
+    flex: 1;
+}
+
+@media (max-width: 600px) {
+    .button {
+        flex: 1 1 100%;
+        max-width: none;
+    }
+}
+

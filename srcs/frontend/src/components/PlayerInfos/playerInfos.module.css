@@ -9,7 +9,7 @@
     clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 30px);
 }
 
-.imageC {
+.imageContainer {
     flex: 2;
     display: flex;
     flex-direction: column;
@@ -19,11 +19,47 @@
     min-width: 50px;
 }
 
+.imageWrapper {
+    position: relative;
+    margin-bottom: 10px;
+}
+
 .image {
     width: 80px;
     height: 80px;
     border-radius: 50%;
     object-fit: cover;
+}
+
+.statusDot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.online {
+    background-color: #4CAF50;
+}
+
+.offline {
+    background-color: #9E9E9E;
+}
+
+.nameUnderImage {
+    font-size: 14px;
+    color: #333333;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.lastSeen {
+    font-size: 12px;
+    color: #666666;
+    text-align: center;
+    margin-top: 5px;
 }
 
 .infosContainer {
@@ -57,7 +93,7 @@
         flex-direction: column;
     }
 
-    .imageC {
+    .imageContainer {
         margin-bottom: 10px;
     }
 
@@ -69,6 +105,8 @@
         font-size: 12px;
     }
 }
-.zwak{
+
+.zwak {
     margin: 10px;
 }
+
