@@ -55,7 +55,12 @@ class UserDetailSerializer(UserSerializer):
             .filter((Q(initiator=user) | Q(recipient=user)))
             .first()
         )
-        return conn.status if conn is not None else None
+        if not conn:
+            return None
+        if conn.status == Connection.PENDING:
+            if conn.initiator.id == user.id:
+                return "request_sent"
+        return conn.status
 
 
 class UpdateAuthUserSerializer(serializers.ModelSerializer):
