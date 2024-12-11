@@ -33,6 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
             "rating",
         )
 
+
 class ConnectionSerializer(serializers.Serializer):
     # Input
     recipient_id = serializers.IntegerField(write_only=True, required=True)
@@ -83,7 +84,11 @@ class ConnectionSerializer(serializers.Serializer):
 
         status = instance.status
         if instance.status == Connection.PENDING:
-            status = 'sent_request' if user.id == instance.recipient.id else 'incoming_request'
+            status = (
+                "sent_request"
+                if user.id == instance.recipient.id
+                else "incoming_request"
+            )
 
         return {
             "id": instance.id,
@@ -98,7 +103,6 @@ class ConnectionSerializer(serializers.Serializer):
             initiator=self.context["request"].user,
             recipient=self.context["recipient"],
         )
-
 
 
 class UserDetailSerializer(UserSerializer):
