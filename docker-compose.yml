@@ -163,6 +163,7 @@ services:
             - ./srcs/vault/init:/vault/init
             - ./srcs/vault/config:/vault/config
             - ./srcs/vault/tools/set_up.sh:/vault/set_up.sh
+            - ./srcs/vault/logs:/vault/logs
         environment:
             - VAULT_ADDR=http://127.0.0.1:8200
         command: ["/bin/sh", "-c", "/vault/set_up.sh"]

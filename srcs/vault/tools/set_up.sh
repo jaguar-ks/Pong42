@@ -63,15 +63,6 @@ fi
 
 READY=$(set +e; vault operator init -status &>/dev/null; echo $?)
 
-# if [ -n "$READY" ]; then
-#     echo "[ZBIIIII]"
-#     vault status | grep "Initialized.*true"
-# else
-#     echo "[9ALAWI]"
-#     vault status | grep "Initialized.*true"
-# fi
-
-
 if [ $READY -eq 0 ]; then
     echo "[INFO] : vault is already initialized"
     vault_login
@@ -79,5 +70,7 @@ else
     init_vault
     vault_login
 fi
+
+
 
 wait $VAULT_PID
