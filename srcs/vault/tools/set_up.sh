@@ -71,6 +71,6 @@ else
     vault_login
 fi
 
-
+/bin/sh -c /vault/tools/secrets_init.sh
 
 wait $VAULT_PID
