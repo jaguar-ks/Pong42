@@ -23,7 +23,15 @@ class AuthUserSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username", "avatar_url", "is_online")
+        fields = (
+            "id",
+            "username",
+            "avatar_url",
+            "is_online",
+            "wins",
+            "loses",
+            "rating",
+        )
 
 
 class UserDetailSerializer(UserSerializer):
@@ -41,10 +49,12 @@ class UserDetailSerializer(UserSerializer):
         )
 
     def get_connection_status(self, instance):
-        user = self.context['request'].user
-        conn = Connection.get_user_connections(instance).filter(
-            (Q(initiator=user) | Q(recipient=user))
-        ).first()
+        user = self.context["request"].user
+        conn = (
+            Connection.get_user_connections(instance)
+            .filter((Q(initiator=user) | Q(recipient=user)))
+            .first()
+        )
         return conn.status if conn is not None else None
 
 
