@@ -1,4 +1,4 @@
-FROM python:3.12-slim-bullseye
+FROM python:3.12-alpine3.21
 
 # Set the working directory in the container
 WORKDIR /var/www/
@@ -15,4 +15,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Run the setup script for migrations
-ENTRYPOINT [ "bash", "tools/setup.sh" ]
+ENTRYPOINT [ "sh", "tools/setup.sh" ]
