@@ -24,7 +24,9 @@ fclean: down delete_images
 init_vault:
 	rm -rf ./srcs/vault/data/*
 	rm -rf ./srcs/vault/init/*
+	rm ./srcs/api/cred.env
+	rm ./srcs/api/django-cred.json
 
-.PHONY: all build up down delete_images fclean
+.PHONY: all build up down delete_images fclean init_vault
 
-.SILENT: all build up down delete_images fclean
+.SILENT: all build up down delete_images fclean init_vault
