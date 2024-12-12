@@ -34,13 +34,15 @@ const WeeklyAttendance: React.FC<WeeklyAttendanceProps> = ({ user }) => {
 
   useEffect(() => {
     const data = user === 'search' ? userDataSearch : userData;
-    
+
+    const adjustedData = [data.wins || 0.01, data.loses || 0.01];
+
     setChartData({
       labels: ['Wins', 'Losses'],
       datasets: [
         {
           label: 'Game Results',
-          data: [data.wins, data.loses],
+          data: adjustedData,
           backgroundColor: [
             'rgba(0, 0, 0, 0.6)',
             'rgba(255, 255, 255, 0.6)',
@@ -60,7 +62,8 @@ const WeeklyAttendance: React.FC<WeeklyAttendanceProps> = ({ user }) => {
       datalabels: {
         color: 'black',
         formatter: (value: number) => {
-          return value;
+          // Display 0 if the value is 0.01
+          return value === 0.01 ? 0 : value;
         },
         anchor: 'center',
         align: 'center',
@@ -76,4 +79,3 @@ const WeeklyAttendance: React.FC<WeeklyAttendanceProps> = ({ user }) => {
 }
 
 export default WeeklyAttendance;
-
