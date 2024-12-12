@@ -50,6 +50,7 @@ interface SearchedUserDataType {
     rating: number;
     username: string;
     wins: number;
+    connection: string;
 }
 
 // Define a type for user data search
@@ -108,6 +109,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         rating: 0,
         username: "",
         wins: 0,
+        connection: ""
     });
 
     const [userDataSearch, setUserDataSearch] = useState<UserDataSearchType>({
