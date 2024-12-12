@@ -4,92 +4,73 @@ import styles from "./page.module.css";
 export default function Home() {
   return (
     <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+      <header className={styles.header}>
+        <div className={styles.logo}>PingPong Pro</div>
+        <nav className={styles.nav}>
+          <a href="#features">Features</a>
+          <a href="#about">About</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </header>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
+      <main className={styles.main}>
+        <section className={styles.hero}>
+          <h1>Experience the Thrill of Ping Pong</h1>
+          <p>Join the ultimate online ping pong community and challenge players worldwide!</p>
+          <div className={styles.ctas}>
+            <a href="#" className={styles.primary}>Play Now</a>
+            <a href="#" className={styles.secondary}>Learn More</a>
+          </div>
+        </section>
+
+        <section id="features" className={styles.features}>
+          <h2>Game Features</h2>
+          <div className={styles.featureGrid}>
+            <div className={styles.featureItem}>
+              <div className={styles.featureIcon}>{/* Add icon later */}</div>
+              <h3>Real-time Multiplayer</h3>
+              <p>Challenge players from around the world in exciting real-time matches.</p>
+            </div>
+            <div className={styles.featureItem}>
+              <div className={styles.featureIcon}>{/* Add icon later */}</div>
+              <h3>Customizable Paddles</h3>
+              <p>Personalize your gameplay with a wide range of paddle designs and colors.</p>
+            </div>
+            <div className={styles.featureItem}>
+              <div className={styles.featureIcon}>{/* Add icon later */}</div>
+              <h3>Global Leaderboards</h3>
+              <p>Compete for the top spot and track your progress on our global leaderboards.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="about" className={styles.about}>
+          <div className={styles.aboutContent}>
+            <h2>About PingPong Pro</h2>
+            <p>PingPong Pro is the ultimate online destination for ping pong enthusiasts. Our cutting-edge platform brings the excitement of table tennis to your screen, allowing you to compete with players worldwide, improve your skills, and climb the ranks.</p>
+          </div>
+          <div className={styles.aboutImage}>
+            {/* Add image later */}
+            <div className={styles.imagePlaceholder}>Ping Pong Image</div>
+          </div>
+        </section>
+
+        <section id="contact" className={styles.contact}>
+          <h2>Ready to Join?</h2>
+          <p>Sign up now and get ready for the ping pong experience of a lifetime!</p>
+          <a href="#" className={styles.primary}>Sign Up</a>
+        </section>
       </main>
+
       <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+        <div className={styles.footerLinks}>
+          <a href="#">Terms of Service</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Contact Us</a>
+        </div>
+        <div className={styles.copyright}>© 2023 PingPong Pro. All rights reserved.</div>
       </footer>
     </div>
   );
 }
+

@@ -1,52 +1,79 @@
 "use client";
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import 'chart.js/auto';
-import ChartDataLabels from 'chartjs-plugin-datalabels'; // Import the plugin
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import classes from './weeklyAttendance.module.css';
+import { useUserContext } from '@/context/UserContext';
 
 const Pie = dynamic(() => import('react-chartjs-2').then((mod) => mod.Pie), {
   ssr: false,
 });
 
-// Sample data for wins and losses
-const matches = { win: 15, lose: 10 }; // Example match data
-const data = {
-  labels: ['Wins', 'Losses'], // Use descriptive labels
-  datasets: [
-    {
-      label: 'Game Results',
-      data: [matches.win, matches.lose], // Use the actual match data
-      backgroundColor: [
-        'rgba(0, 0, 0, 0.6)', // Color for Wins
-        'rgba(255, 255, 255, 0.6)', // Color for Losses
-      ],
-      borderColor: 'rgba(0, 0, 0, 0.6)', // Border color for each segment
-      borderWidth: 2,
-    },
-  ],
-};
+interface WeeklyAttendanceProps {
+  user: 'current' | 'search';
+}
 
-// Chart options
-const options = {
-  plugins: {
-    legend: {
-      display: true, // Show legend
-    },
-    datalabels: {
-      color: 'black', // Text color for the labels
-      formatter: (value) => {
-        return value; // Return the actual value to display in the chart
+const WeeklyAttendance: React.FC<WeeklyAttendanceProps> = ({ user }) => {
+  const { userData, userDataSearch } = useUserContext();
+  const [chartData, setChartData] = useState({
+    labels: ['Wins', 'Losses'],
+    datasets: [
+      {
+        label: 'Game Results',
+        data: [0, 0],
+        backgroundColor: [
+          'rgba(0, 0, 0, 0.6)',
+          'rgba(255, 255, 255, 0.6)',
+        ],
+        borderColor: 'rgba(0, 0, 0, 0.6)',
+        borderWidth: 2,
       },
-      anchor: 'center', // Center the label inside the segment
-      align: 'center',  // Align the label to the center
-    },
-  },
-};
+    ],
+  });
 
-const WeeklyAttendance = () => {
+  useEffect(() => {
+    const data = user === 'search' ? userDataSearch : userData;
+
+    const adjustedData = [data.wins || 0.01, data.loses || 0.01];
+
+    setChartData({
+      labels: ['Wins', 'Losses'],
+      datasets: [
+        {
+          label: 'Game Results',
+          data: adjustedData,
+          backgroundColor: [
+            'rgba(0, 0, 0, 0.6)',
+            'rgba(255, 255, 255, 0.6)',
+          ],
+          borderColor: 'rgba(0, 0, 0, 0.6)',
+          borderWidth: 2,
+        },
+      ],
+    });
+  }, [user, userData, userDataSearch]);
+
+  const options = {
+    plugins: {
+      legend: {
+        display: true,
+      },
+      datalabels: {
+        color: 'black',
+        formatter: (value: number) => {
+          // Display 0 if the value is 0.01
+          return value === 0.01 ? 0 : value;
+        },
+        anchor: 'center',
+        align: 'center',
+      },
+    },
+  };
+
   return (
     <div className={classes.container}>
-      <Pie data={data} options={options} plugins={[ChartDataLabels]} /> {/* Pass the plugin to the Pie chart */}
+      <Pie data={chartData} options={options} plugins={[ChartDataLabels]} />
     </div>
   );
 }
