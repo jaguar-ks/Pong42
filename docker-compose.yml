@@ -31,19 +31,22 @@ services:
         build:
             context: ./srcs/api/
         volumes:
-            - backend_files:/var/www/
+            - ./srcs/api:/var/www
+            - ./srcs/vault/init/django-cred.json:/var/www/django-cred.json:ro
         networks:
             - transcendance_net
             - elk
         ports:
             - 8000:8000
         depends_on:
-            pgdb:
+            # pgdb:
+            #     condition: service_healthy
+            vault:
                 condition: service_healthy
 
         restart: on-failure
-        env_file:
-            - ./srcs/api/.env.example
+        # env_file:
+        #     - ./srcs/api/.env.example
 
     frontend:
         build: ./srcs/frontend
@@ -117,8 +120,6 @@ services:
         environment:
             - ELASTICSEARCH_USERNAME=elastic
             - LS_JAVA_OPTS=-Xms256m -Xmx256m
-            # - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-            # - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
         networks:
             - elk
         depends_on:
@@ -164,12 +165,18 @@ services:
             - ./srcs/vault/config:/vault/config
             - ./srcs/vault/tools:/vault/tools
             - ./srcs/vault/logs:/vault/logs
+            - ./srcs/vault/policies:/vault/policies
         environment:
             - VAULT_ADDR=http://127.0.0.1:8200
         env_file:
             - ./srcs/api/.env.example
         command: ["/bin/sh", "-c", "/vault/tools/set_up.sh"]
         restart: unless-stopped
+        healthcheck:
+            test: ["CMD", "sh", "-c", "ls /vault/init | grep django"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
     #################################################################
 
 
