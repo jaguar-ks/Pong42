@@ -46,3 +46,4 @@ htmlcov/
 #VAULT
 */vault/data/*
 */vault/init/*
+*cred*
