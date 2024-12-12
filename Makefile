@@ -21,6 +21,10 @@ delete_images:
 fclean: down delete_images
 	docker system prune -a --force
 
+init_vault:
+	rm -rf ./srcs/vault/data/*
+	rm -rf ./srcs/vault/init/*
+
 .PHONY: all build up down delete_images fclean
 
 .SILENT: all build up down delete_images fclean
