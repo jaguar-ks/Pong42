@@ -34,17 +34,22 @@ class env:
         self.key = key
         # pass
     
+    def __str__(self, default=None):
+        val = read_resp["data"][self.key]
+        print(val)
+        return val
+    
     def int(key, default=None):
         if  key not in read_resp["data"]:
             return int(default)
         return int(read_resp["data"][key])
-    
+
     def bool(key, default=None):
         if  key not in read_resp["data"]:
             return bool(default)
         return bool(read_resp["data"][key])
-    
+
     def env(key, default=None):
         if  key not in read_resp["data"]:
-            return default
-        return read_resp["data"][key]
+            return str(default)
+        return str(read_resp["data"][key])
