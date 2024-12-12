@@ -80,3 +80,42 @@
         }
     }
 }
+
+.notFoundContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 20px;
+}
+
+.notFoundMessage {
+    font-size: 24px;
+    color: #3040D3;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.homeButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #3040D3;
+    border: none;
+    /* border-radius: 5px; */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+}
+
+.homeButton:hover {
+    background-color: #2030B3;
+}
+
+.userNotFoundImage{
+    max-width: 300px;
+    max-height: 300px;
+    width: 100%;
+    height: 100%;
+}
