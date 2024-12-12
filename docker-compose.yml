@@ -112,6 +112,7 @@ services:
             - ./srcs/ELK/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
             - ./srcs/ELK/logstash/pipeline:/usr/share/logstash/pipeline
             - ./srcs/postgres/logs/:/var/log/postgres/
+            - ./srcs/vault/logs:/var/log/vault
         ports:
             - "50000:50000"
             - "9600:9600"
