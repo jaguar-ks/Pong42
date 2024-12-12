@@ -15,7 +15,7 @@ client = hvac.Client(url="http://vault:8200")
 role_id = os.getenv("ROLE_ID")
 secret_id = os.getenv("SECRET_ID")
 
-print(role_id, secret_id)
+# print(role_id, secret_id)
 
 if not client.is_authenticated():
     client.auth.approle.login(
@@ -23,15 +23,28 @@ if not client.is_authenticated():
         secret_id=secret_id
     )
 
-try:
-    read_resp = client.secrets.kv.v1.read_secret(
-        path="django",
-        mount_point="kv",
-    )
-except hvac.exceptions.Forbidden as e:
-    print(e.errors, e.url, sep="\n")
-    read_resp = None
+read_resp = client.secrets.kv.v1.read_secret(
+    path="django",
+    mount_point="kv",
+)
 
 # Example: Use the token to fetch secrets
-def env(key):
-    return read_resp["data"][key]
+class env:
+    def __init__(self, key, default=None):
+        self.key = key
+        # pass
+    
+    def int(key, default=None):
+        if  key not in read_resp["data"]:
+            return int(default)
+        return int(read_resp["data"][key])
+    
+    def bool(key, default=None):
+        if  key not in read_resp["data"]:
+            return bool(default)
+        return bool(read_resp["data"][key])
+    
+    def env(key, default=None):
+        if  key not in read_resp["data"]:
+            return default
+        return read_resp["data"][key]
