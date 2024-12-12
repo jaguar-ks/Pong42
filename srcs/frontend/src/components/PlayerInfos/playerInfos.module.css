@@ -13,10 +13,8 @@
     flex: 2;
     display: flex;
     flex-direction: column;
-    width: 100%;
-    justify-content: center;
     align-items: center;
-    min-width: 50px;
+    justify-content: center;
 }
 
 .imageWrapper {
@@ -82,6 +80,11 @@
     font-weight: 500;
 }
 
+.value {
+    font-size: 14px;
+    color: #666666;
+}
+
 .infoAndCopy {
     display: flex;
     align-items: center;
@@ -101,12 +104,8 @@
         padding: 5px 0;
     }
 
-    .title {
+    .title, .value {
         font-size: 12px;
     }
-}
-
-.zwak {
-    margin: 10px;
 }
 

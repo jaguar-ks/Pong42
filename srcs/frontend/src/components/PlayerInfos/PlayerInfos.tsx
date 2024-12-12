@@ -1,74 +1,67 @@
 "use client";
 
 import React from "react";
-import classes from "./playerInfos.module.css";
+import Image from "next/image";
+import styles from "./PlayerInfos.module.css";
 import TimeDifference from "../TimeDifference/TimeDifference";
 import CopyToClipboard from "../CopyToClipboard/CopyToClipboard";
-import Image from "next/image";
 import { useUserContext } from "@/context/UserContext";
 
+// Helper function to truncate text
 const truncateText = (text: string | undefined, maxLength: number) => {
   if (!text) return "Loading...";
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };
 
+// Component to display a single info item
+const InfoItem: React.FC<{ title: string; value: string | undefined }> = ({ title, value }) => (
+  <div className={styles.info}>
+    <h2 className={styles.title}>{title}:</h2>
+    <div className={styles.infoAndCopy}>
+      <h2 className={styles.value}>{truncateText(value, 20)}</h2>
+      <CopyToClipboard textToCopy={value || ""} width={18} height={18} />
+    </div>
+  </div>
+);
+
+// Main PlayerInfos component
 const PlayerInfos: React.FC<{ user: string }> = ({ user }) => {
   const { userData, userDataSearch } = useUserContext();
   const data = user === "search" ? userDataSearch : userData;
 
+  const defaultAvatarUrl = "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png";
+
   return (
-    <div className={classes.playerinfos}>
-      <div className={classes.imageContainer}>
-        <div className={classes.imageWrapper}>
+    <div className={styles.playerinfos}>
+      {/* User Image and Name Section */}
+      <div className={styles.imageContainer}>
+        <div className={styles.imageWrapper}>
           <Image
-            className={classes.image}
-            src={
-              data.avatar_url ||
-              "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"
-            }
+            className={styles.image}
+            src={data.avatar_url || defaultAvatarUrl}
             alt="Avatar"
             width={100}
             height={100}
           />
-          <div className={`${classes.statusDot} ${data.is_online ? classes.online : classes.offline}`}></div>
+          {data.is_online && (
+            <div className={`${styles.statusDot} ${data.is_online ? styles.online : styles.offline}`} />
+          )}
         </div>
-        <div className={classes.nameUnderImage}>
+        <div className={styles.nameUnderImage}>
           {truncateText(`${data.first_name} ${data.last_name}`, 20)}
         </div>
         {!data.is_online && data.last_login && (
-          <div className={classes.lastSeen}>
+          <div className={styles.lastSeen}>
             Last seen: <TimeDifference timestamp={data.last_login} />
           </div>
         )}
       </div>
-      <div className={classes.infosContainer}>
-        <div className={classes.info}>
-          <h2 className={classes.title}>Username:</h2>
-          <div className={classes.infoAndCopy}>
-            <h2 className={classes.title}>
-              {truncateText(data.username, 10)}
-            </h2>
-            <CopyToClipboard textToCopy={data.username || ""} width={18} height={18} />
-          </div>
-        </div>
-        <div className={classes.info}>
-          <h2 className={classes.title}>ID:</h2>
-          <div className={classes.infoAndCopy}>
-            <h2 className={classes.title}>
-              {truncateText(data.id?.toString(), 10)}
-            </h2>
-            <CopyToClipboard textToCopy={data.id?.toString() || ""} width={18} height={18} />
-          </div>
-        </div>
-        { user !== "search" && <div className={classes.info}>
-          <h2 className={classes.title}>Email:</h2>
-          <div className={classes.infoAndCopy}>
-            <h2 className={classes.title}>
-              {truncateText(data.email, 10)}
-            </h2>
-            <CopyToClipboard textToCopy={data.email || ""} width={18} height={18} />
-          </div>
-        </div>}
+
+      {/* User Info Section */}
+      <div className={styles.infosContainer}>
+        <InfoItem title="Username" value={data.username} />
+        <InfoItem title="ID" value={data.id?.toString()} />
+        {user !== "search" && <InfoItem title="Email" value={data.email} />}
       </div>
     </div>
   );
