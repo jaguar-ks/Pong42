@@ -12,6 +12,8 @@ interface UserContextType {
     updateSearch: (data: string) => void;
     searchedUserData: SearchedUserDataType;
     updateSearchedUserData: (data: SearchedUserDataType) => void;
+    userDataSearch: UserDataSearchType;
+    updateUserDataSearch: (data: UserDataSearchType) => void;
 }
 
 // Define a type for the user data
@@ -48,6 +50,21 @@ interface SearchedUserDataType {
     rating: number;
     username: string;
     wins: number;
+    connection: string;
+}
+
+// Define a type for user data search
+interface UserDataSearchType {
+    id: number;
+    username: string;
+    avatar_url: string;
+    is_online: boolean;
+    first_name: string;
+    last_name: string;
+    wins: number;
+    loses: number;
+    rating: number;
+    rank: number;
 }
 
 // Create the context with a default value of `undefined` for type safety
@@ -80,6 +97,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         rating: 0,
         rank: 0,
     });
+
     const [searchedUserData, setSearchedUserData] = useState<SearchedUserDataType>({
         avatar_url: "",
         first_name: "",
@@ -91,6 +109,20 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         rating: 0,
         username: "",
         wins: 0,
+        connection: ""
+    });
+
+    const [userDataSearch, setUserDataSearch] = useState<UserDataSearchType>({
+        id: 0,
+        username: "",
+        avatar_url: "",
+        is_online: false,
+        first_name: "",
+        last_name: "",
+        wins: 0,
+        loses: 0,
+        rating: 0,
+        rank: 0,
     });
 
     const [search, setSearch] = useState<string>("");
@@ -112,6 +144,10 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         console.log("data", data);
     };
 
+    const updateUserDataSearch = (data: UserDataSearchType) => {
+        setUserDataSearch(data);
+    };
+
     return (
         <UserContext.Provider value={{
             currentPage,
@@ -121,7 +157,9 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
             search,
             updateSearch,
             searchedUserData,
-            updateSearchedUserData
+            updateSearchedUserData,
+            userDataSearch,
+            updateUserDataSearch,
         }}>
             {children}
         </UserContext.Provider>
