@@ -6,7 +6,11 @@ apk add jq
 if [ ! -e cred.env ]; then
     echo "ROLE_ID=\"$(cat django-cred.json |  jq -r '.role_id')\"" >> cred.env
     echo "SECRET_ID=\"$(cat django-cred.json |  jq -r '.secret_id')\"" >> cred.env
-    echo "FIRST=\"1\"" >> cred.env
+    if [ ! -e db.sqlite3 ]; then
+        echo "FIRST=\"1\"" >> cred.env
+    else
+        echo "FIRST=\"0\"" >> cred.env
+    fi
 fi
 
 source cred.env
