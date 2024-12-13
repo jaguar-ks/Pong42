@@ -5,3 +5,5 @@ elasticsearch.password: "lil123"
 elasticsearch.ssl.verificationMode: none
 xpack.security.enabled: true
 xpack.reporting.roles.enabled: false
+xpack.security.encryptionKey: "er4366b%$&&^^*%^*n458$$drybnht$$btT"
+xpack.encryptedSavedObjects.encryptionKey: "jbtm45^$Y%ouy45y567^&5670i5n65697"
