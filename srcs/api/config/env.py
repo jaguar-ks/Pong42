@@ -29,16 +29,16 @@ read_resp = client.secrets.kv.v1.read_secret(
 )
 
 # Example: Use the token to fetch secrets
-class env(str):
+class env:
     def __init__(self, key, default=None):
         self.key = key
-    
-    def __repr__(self):
-        return self.env(self.key)
-    
-    def __str__(self, default=None):
-        return self.env(self.key, default)
+        # pass
 
+    def __new__(cls, key, default=None):
+        if  key not in read_resp["data"]:
+            return str(default)
+        return str(read_resp["data"][key])
+    
     def int(key, default=None):
         if  key not in read_resp["data"]:
             return int(default)
@@ -49,7 +49,7 @@ class env(str):
             return bool(default)
         return bool(read_resp["data"][key])
 
-    def env(self, key, default=None):
+    def env(key, default=None):
         if  key not in read_resp["data"]:
             return str(default)
         return str(read_resp["data"][key])
