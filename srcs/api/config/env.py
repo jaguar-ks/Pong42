@@ -28,11 +28,18 @@ read_resp = client.secrets.kv.v1.read_secret(
     mount_point="kv",
 )
 
-# Example: Use the token to fetch secrets
+db_creds = client.secrets.database.generate_credentials(name="postgres-role")
+
 class env:
     def __init__(self, key, default=None):
         self.key = key
         # pass
+
+    def db_user():
+        return str(db_creds["data"]["username"])
+    
+    def db_password():
+        return str(db_creds["data"]["password"])
 
     def __new__(cls, key, default=None):
         if  key not in read_resp["data"]:
