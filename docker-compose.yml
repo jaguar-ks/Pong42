@@ -15,10 +15,8 @@ services:
             - transcendance_net
             - elk
         restart: always
-        environment:
-            POSTGRES_PASSWORD: "halla123"
-            POSTGRES_DB: "pgdb"
-            POSTGRES_USER: "postgres"
+        env_file:
+            - ./srcs/postgres/.env
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
             interval: 30s
@@ -45,8 +43,6 @@ services:
                 condition: service_healthy
 
         restart: on-failure
-        # env_file:
-        #     - ./srcs/api/.env.example
 
     frontend:
         build: ./srcs/frontend
@@ -171,6 +167,7 @@ services:
             - VAULT_ADDR=http://127.0.0.1:8200
         env_file:
             - ./srcs/api/.env.example
+            - ./srcs/postgres/.env
         command: ["/bin/sh", "-c", "/vault/tools/set_up.sh"]
         restart: unless-stopped
         healthcheck:
@@ -178,6 +175,9 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+        depends_on:
+            pgdb:
+                condition: service_healthy
     #################################################################
 
 
