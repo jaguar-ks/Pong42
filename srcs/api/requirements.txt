@@ -50,3 +50,4 @@ wheel==0.44.0
 wrapt==1.16.0
 logstash_formatter==0.5.17
 hvac==2.3.0
+psycopg2-binary==2.9.9
