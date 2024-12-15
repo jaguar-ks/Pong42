@@ -1,11 +1,16 @@
 #!/bin/sh
 
-if vault secrets list | grep -q "^kv/"; then
-    echo "[INFO] : KV secrets engine is already enabled at 'kv/'"
-else
-    echo "[INFO] : KV secrets engine is not enabled at 'kv/'. Enabling now..."
-    vault secrets enable kv
-fi
+set -e
+
+activate_secrets_engine() {
+    service=$1
+    if ! vault secrets list | grep -q "^${service}/"; then
+        echo "[INFO] : Enabling secrets engine '${service}'..."
+        vault secrets enable ${service}
+    else
+        echo "[INFO] : Secrets engine '${service}' is already enabled."
+    fi
+}
 
 create_policy() {
     service=$1
@@ -61,6 +66,29 @@ EOF
     fi
 }
 
+config_db (){
+    vault write database/config/${DB_NAME} \
+        plugin_name=postgresql-database-plugin \
+        allowed_roles="postgres-role" \
+        connection_url="postgresql://{{username}}:{{password}}@${POSTGRES_DB}:5432/${DB_NAME}?sslmode=disable" \
+        username="${POSTGRES_USER}" \
+        password="${POSTGRES_PASSWORD}"
+    
+    vault write database/roles/postgres-role \
+        db_name=${DB_NAME} \
+        creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
+        GRANT ALL PRIVILEGES ON DATABASE ${DB_NAME} TO \"{{name}}\"; 
+        GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"{{name}}\"; 
+        GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \"{{name}}\"; 
+        GRANT USAGE ON SCHEMA public TO \"{{name}}\"; 
+        ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO \"{{name}}\"; 
+        ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO \"{{name}}\";" \
+        default_ttl="1h" \
+        max_ttl="24h"
+}
+
+activate_secrets_engine kv
+activate_secrets_engine database
 
 vault auth enable approle || echo "[INFO]: AppRole already enabled."
 
@@ -68,3 +96,19 @@ create_policy django
 create_approle django
 
 create_django_secrets
+
+config_db
+# create_policy postgres
+
+# vault write auth/approle/role/postgres-role token_policies=postgres
+
+# CREDS=$(vault read -format=json database/creds/postgres-role)
+# USERNAME=$(echo $CREDS | jq -r '.data.username')
+# PASSWORD=$(echo $CREDS | jq -r '.data.password')
+
+# cat << EOF > /vault/init/postgres-cred.json
+# {
+#     "username": "${USERNAME}",
+#     "password": "${PASSWORD}"
+# }
+# EOF
