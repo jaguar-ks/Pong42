@@ -37,7 +37,9 @@ create_django_secrets() {
         GOOGLE_OAUTH_REDIRECT_URI="${GOOGLE_OAUTH_REDIRECT_URI}" \
         GITHUB_OAUTH_CLIENT_ID="${GITHUB_OAUTH_CLIENT_ID}" \
         GITHUB_OAUTH_CLIENT_SECRET="${GITHUB_OAUTH_CLIENT_SECRET}" \
-        GITHUB_OAUTH_REDIRECT_URI="${GITHUB_OAUTH_REDIRECT_URI}"
+        GITHUB_OAUTH_REDIRECT_URI="${GITHUB_OAUTH_REDIRECT_URI}" \
+        DB_NAME="${DB_NAME}" \
+        POSTGRES_DB="${POSTGRES_DB}"
 }
 
 create_approle() {
@@ -76,15 +78,16 @@ config_db (){
     
     vault write database/roles/postgres-role \
         db_name=${DB_NAME} \
-        creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
-        GRANT ALL PRIVILEGES ON DATABASE ${DB_NAME} TO \"{{name}}\"; 
-        GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"{{name}}\"; 
-        GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \"{{name}}\"; 
-        GRANT USAGE ON SCHEMA public TO \"{{name}}\"; 
-        ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO \"{{name}}\"; 
-        ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO \"{{name}}\";" \
-        default_ttl="1h" \
-        max_ttl="24h"
+        creation_statements="
+            CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}';
+            GRANT USAGE ON SCHEMA public TO \"{{name}}\"; 
+            GRANT CREATE ON SCHEMA public TO \"{{name}}\"; 
+            GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"{{name}}\"; 
+            GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \"{{name}}\"; 
+            ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO \"{{name}}\"; 
+            ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO \"{{name}}\";" \
+        default_ttl="0" \
+        max_ttl="0"
 }
 
 activate_secrets_engine kv
@@ -98,9 +101,6 @@ create_approle django
 create_django_secrets
 
 config_db
-# create_policy postgres
-
-# vault write auth/approle/role/postgres-role token_policies=postgres
 
 # CREDS=$(vault read -format=json database/creds/postgres-role)
 # USERNAME=$(echo $CREDS | jq -r '.data.username')
