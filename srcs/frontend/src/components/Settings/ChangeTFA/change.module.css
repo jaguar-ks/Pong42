@@ -1,14 +1,45 @@
 .NotifNotif {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.6);
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.bigWindowContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    background-color: #264D99;
+    clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
+    max-width: 400px;
+    min-width: 350px;
+    max-height: 80vh;
+    margin: auto;
+    padding: 2px;
+}
+
+.windowContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    border: 1px solid #264D99;
+    background-color: #ffffff;
+    clip-path: polygon(41px 0, 100% 0, 100% calc(100% - 41px), calc(100% - 41px) 100%, 0 100%, 0 41px);
+    max-width: 400px;
+    min-width: 350px;
+    padding: 20px;
+    max-height: 80vh;
+    margin: auto;
 }
 
 .window {
@@ -16,127 +47,144 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    max-height: 90vh;
+    max-height: 100vh;
     overflow-y: auto;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    max-width: 450px;
-    min-width: 320px;
-    padding: 20px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-
-    .element {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        padding: 15px;
-        width: 100%;
-        border-radius: 8px;
-        max-width: 100%;
-        background-color: #f9f9f9;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-
-        .codeInput{
-            width: 100px;
-            height: 40px;
-            text-align: center;
-        }
-        .toggleContainer {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            
-
-            .toggleButton,
-            .toggleButtonActive {
-                width: 100px;
-                height: 50px;
-                border-radius: 25px;
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-                background-color: #e0e0e0;
-                cursor: pointer;
-                padding: 5px;
-                transition: justify-content 2s ease;
-                position: relative;
-
-                .dote {
-                    width: 40px;
-                    height: 40px;
-                    background-color: #949494;
-                    border-radius: 50%;
-                    position: absolute;
-                    left: 5px;
-                    transform: transform 0.4s ease;
-                }
-            }
-            .toggleButtonActive .dote {
-                transform: translateX(45px);
-            }
-        }
-
-        .errors {
-            text-align: center;
-            color: #f44336;
-            font-weight: bold;
-            margin-top: 10px;
-            font-size: 14px;
-        }
-
-        .label {
-            width: 100%;
-            font-size: 16px;
-            text-align: left;
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        .input {
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            padding: 12px;
-            font-size: 16px;
-            width: 100%;
-            transition: transform 0.3s ease, background-color 0.3s ease;
-
-            &:focus {
-                background-color: #f0f0f0;
-                transform: scale(1.02);
-                outline: none;
-            }
-        }
-
-        .buttonContainer {
-            width: 100%;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-
-            .button {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 45px;
-                width: 80px;
-                border-radius: 8px;
-                background-color: #e0e0e0;
-                border: 1px solid #ccc;
-                cursor: pointer;
-                transition: transform 0.3s ease, background-color 0.3s ease;
-
-                &:hover {
-                    background-color: #333;
-                    color: white;
-                    transform: scale(1.05);
-                }
-            }
-        }
-    }
+    scrollbar-width: none;
+    border: 1px solid #264D99;
+    background-color: #ffffff;
+    clip-path: polygon(38px 0, 100% 0, 100% calc(100% - 38px), calc(100% -38px) 100%, 0 100%, 0 40px);
+    max-width: 400px;
+    min-width: 350px;
+    padding: 10px;
+    clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
 }
+
+.element {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 15px;
+    width: 100%;
+    max-width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.title {
+    font-size: 24px;
+    color: #264D99;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.toggleContainer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.toggleButton {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 200px;
+    height: 50px;
+    background-color: #EEEEE0;
+    cursor: pointer;
+    position: relative;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.dote,
+.doteActive {
+    width: 100px;
+    height: 50px;
+    background-color: #949494;
+    position: absolute;
+    transition: transform 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.doteActive {
+    transform: translateX(100px);
+}
+
+.buttonText {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.inputContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.codeInput {
+    width: 120px;
+    height: 40px;
+    text-align: center;
+    font-size: 18px;
+    letter-spacing: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.instructions {
+    text-align: center;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.errors {
+    text-align: center;
+    color: #ff3333;
+    font-weight: bold;
+    margin-top: 5px; 
+    font-size: 14px; 
+}
+
+.buttonContainer {
+    width: 100%;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    width: 80px;
+    background-color: #264D99;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    font-weight: bold;
+    color: white;
+}
+
+.button:hover:not(:disabled) {
+    background-color: #1a3366;
+    transform: scale(1.05);
+}
+
+.button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+

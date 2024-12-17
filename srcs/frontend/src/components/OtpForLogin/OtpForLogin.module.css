@@ -18,13 +18,12 @@
     justify-content: center;
     max-height: 90vh;
     overflow-y: auto;
-    border-radius: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #3040D3;
     background-color: #fff;
     max-width: 450px;
     min-width: 320px;
     padding: 20px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
 
     .element {
         display: flex;
@@ -36,8 +35,6 @@
         width: 100%;
         border-radius: 8px;
         max-width: 100%;
-        background-color: #f9f9f9;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 
         .codeInput{
             width: 100px;
@@ -59,7 +56,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: flex-start;
-                background-color: #e0e0e0;
+                background-color: #EEEEE0;
                 cursor: pointer;
                 padding: 5px;
                 transition: justify-content 2s ease;
@@ -80,7 +77,7 @@
             }
         }
 
-        .errors {
+        .error {
             text-align: center;
             color: #f44336;
             font-weight: bold;
@@ -126,7 +123,7 @@
                 height: 45px;
                 width: 80px;
                 border-radius: 8px;
-                background-color: #e0e0e0;
+                background-color: #EEEEE0;
                 border: 1px solid #ccc;
                 cursor: pointer;
                 transition: transform 0.3s ease, background-color 0.3s ease;
@@ -140,3 +137,72 @@
         }
     }
 }
+
+
+.signInLink {
+    font-weight: 500;
+    color: #3040D3;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: underline;
+  }
+  
+  .signInLink:hover {
+    color: #dd6b20;
+  }
+
+  .submitButtonContainer {
+    display: inline-block;
+    max-width: 500px;
+    position: relative;
+    background-color: black;
+    clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .submitButton {
+    position: relative;
+    padding: 10px 20px;
+    width: 100%;
+    height: 100%;
+    background-color: #3040D3;
+    color: white;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+    /* border: 1px solid black; */
+    max-width: 500px;
+    font-weight: bold;
+  }
+  .submitButtonContainerRevers {
+    display: inline-block;
+    max-width: 500px;
+    position: relative;
+    background-color: black;
+    clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .submitButtonRevers {
+    position: relative;
+    padding: 10px 20px;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    color: #3040D3;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+    border: 1px solid #3040D3;
+    max-width: 500px;
+    font-weight: bold;
+  }

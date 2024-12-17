@@ -23,47 +23,15 @@ class AuthUserSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username", "avatar_url", "is_online")
-
-
-class UserDetailSerializer(UserSerializer):
-    class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + (
-            "first_name",
-            "last_name",
+        fields = (
+            "id",
+            "username",
+            "avatar_url",
+            "is_online",
             "wins",
             "loses",
             "rating",
-            "rank",
         )
-
-
-class UpdateAuthUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("id", "first_name", "last_name", "username", "avatar_url", "password")
-        extra_kwargs = {
-            "username": {
-                "required": False,
-                "validators": [validators.UsernameValidator()],
-            },
-            "password": {
-                "write_only": True,
-                "required": False,
-                "validators": [validators.PasswordValidator()],
-            },
-            "first_name": {"validators": [validators.NameValidator("First name")]},
-            "last_name": {"validators": [validators.NameValidator("Last name")]},
-            "avatar_url": {"required": False},
-        }
-
-    def validate(self, attrs):
-        return {key: value for key, value in attrs.items() if value}
-
-    def update(self, instance, validated_data):
-        if "password" in validated_data:
-            instance.set_password(validated_data.pop("password"))
-        return super().update(instance, validated_data)
 
 
 class ConnectionSerializer(serializers.Serializer):
@@ -114,10 +82,18 @@ class ConnectionSerializer(serializers.Serializer):
             else {"username": user.username}
         )
 
+        status = instance.status
+        if instance.status == Connection.PENDING:
+            status = (
+                "sent_request"
+                if user.id == instance.recipient.id
+                else "incoming_request"
+            )
+
         return {
             "id": instance.id,
             "user": user_data,
-            "status": instance.status,
+            "status": status,
             "created_at": instance.created_at,
             "updated_at": instance.updated_at,
         }
@@ -127,3 +103,57 @@ class ConnectionSerializer(serializers.Serializer):
             initiator=self.context["request"].user,
             recipient=self.context["recipient"],
         )
+
+
+class UserDetailSerializer(UserSerializer):
+    connection = serializers.SerializerMethodField(read_only=True)
+
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + (
+            "first_name",
+            "last_name",
+            "wins",
+            "loses",
+            "rating",
+            "rank",
+            "connection",
+        )
+
+    def get_connection(self, instance):
+        user = self.context["request"].user
+        conn = (
+            Connection.get_user_connections(user=instance).filter(
+                Q(initiator=user) | Q(recipient=user)
+            )
+        ).first()
+        if not conn:
+            return None
+        return ConnectionSerializer(conn, context=self.context).data
+
+
+class UpdateAuthUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "first_name", "last_name", "username", "avatar_url", "password")
+        extra_kwargs = {
+            "username": {
+                "required": False,
+                "validators": [validators.UsernameValidator()],
+            },
+            "password": {
+                "write_only": True,
+                "required": False,
+                "validators": [validators.PasswordValidator()],
+            },
+            "first_name": {"validators": [validators.NameValidator("First name")]},
+            "last_name": {"validators": [validators.NameValidator("Last name")]},
+            "avatar_url": {"required": False},
+        }
+
+    def validate(self, attrs):
+        return {key: value for key, value in attrs.items() if value}
+
+    def update(self, instance, validated_data):
+        if "password" in validated_data:
+            instance.set_password(validated_data.pop("password"))
+        return super().update(instance, validated_data)

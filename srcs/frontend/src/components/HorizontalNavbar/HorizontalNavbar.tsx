@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import classes from './HorizontalNavbar.module.css';
 import SearchBar from "./SearchBar/SearchBar";
 import MessagesWhite from '../../../assets/MessagesWhite.svg'
@@ -12,42 +12,75 @@ import serchIcon from '../../../assets/SearchBlack.svg'
 import ex from '../../../assets/XBlack.svg'
 import Image from "next/image";
 import { useUserContext } from "@/context/UserContext";
+import Notifications from "./ComponentsHB/Notifications";
+import Messages from "./ComponentsHB/Messages";
+import Profile from "./ComponentsHB/Profile";
 
 const HorizontalNavbar = () => {
-
     const [selectedIcon, setSelectedIcon] = useState("");
-    const [isSeaerchActive, setIsSearchActive] = useState(false);
-    const {userData}  = useUserContext();
+    const [isSearchActive, setIsSearchActive] = useState(false);
+    const { userData } = useUserContext();
 
+    const toggleDropdown = (icon: string) => {
+        setSelectedIcon(selectedIcon === icon ? "" : icon);
+    };
 
     return (
         <div className={classes.container}>
             <div className={classes.searchBar}>
-                <SearchBar/>
+                <SearchBar />
             </div>
             <div className={classes.searchButton}>
-                {!isSeaerchActive && <button className={classes.iconsContainer} onClick={() => setIsSearchActive(true)}>
-                    <Image className={classes.image} src={serchIcon} alt="messages logo black" />
-                </button>}
-                {isSeaerchActive && <SearchBar/>}
-
+                {!isSearchActive && (
+                    <button className={classes.iconsContainer} onClick={() => setIsSearchActive(true)}>
+                        <Image className={classes.image} src={serchIcon} alt="messages logo black" />
+                    </button>
+                )}
+                {isSearchActive && <SearchBar />}
             </div>
             <div className={classes.container2}>
-                <button className={ isSeaerchActive ? classes.displayNone : selectedIcon === "msg" ? classes.iconsContainerSelected : classes.iconsContainer} onClick={() => selectedIcon !== "msg" ? setSelectedIcon("msg") : setSelectedIcon("") }>
-                    <Image className={classes.image} src={selectedIcon === "msg" ? MessagesWhite : MessagesBlack} alt="messages logo black" />
-                </button>
-                <button className={ isSeaerchActive ? classes.displayNone : selectedIcon === "notif" ? classes.iconsContainerSelected : classes.iconsContainer} onClick={() => selectedIcon !== "notif" ? setSelectedIcon("notif") : setSelectedIcon("") }>
-                    <Image className={classes.image} src={selectedIcon === "notif" ? notificationsWhite : NotificationsBlack} alt="notification logo black" />
-                </button>
-                <button className={isSeaerchActive ? classes.displayNone :classes.profile}>
-                    <Image width={40} height={40} className={classes.image} src={userData.avatar_url ? userData.avatar_url : "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} alt="player image excemple" />
-                </button>
-                {isSeaerchActive && <button className={classes.X}  onClick={() => setIsSearchActive(false)}>
-                    <Image className={classes.image} src={ex} alt="X black" />
-                </button>}
+                <div className={classes.dropdownWrapper}>
+                    <button
+                        className={isSearchActive ? classes.displayNone : selectedIcon === "msg" ? classes.iconsContainerSelected : classes.iconsContainer}
+                        onClick={() => toggleDropdown("msg")}
+                    >
+                        <Image className={classes.image} src={selectedIcon === "msg" ? MessagesWhite : MessagesBlack} alt="messages logo" />
+                    </button>
+                    {selectedIcon === "msg" && <Messages />}
+                </div>
+                <div className={classes.dropdownWrapper}>
+                    <button
+                        className={isSearchActive ? classes.displayNone : selectedIcon === "notif" ? classes.iconsContainerSelected : classes.iconsContainer}
+                        onClick={() => toggleDropdown("notif")}
+                    >
+                        <Image className={classes.image} src={selectedIcon === "notif" ? notificationsWhite : NotificationsBlack} alt="notification logo" />
+                    </button>
+                    {selectedIcon === "notif" && <Notifications />}
+                </div>
+                <div className={classes.dropdownWrapper}>
+                    <button
+                        className={isSearchActive ? classes.displayNone : classes.profile}
+                        onClick={() => toggleDropdown("profile")}
+                    >
+                        <Image
+                            width={40}
+                            height={40}
+                            className={classes.imageProfile}
+                            src={userData.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"}
+                            alt="player image"
+                        />
+                    </button>
+                    {selectedIcon === "profile" && <Profile username={userData.username} />}
+                </div>
+                {isSearchActive && (
+                    <button className={classes.X} onClick={() => setIsSearchActive(false)}>
+                        <Image className={classes.image} src={ex} alt="X black" />
+                    </button>
+                )}
             </div>
         </div>
     );
 };
 
 export default HorizontalNavbar;
+

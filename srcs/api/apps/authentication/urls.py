@@ -1,7 +1,7 @@
 from django.urls import path
 
 from . import views
-from .socialauth.views import OauthAuthorizeView, OauthCallbackView
+from .socialauth.views import OauthAuthorizeListView, OauthCallbackView
 
 urlpatterns = [
     # 2Fa
@@ -16,10 +16,14 @@ urlpatterns = [
         views.EmailVerifyView.as_view(),
         name="verify_email",
     ),
-    path("email/resend_verify_email/", views.ResendVerifyEmailView.as_view(), name="send_email"),
     path(
-        "social/<str:provider>/authorize/",
-        OauthAuthorizeView.as_view(),
+        "email/resend_verify_email/",
+        views.ResendVerifyEmailView.as_view(),
+        name="send_email",
+    ),
+    path(
+        "social/providers/",
+        OauthAuthorizeListView.as_view(),
         name="social_auth_authorize",
     ),
     path(

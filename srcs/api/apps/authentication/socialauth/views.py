@@ -2,7 +2,7 @@ from rest_framework import views, permissions
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 
-from .serializers import OauthAuthorizeSerializer, OauthCallBackSerializer
+from .serializers import OauthProvidersUrls, OauthCallBackSerializer
 from apps.utils import sing_in_response
 from .docs import OAUTH_CALLBACK_SCHEMA, OAUTH_AUTHORIZE_SCHEMA
 
@@ -12,9 +12,9 @@ class OauthCallbackView(views.APIView):
     serializer_class = OauthCallBackSerializer
     permission_classes = [permissions.AllowAny]
 
-    def post(self, request, provider):
+    def get(self, request, provider):
         serializer = self.serializer_class(
-            data=request.data, context={"provider": provider}
+            data=request.GET, context={"provider": provider}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -26,10 +26,10 @@ class OauthCallbackView(views.APIView):
 
 
 @extend_schema(**OAUTH_AUTHORIZE_SCHEMA)
-class OauthAuthorizeView(views.APIView):
-    serializer_class = OauthAuthorizeSerializer
+class OauthAuthorizeListView(views.APIView):
+    serializer_class = OauthProvidersUrls
     permission_classes = [permissions.AllowAny]
 
-    def get(self, request, provider):
-        serializer = self.serializer_class({}, context={"provider": provider})
+    def get(self, request):
+        serializer = self.serializer_class({})
         return Response(serializer.data)

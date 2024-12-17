@@ -4,19 +4,22 @@
     justify-content: space-around;
     height: 100%;
     background-color: #F5F5F5;
-    border: 1px solid #E0E0E0;
-    border-radius: 8px;
+    border: 2px solid #3040D3;
     padding: 10px;
+    clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 30px);
 }
 
-.imageC {
+.imageContainer {
     flex: 2;
     display: flex;
     flex-direction: column;
-    width: 100%;
-    justify-content: center;
     align-items: center;
-    min-width: 50px;
+    justify-content: center;
+}
+
+.imageWrapper {
+    position: relative;
+    margin-bottom: 10px;
 }
 
 .image {
@@ -24,6 +27,37 @@
     height: 80px;
     border-radius: 50%;
     object-fit: cover;
+}
+
+.statusDot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.online {
+    background-color: #4CAF50;
+}
+
+.offline {
+    background-color: #9E9E9E;
+}
+
+.nameUnderImage {
+    font-size: 14px;
+    color: #333333;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.lastSeen {
+    font-size: 12px;
+    color: #666666;
+    text-align: center;
+    margin-top: 5px;
 }
 
 .infosContainer {
@@ -46,6 +80,11 @@
     font-weight: 500;
 }
 
+.value {
+    font-size: 14px;
+    color: #666666;
+}
+
 .infoAndCopy {
     display: flex;
     align-items: center;
@@ -57,7 +96,7 @@
         flex-direction: column;
     }
 
-    .imageC {
+    .imageContainer {
         margin-bottom: 10px;
     }
 
@@ -65,7 +104,8 @@
         padding: 5px 0;
     }
 
-    .title {
+    .title, .value {
         font-size: 12px;
     }
 }
+
