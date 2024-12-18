@@ -20,4 +20,5 @@ api_addr = "http://127.0.0.1:8200"
 # max_lease_ttl     = "24h"
 log_file = "/vault/logs/vault.log"  # Path to store the log file
 log_level = "trace"             # Capture all log levels
+log_format = "json"
 
