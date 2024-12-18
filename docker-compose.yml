@@ -137,6 +137,8 @@ services:
             - ELASTICSEARCH_SSL_VERIFICATIONMODE=none
         volumes:
             - ./srcs/ELK/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+            - ./srcs/ELK/tools/cert_gen.sh:/docker-entrypoint-init.d/cert_gen.sh
+        entrypoint: ["bash", "-c", "/docker-entrypoint-init.d/cert_gen.sh"]
         ports:
             - "5601:5601"
         networks:

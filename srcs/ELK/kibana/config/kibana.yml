@@ -7,3 +7,6 @@ xpack.security.enabled: true
 xpack.reporting.roles.enabled: false
 xpack.security.encryptionKey: "er4366b%$&&^^*%^*n458$$drybnht$$btT"
 xpack.encryptedSavedObjects.encryptionKey: "jbtm45^$Y%ouy45y567^&5670i5n65697"
+server.ssl.enabled: true
+server.ssl.certificate: "/usr/share/kibana/config/certs/kibana.crt"
+server.ssl.key: "/usr/share/kibana/config/certs/kibana.key"
