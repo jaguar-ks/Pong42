@@ -72,7 +72,7 @@ services:
             - xpack.security.enabled=true
             - ELASTIC_USERNAME=elastic
         healthcheck:
-            test: ["CMD-SHELL", "curl -s -u elastic:lol123 http://localhost:9200/_cat/health >/dev/null || exit 1"]
+            test: ["CMD-SHELL", "curl -s -u $${ELASTIC_USERNAME}:$${ELASTIC_PASSWORD} http://localhost:9200/_cat/health >/dev/null || exit 1"]
             interval: 30s
             timeout: 30s
             retries: 3
