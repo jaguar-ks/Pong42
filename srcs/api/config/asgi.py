@@ -10,7 +10,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 # is populated before importing code that may import ORM models.
 django_asgi_app = get_asgi_application()
 
-from apps.pongue.routing import ws_urlpatterns as pongue_urlpatterns
+from apps.notifications.routing import ws_urlpatterns as pongue_urlpatterns
 
 application = ProtocolTypeRouter(
     {
@@ -21,7 +21,7 @@ application = ProtocolTypeRouter(
                     [
                         *pongue_urlpatterns,
                     ]
-                )
+                ),
             )
         ),
     }
