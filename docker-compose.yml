@@ -136,6 +136,7 @@ services:
             - ./srcs/ELK/logstash/pipeline:/usr/share/logstash/pipeline
             - ./srcs/postgres/logs/:/var/log/postgres/
             - ./srcs/vault/logs:/var/log/vault
+            - ./srcs/redis/logs:/var/log/redis
         ports:
             - "50000:50000"
             - "9600:9600"
