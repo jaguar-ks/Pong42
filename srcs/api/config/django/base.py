@@ -1,4 +1,4 @@
-from config.env import BASE_DIR, env
+from config.env_dev import BASE_DIR, env
 import os
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -40,6 +40,7 @@ INSTALLED_APPS += [
         "users",
         "authentication",
         "pongue",
+        "notifications",
     ]
 ]
 
