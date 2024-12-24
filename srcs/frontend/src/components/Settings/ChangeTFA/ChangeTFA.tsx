@@ -1,9 +1,10 @@
-"use client";
+'use client';
+
 import { useState, useEffect } from "react";
-import classes from './change.module.css';
 import axios from "axios";
 import { useUserContext } from "@/context/UserContext";
 import QRCode from "react-qr-code";
+import styles from './change.module.css';
 
 interface ChangeTFAProps {
   setCurrentPage: (page: string) => void;
@@ -64,10 +65,6 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
         );
         updateUserData({ ...userData, two_fa_enabled: false });
         setIsActive(false);
-        setShowInput(false);
-        setInputCode("");
-        setCode("");
-        setCurrentPage("");
       } else {
         await axios.post(
           "http://localhost:8000/api/auth/2fa/enable/",
@@ -76,14 +73,11 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
         );
         updateUserData({ ...userData, two_fa_enabled: true });
         setIsActive(true);
-        setShowInput(false);
-        setInputCode("");
-        setCode("");
-        setCurrentPage("");
       }
       setShowInput(false);
       setInputCode("");
       setCode("");
+      setCurrentPage("");
     } catch (err) {
       setError("Invalid OTP code. Please try again.");
       console.error("Error handling OTP:", err);
@@ -99,72 +93,73 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
   };
 
   return (
-    <div className={classes.NotifNotif} onClick={handleOverlayClick}>
-      <div className={classes.bigWindowContainer}>
-        <div className={classes.windowContainer}>
-          <div className={classes.window}>
-            <div className={classes.element}>
-              <h2 className={classes.title}>Two-Factor Authentication</h2>
-              <div className={classes.toggleContainer}>
-                <button
-                  className={classes.toggleButton}
-                  onClick={handleToggleTFA}
-                  disabled={isLoading || showInput}
-                >
-                  <div className={isActive ? classes.doteActive : classes.dote}>
-                    <p className={classes.buttonText}>{isActive ? "ON" : "OFF"}</p>
-                  </div>
-                </button>
-              </div>
-              {showInput && (
-                <div className={classes.inputContainer}>
-                  {!isActive && code && (
-                    <>
-                      <p className={classes.instructions}>
-                        Scan this QR code with your authenticator app, then enter the 6-digit code below:
-                      </p>
-                      <QRCode value={code} size={150} />
-                    </>
-                  )}
-                  {isActive && (
-                    <p className={classes.instructions}>
-                      Enter your current 2FA code to disable Two-Factor Authentication:
+    <div className={styles.overlay} onClick={handleOverlayClick}>
+      <div className={styles.modal}>
+        <div className={styles.modalContent}>
+          <h2 className={styles.title}>Two-Factor Authentication</h2>
+          <div className={styles.form}>
+            <div className={`${styles.toggleContainer} ${isActive ? styles.active : ''}`}>
+              <button
+                className={styles.toggleButton}
+                onClick={handleToggleTFA}
+                disabled={isLoading || showInput}
+                aria-label={isActive ? "Disable 2FA" : "Enable 2FA"}
+              >
+                <span className={styles.toggleText}>{isActive ? "ON" : "OFF"}</span>
+                <span className={styles.toggleSlider}></span>
+              </button>
+            </div>
+            {showInput && (
+              <div className={styles.inputContainer}>
+                {!isActive && code && (
+                  <>
+                    <p className={styles.instructions}>
+                      Scan this QR code with your authenticator app, then enter the 6-digit code below:
                     </p>
-                  )}
-                  <input
-                    onChange={(e) => setInputCode(e.target.value)}
-                    className={classes.codeInput}
-                    type="text"
-                    placeholder="_ _ _ _ _ _"
-                    value={inputCode}
-                    disabled={isLoading}
-                    aria-label="Enter 2FA code"
-                  />
-                </div>
-              )}
-              {error && <p className={classes.errors}>{error}</p>}
-              <div className={classes.buttonContainer}>
-                {showInput && (
-                  <button 
-                    className={classes.button} 
-                    onClick={handleDone} 
-                    disabled={isLoading || inputCode.length !== 6}
-                  >
-                    {isLoading ? "Processing..." : "Done"}
-                  </button>
+                    <div className={styles.qrCodeContainer}>
+                      <QRCode value={code} size={150} />
+                    </div>
+                  </>
                 )}
-                <button 
-                  className={classes.button} 
-                  onClick={() => {
-                    setShowInput(false);
-                    setInputCode("");
-                    setCode("");
-                    setCurrentPage("");
-                  }}
-                >
-                  Cancel
-                </button>
+                {isActive && (
+                  <p className={styles.instructions}>
+                    Enter your current 2FA code to disable Two-Factor Authentication:
+                  </p>
+                )}
+                <input
+                  onChange={(e) => setInputCode(e.target.value)}
+                  className={styles.input}
+                  type="text"
+                  placeholder="Enter 6-digit code"
+                  value={inputCode}
+                  disabled={isLoading}
+                  aria-label="Enter 2FA code"
+                  maxLength={6}
+                />
               </div>
+            )}
+            {error && <p className={styles.error}>{error}</p>}
+            <div className={styles.buttonContainer}>
+              {showInput && (
+                <button 
+                  className={styles.button}
+                  onClick={handleDone} 
+                  disabled={isLoading || inputCode.length !== 6}
+                >
+                  {isLoading ? "Processing..." : "Confirm"}
+                </button>
+              )}
+              <button 
+                className={`${styles.button} ${styles.cancelButton}`}
+                onClick={() => {
+                  setShowInput(false);
+                  setInputCode("");
+                  setCode("");
+                  setCurrentPage("");
+                }}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import styles from "./PlayerInfos.module.css";
+import styles from "./playerInfos.module.css";
 import TimeDifference from "../TimeDifference/TimeDifference";
 import CopyToClipboard from "../CopyToClipboard/CopyToClipboard";
 import { useUserContext } from "@/context/UserContext";

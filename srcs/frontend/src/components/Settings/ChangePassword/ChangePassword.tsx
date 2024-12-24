@@ -1,8 +1,9 @@
-"use client";
+'use client';
+
 import { useState, useEffect, useRef, ChangeEvent } from 'react';
-import classes from './change.module.css';
 import axios from 'axios';
 import { useUserContext } from '@/context/UserContext';
+import styles from './change.module.css';
 
 interface ChangePasswordProps {
   setCurrentPage: (page: string) => void;
@@ -10,6 +11,7 @@ interface ChangePasswordProps {
 
 const ChangePassword: React.FC<ChangePasswordProps> = ({ setCurrentPage }) => {
   const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [error, setError] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const { userData, updateUserData } = useUserContext();
@@ -20,12 +22,20 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ setCurrentPage }) => {
     }
   }, []);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleNewPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNewPassword(e.target.value);
+  };
+
+  const handleConfirmPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setConfirmPassword(e.target.value);
   };
 
   const handleChangePassword = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setError(["Passwords do not match"]);
+      return;
+    }
     try {
       const res = await axios.patch(
         "http://localhost:8000/api/users/me/",
@@ -33,7 +43,6 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ setCurrentPage }) => {
         { withCredentials: true }
       );
       console.log(res.data);
-      updateUserData({ ...userData, password: newPassword });
       setCurrentPage("");
     } catch (err: any) {
       setError(err.response?.data?.password || []);
@@ -47,30 +56,34 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ setCurrentPage }) => {
   };
 
   return (
-    <div className={classes.NotifNotif} onClick={handleOverlayClick}>
-      <div className={classes.bigWindowContainer}>
-        <div className={classes.windowContainer}>
-          <div className={classes.window}>
-            <div className={classes.element}>
-              <h2 className={classes.title}>Change Password</h2>
-              <label className={classes.label}>Current Password:</label>
-              <input type="password" disabled={true} className={classes.input} value="********" />
-              <label className={classes.label}>New Password:</label>
-              <input 
-                type="password"
-                ref={inputRef} 
-                className={classes.input} 
-                value={newPassword} 
-                onChange={handleInputChange}
-                placeholder="Enter new password"
-              />
-              {error.length > 0 && error.map((item, index) => (
-                <span className={classes.errors} key={index}>{item}</span>
-              ))}
-              <div className={classes.buttonContainer}>
-                <button className={classes.button} onClick={handleChangePassword}>Update</button>
-                <button className={classes.button} onClick={() => setCurrentPage("")}>Cancel</button>
-              </div>
+    <div className={styles.overlay} onClick={handleOverlayClick}>
+      <div className={styles.modal}>
+        <div className={styles.modalContent}>
+          <h2 className={styles.title}>Change Password</h2>
+          <div className={styles.form}>
+            <label className={styles.label}>New Password:</label>
+            <input 
+              type="password"
+              ref={inputRef} 
+              className={styles.input} 
+              value={newPassword} 
+              onChange={handleNewPasswordChange}
+              placeholder="Enter new password"
+            />
+            <label className={styles.label}>Confirm New Password:</label>
+            <input 
+              type="password"
+              className={styles.input} 
+              value={confirmPassword} 
+              onChange={handleConfirmPasswordChange}
+              placeholder="Confirm new password"
+            />
+            {error.length > 0 && error.map((item, index) => (
+              <span className={styles.error} key={index}>{item}</span>
+            ))}
+            <div className={styles.buttonContainer}>
+              <button className={styles.button} onClick={handleChangePassword}>Update</button>
+              <button className={`${styles.button} ${styles.cancelButton}`} onClick={() => setCurrentPage("")}>Cancel</button>
             </div>
           </div>
         </div>

@@ -5,13 +5,28 @@ import { useUserContext } from '@/context/UserContext';
 import settingsIcon from '../../../../assets/settingsIcon.svg'
 import settingsIconBlack from '../../../../assets/SettingsBlack.svg'
 import logoutIcon from '../../../../assets/LogoutBlack.svg'
+import { useRouter } from 'next/navigation'
 
 interface ProfileProps {
   username: string;
 }
 
-const Profile: React.FC<ProfileProps> = ({ username }) => {
+const Profile: React.FC<ProfileProps> = ({ username, setSelectedIcon }) => {
   const {userData, updateCurrentPage,updateSearchedUserData } = useUserContext();
+  const router = useRouter();
+
+  const handleGosettings = () =>{
+    setSelectedIcon("");
+    router.push('/users/settings');
+  }
+  const handlelLogout = () =>{
+    setSelectedIcon("");
+    router.push('/users/logout');
+  }
+  const handleViewProfile = () =>{
+    setSelectedIcon("");
+    router.push('/users/home');
+  }
 
   return (
     <div className={classes.dropdownContent}>
@@ -19,15 +34,15 @@ const Profile: React.FC<ProfileProps> = ({ username }) => {
         <Image src={userData.avatar_url ||  "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} alt={username} width={60} height={60} className={classes.profileImage} />
         <div className={classes.profileInfo}>
           <p className={classes.username}>{username}</p>
-          <span className={classes.viewProfile}>View Profile</span>
+          <span className={classes.viewProfile} onClick={handleViewProfile}>View Profile</span>
         </div>
       </div>
       <div className={classes.profileActions}>
-        <button className={classes.profileButton}>
+        <button className={classes.profileButton} onClick={handleGosettings}>
           <Image src={settingsIconBlack} alt="Settings" width={20} height={20} />
           Settings
         </button>
-        <button className={classes.profileButton}>
+        <button className={classes.profileButton} onClick={handlelLogout}>
           <Image src={logoutIcon} alt="Logout" width={20} height={20} />
           Logout
         </button>
