@@ -14,6 +14,12 @@ interface UserContextType {
     updateSearchedUserData: (data: SearchedUserDataType) => void;
     userDataSearch: UserDataSearchType;
     updateUserDataSearch: (data: UserDataSearchType) => void;
+    localTournementNames: string[];
+    setLocalTournementNames: React.Dispatch<React.SetStateAction<string[]>>;
+    localTournementCount: 4 | 8;
+    setLocalTournementCount: React.Dispatch<React.SetStateAction<4 | 8>>;
+    localOneVsOneNames: string[];
+    setLocalOneVsOneNames: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 // Define a type for the user data
@@ -91,7 +97,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         date_joined: "",
         two_fa_enabled: false,
         is_online: "",
-        avatar_url: "",
+        avatar_url: null,
         wins: 0,
         loses: 0,
         rating: 0,
@@ -125,42 +131,34 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         rank: 0,
     });
 
+    const [localTournementCount, setLocalTournementCount] = useState<4 | 8>(4);
+    const [localTournementNames, setLocalTournementNames] = useState(Array(4).fill(""));
+
+    const [localOneVsOneNames, setLocalOneVsOneNames] = useState(Array(2).fill(""));
+
     const [search, setSearch] = useState<string>("");
 
-    const updateSearchedUserData = (data: SearchedUserDataType) => {
-        setSearchedUserData(data);
-    };
-
-    const updateCurrentPage = (pageName: string) => {
-        setCurrentPage(pageName);
-    };
-
-    const updateSearch = (data: string) => {
-        setSearch(data);
-    };
-
-    const updateUserData = (data: UserDataType) => {
-        setUserData(data);
-        console.log("data", data);
-    };
-
-    const updateUserDataSearch = (data: UserDataSearchType) => {
-        setUserDataSearch(data);
-    };
-
     return (
-        <UserContext.Provider value={{
-            currentPage,
-            updateCurrentPage,
-            userData,
-            updateUserData,
-            search,
-            updateSearch,
-            searchedUserData,
-            updateSearchedUserData,
-            userDataSearch,
-            updateUserDataSearch,
-        }}>
+        <UserContext.Provider
+            value={{
+                currentPage,
+                updateCurrentPage: setCurrentPage,
+                userData,
+                updateUserData: setUserData,
+                search,
+                updateSearch: setSearch,
+                searchedUserData,
+                updateSearchedUserData: setSearchedUserData,
+                userDataSearch,
+                updateUserDataSearch: setUserDataSearch,
+                localTournementNames,
+                setLocalTournementNames,
+                localTournementCount,
+                setLocalTournementCount,
+                localOneVsOneNames,
+                setLocalOneVsOneNames,
+            }}
+        >
             {children}
         </UserContext.Provider>
     );

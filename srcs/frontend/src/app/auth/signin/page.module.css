@@ -1,226 +1,259 @@
 .pageContainer {
-    min-height: 100vh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+}
+
+.main {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  padding: 3rem 1rem;
+}
+
+.formContainer {
+  background-color: #3040D3;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
+  width: 100%;
+  max-width: 1000px;
+  transition: all 0.3s ease;
+}
+
+.formContainer:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.formContent {
+  display: flex;
+  border: 2px solid #3040D3;
+  background-color: white;
+  clip-path: polygon(42px 0, 100% 0, 100% calc(100% - 42px), calc(100% - 42px) 100%, 0 100%, 0 42px);
+}
+
+.formSection {
+  width: 100%;
+  padding: 2rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.formSectionSuccess {
+  width: 100%;
+  padding: 2rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 768px) {
+  .formSection, .formSectionSuccess {
+    width: 50%;
+  }
+}
+
+.subtitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.description {
+  margin-bottom: 1.5rem;
+  color: #34495e;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.errorText {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin-top: -0.5rem;
+}
+
+.submitButtonContainer {
+  display: inline-block;
+  max-width: 500px;
+  position: relative;
+  background-color: black;
+  clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+  transition: all 0.3s ease;
+}
+
+.submitButtonContainer:hover {
+  transform: translateY(-2px);
+}
+
+.submitButton {
+  position: relative;
+  padding: 12px 24px;
+  width: 100%;
+  height: 100%;
+  background-color: #3040D3;
+  color: white;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+  max-width: 500px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+  background-color: #2030C3;
+}
+
+.submitButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(48, 64, 211, 0.5);
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.signInText, .signUpText {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #34495e;
+}
+
+.signInLink, .signUpLink {
+  font-weight: 600;
+  color: #3040D3;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  font-size: 0.95rem;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.signInLink:hover, .signUpLink:hover {
+  color: #2030C3;
+}
+
+.successMessage {
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.imageSection {
+  display: none;
+  width: 50%;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .imageSection {
     display: flex;
-    flex-direction: column;
-    background-color: white;
   }
-  
-  .main {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #ffffff;
-    padding: 3rem 1rem;
+}
+
+.containerImage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.ImageContainer {
+  object-fit: fill;
+  width: 80%;
+  height: 80%;
+  background-color: #3040D3;
+  clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
+  max-width: 400px;
+}
+
+.image {
+  object-fit: cover;
+  border: 2px solid #3040D3;
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(42px 0, 100% 0, 100% calc(100% - 42px), calc(100% - 42px) 100%, 0 100%, 0 42px);
+  transition: transform 0.3s ease;
+}
+
+.image:hover {
+  transform: scale(1.05);
+}
+
+.submitContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.error {
+  color: #e74c3c;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
   }
-  
-  .contentContainer {
-    max-width: 64rem;
-    width: 100%;
-    /* background-color: #e53e3e; */
-    background-color: #3040D3;
-    clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
+  50% {
+    transform: scale(1.05);
   }
-  
-  .title {
-    text-align: center;
-    font-size: 1.875rem;
-    font-weight: 800;
-    color: #1a202c;
-    margin-bottom: 2rem;
+  100% {
+    transform: scale(1);
   }
-  
+}
+
+.submitButton:not(:disabled):hover {
+  animation: pulse 1s infinite;
+}
+
+@media (max-width: 480px) {
   .formContainer {
-    background-color: white;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-    /* border-radius: 0.5rem; */
-    clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
-  
-    background-color: #3040D3;
-  } 
-  
+    clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+  }
+
   .formContent {
-    display: flex;
-    border: 2px solid #3040D3;
-    background-color: white;
-    clip-path: polygon(42px 0, 100% 0, 100% calc(100% - 42px), calc(100% - 42px) 100%, 0 100%, 0 42px);
+    clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px);
   }
-  
-  .formSection {
-    width: 100%;
-    padding: 2rem;
-  }
-  .formSectionSuccess {
-    width: 100%;
-    padding: 2rem;
-  }
-  
-  @media (min-width: 768px) {
-    .formSection {
-      width: 50%;
-    }
-    
-  
-  }
-  @media (max-width: 768px) {
-  
-    .imageSection{
-      display: none;
-    }
-    
-  
-  }
-  
+
   .subtitle {
     font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
   }
-  
+
   .description {
-    margin-bottom: 1.5rem;
-    color: #4a5568;
+    font-size: 0.9rem;
   }
-  
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .errorText {
-    color: #e53e3e;
-    width: 100%;
-    text-align: center;
-  }
-  
-  .submitButtonContainer {
-    display: inline-block;
-    max-width: 500px;
-    position: relative;
-    background-color: black;
-    clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
+
   .submitButton {
-    position: relative;
+    font-size: 14px;
     padding: 10px 20px;
-    width: 100%;
-    height: 100%;
-    background-color: #3040D3;
-    color: white;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
-    /* border: 1px solid black; */
-    max-width: 500px;
-    font-weight: bold;
   }
-  
-  .submitButton:hover {
-    background-color: #dd6b20;
-  }
-  
-  .submitButton:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(237, 137, 54, 0.5);
-  }
-  
-  .submitButton:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  .signInText {
-    margin-top: 1rem;
-    text-align: center;
-    font-size: 0.875rem;
-    color: #4a5568;
-  }
-  
-  .signInLink {
-    font-weight: 500;
-    color: #3040D3;
-    cursor: pointer;
-    border: none;
-    background-color: transparent;
-    font-weight: bold;
-    font-size: 16px;
-    text-decoration: underline;
-  }
-  
-  .signInLink:hover {
-    color: #dd6b20;
-  }
-  
-  .successMessage {
-    text-align: center;
-  }
-  
-  .imageSection {
-    display: none;
-    width: 50%;
-    /* background-color: #285a7; */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* border: 1px solid black; */
-    @media (max-width: 768px){
-      display: none;
-    }
-    
-  }
-  
-  /* @media (max-width: 768px) {
-    .imageSection {
-      width: 100%;
-    }
-  } */
-  .containerImage{
-    display: flex;align-items: center;
-    justify-content: center;
-    height: 100%;
-    
-    
-  }
-  .ImageContainer{
-    object-fit: fill;
-    width: 80%;
-    height: 80%;
-    /* border: 1px solid #3040D3; */
-    background-color: #3040D3;
-    clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
-    max-width: 400px;
-  }
-  .image {
-    object-fit: fill;
-    border: 2px solid #3040D3;
-    background-color: white;
-    width: 100%;
-    height: 100%;
-    clip-path: polygon(42px 0, 100% 0, 100% calc(100% - 42px), calc(100% - 42px) 100%, 0 100%, 0 42px);
-    
-  }
-  
-  
-  .submitContainer{
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+}
 
-  .error{
-    color: red;
-    width: 100%;
-    text-align: center;
-  }
-
-  .noError{
-    color: transparent;
-  }

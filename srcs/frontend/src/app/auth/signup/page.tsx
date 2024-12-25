@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -34,7 +34,6 @@ export default function SignUpPage() {
     password: '',
     confermPassword: '',
   })
-  const [signedUp, setSignedUp] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [errors, setErrors] = useState<Partial<FormData> & { non_field_errors?: string }>({})
@@ -66,8 +65,7 @@ export default function SignUpPage() {
         first_name: formData.firstname,
         last_name: formData.lastname,
       })
-      setIsSuccess(true);
-      signedUp(true);
+      setIsSuccess(true)
     } catch (err: any) {
       console.error('Error:', err.response?.data)
       setErrors(err.response?.data || { non_field_errors: 'An error occurred' })
@@ -80,85 +78,83 @@ export default function SignUpPage() {
     <div className={styles.pageContainer}>
       <Header forWhat="Sign Up"/>
       <main className={styles.main}>
-        {/* <div className={styles.contentContainer}> */}
-          <div className={styles.formContainer}>
-            <div className={styles.formContent}>
-              <div className={!isSuccess ? styles.formSection : styles.formSectionSuccess}>
-                {!isSuccess ? (
-                  <>
-                    <h2 className={styles.subtitle}>Welcome to the Ping Pong World</h2>
-                    <p className={styles.description}>Please create your account.</p>
-                    <form onSubmit={handleSubmit} className={styles.form}>
-                      {Object.entries(formData).map(([key, value]) => (
-                        <InputField
-                          key={key}
-                          label={key.charAt(0).toUpperCase() + key.slice(1)}
-                          type={key.includes('password') ? 'password' : 'text'}
-                          id={key}
-                          name={key}
-                          value={value}
-                          onChange={handleChange}
-                          error={errors[key as keyof FormData]}
-                        />
-                      ))}
-                      {errors.non_field_errors && (
-                        <p className={styles.errorText}>{errors.non_field_errors}</p>
-                      )}
-                      <div className={styles.submitContainer}>
-                        <div className={styles.submitButtonContainer}>
-                          <button
-                            type="submit"
-                            disabled={isLoading}
-                            className={styles.submitButton}
-                            >
-                            {isLoading ? 'Loading...' : 'Submit'}
-                          </button>
-                        </div>
+        <div className={styles.formContainer}>
+          <div className={styles.formContent}>
+            <div className={!isSuccess ? styles.formSection : styles.formSectionSuccess}>
+              {!isSuccess ? (
+                <>
+                  <h2 className={styles.subtitle}>Welcome to the Ping Pong World</h2>
+                  <p className={styles.description}>Please create your account.</p>
+                  <form onSubmit={handleSubmit} className={styles.form}>
+                    {Object.entries(formData).map(([key, value]) => (
+                      <InputField
+                        key={key}
+                        label={key.charAt(0).toUpperCase() + key.slice(1)}
+                        type={key.includes('password') ? 'password' : 'text'}
+                        id={key}
+                        name={key}
+                        value={value}
+                        onChange={handleChange}
+                        error={errors[key as keyof FormData]}
+                      />
+                    ))}
+                    {errors.non_field_errors && (
+                      <p className={styles.errorText}>{errors.non_field_errors}</p>
+                    )}
+                    <div className={styles.submitContainer}>
+                      <div className={styles.submitButtonContainer}>
+                        <button
+                          type="submit"
+                          disabled={isLoading}
+                          className={styles.submitButton}
+                        >
+                          {isLoading ? 'Loading...' : 'Sign Up'}
+                        </button>
                       </div>
-                    </form>
-                    <p className={styles.signInText}>
-                      Already have an account?{' '}
-                      <button
-                        onClick={() => router.push('/auth/signin')}
-                        className={styles.signInLink}
-                      >
-                        Sign In
-                      </button>
-                    </p>
-                  </>
-                ) : (
-                  <div className={styles.successMessage}>
-                    <h2 className={styles.subtitle}>Sign Up Successful!</h2>
-                    <p className={styles.description}>please check your email to validate regestration.</p>
-                    <div className={styles.submitButtonContainer}>
-                      <button
-                        onClick={() => router.push('/auth/signin')}
-                        className={styles.submitButton}
-                      >
-                        Go to Login
-                      </button>
                     </div>
+                  </form>
+                  <p className={styles.signInText}>
+                    Already have an account?{' '}
+                    <button
+                      onClick={() => router.push('/auth/signin')}
+                      className={styles.signInLink}
+                    >
+                      Sign In
+                    </button>
+                  </p>
+                </>
+              ) : (
+                <div className={styles.successMessage}>
+                  <h2 className={styles.subtitle}>Sign Up Successful!</h2>
+                  <p className={styles.description}>Please check your email to validate registration.</p>
+                  <div className={styles.submitButtonContainer}>
+                    <button
+                      onClick={() => router.push('/auth/signin')}
+                      className={styles.submitButton}
+                    >
+                      Go to Login
+                    </button>
                   </div>
-                )}
-              </div>
-              {!isSuccess && <div className={styles.imageSection}>
-                <div className={styles.containerImage}>
-                <div className={styles.ImageContainer}>
-                  
-                  <Image
-                    src={imageee}
-                    alt="Login Player"
-                    width={500}
-                    height={500}
-                    className={styles.image}
-                    />
-                    
                 </div>
-                  </div>
-              </div>}
+              )}
             </div>
+            {!isSuccess && (
+              <div className={styles.imageSection}>
+                <div className={styles.containerImage}>
+                  <div className={styles.ImageContainer}>
+                    <Image
+                      src={imageee}
+                      alt="Login Player"
+                      width={500}
+                      height={500}
+                      className={styles.image}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        {/* </div> */}
+        </div>
       </main>
       <Footer />
     </div>

@@ -1,8 +1,9 @@
-"use client";
+'use client';
+
 import { useState, useEffect, useRef, ChangeEvent } from 'react';
-import classes from './change.module.css';
 import axios from 'axios';
 import { useUserContext } from '@/context/UserContext';
+import styles from './change.module.css';
 
 interface ChangeFirstnameProps {
   setCurrentPage: (page: string) => void;
@@ -47,29 +48,27 @@ const ChangeFirstname: React.FC<ChangeFirstnameProps> = ({ setCurrentPage }) => 
   };
 
   return (
-    <div className={classes.NotifNotif} onClick={handleOverlayClick}>
-      <div className={classes.bigWindowContainer}>
-        <div className={classes.windowContainer}>
-          <div className={classes.window}>
-            <div className={classes.element}>
-              <h2 className={classes.title}>Change First Name</h2>
-              <label className={classes.label}>Current First Name:</label>
-              <input disabled={true} className={classes.input} value={userData.first_name} />
-              <label className={classes.label}>New First Name:</label>
-              <input 
-                ref={inputRef} 
-                className={classes.input} 
-                value={newFirstName} 
-                onChange={handleInputChange}
-                placeholder="Enter new first name"
-              />
-              {error.length > 0 && error.map((item, index) => (
-                <span className={classes.errors} key={index}>{item}</span>
-              ))}
-              <div className={classes.buttonContainer}>
-                <button className={classes.button} onClick={handleChangeFirstName}>Update</button>
-                <button className={classes.button} onClick={() => setCurrentPage("")}>Cancel</button>
-              </div>
+    <div className={styles.overlay} onClick={handleOverlayClick}>
+      <div className={styles.modal}>
+        <div className={styles.modalContent}>
+          <h2 className={styles.title}>Change First Name</h2>
+          <div className={styles.form}>
+            <label className={styles.label}>Current First Name:</label>
+            <input disabled={true} className={styles.input} value={userData.first_name} />
+            <label className={styles.label}>New First Name:</label>
+            <input 
+              ref={inputRef} 
+              className={styles.input} 
+              value={newFirstName} 
+              onChange={handleInputChange}
+              placeholder="Enter new first name"
+            />
+            {error.length > 0 && error.map((item, index) => (
+              <span className={styles.error} key={index}>{item}</span>
+            ))}
+            <div className={styles.buttonContainer}>
+              <button className={styles.button} onClick={handleChangeFirstName}>Update</button>
+              <button className={`${styles.button} ${styles.cancelButton}`} onClick={() => setCurrentPage("")}>Cancel</button>
             </div>
           </div>
         </div>
