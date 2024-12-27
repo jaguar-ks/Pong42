@@ -86,7 +86,6 @@ class EmailVerifyView(views.APIView):
 
 @extend_schema(**TEST_AUTH_SCHEMA)
 class TestAuthView(views.APIView):
-    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         return Response({"success": True})
