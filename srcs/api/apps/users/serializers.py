@@ -1,8 +1,7 @@
 from rest_framework import serializers
 from apps.utils import validators
 from django.db.models import Q
-
-from .models import Connection, User
+from .models import Connection, User, Message
 
 
 class AuthUserSerializer(serializers.ModelSerializer):
@@ -157,3 +156,12 @@ class UpdateAuthUserSerializer(serializers.ModelSerializer):
         if "password" in validated_data:
             instance.set_password(validated_data.pop("password"))
         return super().update(instance, validated_data)
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender_username = serializers.CharField(source='sender.username', read_only=True)
+    recipient_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = Message
+        fields = ['id', 'content', 'timestamp', 'is_read', 'sender_username', 'recipient_id']
+        read_only_fields = ['id', 'timestamp', 'is_read', 'sender_username']

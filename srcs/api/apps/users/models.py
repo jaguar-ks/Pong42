@@ -3,12 +3,15 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 import pyotp
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **kwargs):
 
         kwargs.setdefault("is_active", True)
+
+        # test :: change it to False
         kwargs.setdefault("is_email_verified", False)
         kwargs.setdefault("is_admin", False)
 
@@ -30,7 +33,6 @@ class UserManager(BaseUserManager):
         return self.create_user(
             username=username, email=email, password=password, **kwargs
         )
-
 
 class User(AbstractBaseUser):
     username = models.CharField(max_length=100, unique=True)
@@ -79,7 +81,6 @@ class User(AbstractBaseUser):
 
     def get_all_permissions(self):
         return []
-
 
 class Connection(models.Model):
     PENDING = "pending"
@@ -185,3 +186,21 @@ class Connection(models.Model):
         Get the other user in the connection.
         """
         return self.recipient if self.initiator == user else self.initiator
+
+class Message(models.Model):
+    connection = models.ForeignKey(Connection, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    content = models.TextField()
+    timestamp = models.DateTimeField(default=timezone.now)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['timestamp']
+
+    def __str__(self):
+        return f"{self.sender.username} to {self.connection.get_other_user(self.sender).username}: {self.content[:50]}"
+
+    @classmethod
+    def get_conversation(cls, connection):
+        """Get all messages for a specific connection"""
+        return cls.objects.filter(connection=connection).order_by('timestamp')
