@@ -1,5 +1,5 @@
-.NotifNotif {
-    position: absolute;
+.overlay {
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -8,183 +8,181 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(2px);
-}
-
-.bigWindowContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow-y: auto;
-    background-color: #264D99;
-    clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
-    max-width: 400px;
-    min-width: 350px;
-    max-height: 80vh;
-    margin: auto;
-    padding: 2px;
-}
-
-.windowContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow-y: auto;
-    border: 1px solid #264D99;
+  }
+  
+  .modal {
     background-color: #ffffff;
-    clip-path: polygon(41px 0, 100% 0, 100% calc(100% - 41px), calc(100% - 41px) 100%, 0 100%, 0 41px);
-    max-width: 400px;
-    min-width: 350px;
-    padding: 20px;
-    max-height: 80vh;
-    margin: auto;
-}
-
-.window {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    max-height: 100vh;
-    overflow-y: auto;
-    scrollbar-width: none;
-    border: 1px solid #264D99;
-    background-color: #ffffff;
-    clip-path: polygon(38px 0, 100% 0, 100% calc(100% - 38px), calc(100% -38px) 100%, 0 100%, 0 40px);
-    max-width: 400px;
-    min-width: 350px;
-    padding: 10px;
-    clip-path: polygon(40px 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%, 0 40px);
-}
-
-.element {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    padding: 15px;
+    /* border-radius: 12px; */
+    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 100%;
-    background-color: #ffffff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.title {
-    font-size: 24px;
+    max-width: 400px;
+    overflow: hidden;
+  }
+  
+  .modalContent {
+    padding: 2rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
     color: #264D99;
-    margin-bottom: 15px;
+    margin-bottom: 1.5rem;
     text-align: center;
     font-weight: bold;
-}
-
-.toggleContainer {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 15px;
-}
-
-.toggleButton {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 200px;
-    height: 50px;
-    background-color: #EEEEE0;
-    cursor: pointer;
-    position: relative;
-    border: none;
-    transition: background-color 0.3s ease;
-}
-
-.dote,
-.doteActive {
-    width: 100px;
-    height: 50px;
-    background-color: #949494;
-    position: absolute;
-    transition: transform 0.4s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.doteActive {
-    transform: translateX(100px);
-}
-
-.buttonText {
-    color: #ffffff;
-    font-weight: bold;
-}
-
-.inputContainer {
+  }
+  
+  .form {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.codeInput {
-    width: 120px;
-    height: 40px;
-    text-align: center;
-    font-size: 18px;
-    letter-spacing: 4px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.instructions {
-    text-align: center;
-    color: #333;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-.errors {
-    text-align: center;
-    color: #ff3333;
-    font-weight: bold;
-    margin-top: 5px; 
-    font-size: 14px; 
-}
-
-.buttonContainer {
+    gap: 1rem;
+  }
+  
+  .label {
+    font-size: 1rem;
+    color: #264D99;
+    font-weight: 500;
+  }
+  
+  .input {
     width: 100%;
-    margin-top: 15px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #264D99;
+    /* border-radius: 4px; */
+    transition: all 0.3s ease;
+  }
+  
+  .input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(38, 77, 153, 0.2);
+  }
+  
+  .error {
+    color: #ff3333;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  .buttonContainer {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-}
-
-.button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 45px;
-    width: 80px;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .button {
+    flex: 1;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
     background-color: #264D99;
-    border: 1px solid #ccc;
+    border: none;
+    /* border-radius: 4px; */
+    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
     cursor: pointer;
-    transition: transform 0.3s ease, background-color 0.3s ease;
-    font-weight: bold;
-    color: white;
-}
-
-.button:hover:not(:disabled) {
+    transition: all 0.3s ease;
+  }
+  
+  .button:hover {
     background-color: #1a3366;
-    transform: scale(1.05);
-}
-
-.button:disabled {
+  }
+  
+  .button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-}
-
+  }
+  
+  .cancelButton {
+    background-color: #f0f0f0;
+    color: #264D99;
+  }
+  
+  .cancelButton:hover {
+    background-color: #e0e0e0;
+  }
+  
+  @media (max-width: 480px) {
+    .modal {
+      max-width: 90%;
+    }
+  
+    .modalContent {
+      padding: 1.5rem;
+    }
+  
+    .buttonContainer {
+      flex-direction: column;
+    }
+  }
+  
+  .toggleContainer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  
+  .toggleButton {
+    position: relative;
+    width: 60px;
+    height: 34px;
+    background-color: #ccc;
+    /* border-radius: 34px; */
+    clip-path: polygon(7.5px 0, 100% 0, 100% calc(100% - 7.5px), calc(100% - 7.5px) 100%, 0 100%, 0 7.5px);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .toggleButton.active {
+    background-color: #264D99;
+  }
+  
+  .toggleSlider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+  }
+  
+  .active .toggleSlider {
+    transform: translateX(26px);
+  }
+  
+  .toggleText {
+    position: absolute;
+    left: 70px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+  }
+  
+  .qrCodeContainer {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+  }
+  
+  .instructions {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .inputContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  
