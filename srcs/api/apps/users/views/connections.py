@@ -5,9 +5,10 @@ from rest_framework.exceptions import ValidationError, PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema
+from ...utils import send_real_time_notif
 
 from apps.users import serializers
-from apps.users.models import Connection, User
+from apps.users.models import Connection, User, Notification
 from apps.users.docs import (
     CONNECTIONS_LIST_SCHEMA,
     CONNECTIONS_ACCEPT_SCHEMA,
@@ -54,7 +55,7 @@ class ConnectionViewSet(
 
     def get_connection(self):
         """Get connection object and verify user's permission to modify it"""
-        print('eroor', flush=True)
+        # print('eroor', flush=True)
         connection = get_object_or_404(Connection, pk=self.kwargs["pk"])
         user = self.request.user
 
@@ -89,7 +90,13 @@ class ConnectionViewSet(
 
         connection.status = Connection.FRIENDS
         connection.save()
-
+        notif = Notification.objects.create(
+            user=connection.initiator,
+            notification_type=Notification.NOTIFICATION_TYPES["connections"],
+            message=f"{connection.recipient.username} accepted your friend request",
+        )
+        data = serializers.NotificationSerializer(notif)
+        send_real_time_notif(notif.user.id, data.data)
         return Response(
             {
                 "message": "Connection request accepted",
