@@ -1,65 +1,82 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from .models import Message
+from .models import Message, Notification, Connection
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import Connection
+from django.forms.models import model_to_dict
+from .serializers import NotificationSerializer
 
 User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user = self.scope["user"]
-        self.user_channel = f"user_{self.user.id}"
+        self.connection_type = self.scope["url_route"]["kwargs"].get("type", "chat")
 
-        # Add user to their personal channel
+        if self.connection_type == "chat":
+            self.group_name = f"user_{self.user.id}"
+        elif self.connection_type == "notifications":
+            self.group_name = f"user_notif_{self.user.id}"
+        else:
+            await self.close()
+            return
+
         await self.channel_layer.group_add(
-            self.user_channel,
-            self.channel_name
+            self.group_name,
+            self.channel_name,
         )
 
         await self.accept()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
-            self.user_channel,
+            self.group_name,
             self.channel_name
         )
+
+    # send a notification
+    async def send_notification(self, event):
+        print(event['data'], flush=True)
+        # serializer = NotificationSerializer(instance=event['data'])
+        # print(serializer.data)
+        
+        await self.send(text_data=json.dumps(event['data']))
 
     async def receive(self, text_data):
         try:
             data = json.loads(text_data)
-            message = data.get('message')
-            recipient_id = data.get('recipient_id')
-            
-            saved_message = await self.save_message(self.user.id, recipient_id, message)
-            if not saved_message:
-                await self.send(text_data=json.dumps({
-                    'error': 'Failed to save message'
-                }))
-                return
-            print(f'message = > {message} | recipient => {recipient_id}', flush=True)
+            if self.connection_type == 'chat':
+                message = data.get('message')
+                recipient_id = data.get('recipient_id')
+                
+                saved_message = await self.save_message(self.user.id, recipient_id, message)
+                if not saved_message:
+                    await self.send(text_data=json.dumps({
+                        'error': 'Failed to save message'
+                    }))
+                    return
+                print(f'message = > {message} | recipient => {recipient_id}', flush=True)
 
-            recipient_channel = f"user_{recipient_id}"
-            await self.channel_layer.group_send(
-                recipient_channel,
-                {
-                    'type': 'chat_message',
+                recipient_channel = f"user_{recipient_id}"
+                await self.channel_layer.group_send(
+                    recipient_channel,
+                    {
+                        'type': 'chat_message',
+                        'message': message,
+                        'sender_id': self.user.id,
+                        'sender_username': self.user.username,
+                        'timestamp': saved_message.timestamp.isoformat(),
+                    }
+                )
+
+                await self.send(text_data=json.dumps({
                     'message': message,
                     'sender_id': self.user.id,
                     'sender_username': self.user.username,
+                    'recipient_id': recipient_id,
                     'timestamp': saved_message.timestamp.isoformat(),
-                }
-            )
-
-            await self.send(text_data=json.dumps({
-                'message': message,
-                'sender_id': self.user.id,
-                'sender_username': self.user.username,
-                'recipient_id': recipient_id,
-                'timestamp': saved_message.timestamp.isoformat(),
-            }))
+                }))
         except json.JSONDecodeError:
             await self.send(text_data=json.dumps({
                 'error': 'Invalid message format'
