@@ -1,4 +1,5 @@
 import { UserContextProvider } from "@/context/UserContext";
+import { WebSocketProvider } from '@/context/WebSocketContext';
 import VerticalNavbar from "@/components/VerticalNavbar/VerticalNavbar";
 import HorizontalNavbar from "@/components/HorizontalNavbar/HorizontalNavbar";
 import NavBar from "@/components/NavBar/NavBar";
@@ -15,7 +16,9 @@ export default function UsersLayout({
   children: React.ReactNode;
 }) {
   return (
-    <UserContextProvider>
+    <WebSocketProvider>
+      <UserContextProvider>
+
       <div className="layout-container">
         <div className="verticalNavbarr">
           <VerticalNavbar />
@@ -32,6 +35,7 @@ export default function UsersLayout({
           </div>
         </div>
       </div>
-    </UserContextProvider>
+      </UserContextProvider>
+    </WebSocketProvider>
   );
 }

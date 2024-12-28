@@ -29,17 +29,15 @@ services:
         build:
             context: ./srcs/api/
         volumes:
-            - backend_files:/var/www/
+            - ./srcs/api/:/var/www/
         networks:
             - transcendance_net
             - elk
         ports:
             - 8000:8000
-        depends_on:
-            pgdb:
-                condition: service_healthy
+        # depends_on:zrvice_healthy
 
-        restart: on-failure
+        restart: always
         env_file:
             - ./srcs/api/.env.example
         # environment:

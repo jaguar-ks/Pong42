@@ -54,6 +54,7 @@ class ConnectionViewSet(
 
     def get_connection(self):
         """Get connection object and verify user's permission to modify it"""
+        print('eroor', flush=True)
         connection = get_object_or_404(Connection, pk=self.kwargs["pk"])
         user = self.request.user
 

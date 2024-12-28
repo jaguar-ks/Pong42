@@ -1,16 +1,11 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-
 from apps.users import views
-
-router = DefaultRouter()
+from rest_framework.routers import DefaultRouter
 
 # URLs configuration
-from rest_framework.routers import DefaultRouter
-
 router = DefaultRouter()
 router.register(r"connections", views.ConnectionViewSet, basename="connection")
-
+router.register(r"connections/(?P<connection_id>\d+)/messages", views.MessageViewSet, basename="message")  # Add this line
 
 urlpatterns = [
     path("", views.ListUserView.as_view(), name="list_user"),
