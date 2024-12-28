@@ -8,6 +8,8 @@ from django.conf import settings
 import logging
 from rest_framework.response import Response
 from datetime import datetime
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 logger = logging.getLogger(__name__)
 
@@ -69,4 +71,22 @@ def sing_in_response(response: Response, token):
         value=token,
         httponly=True,
         expires=int((datetime.now() + settings.AUTH_TOKEN_LIFETIME).timestamp()),
+    )
+
+def send_real_time_notif(user_id, data):
+    """
+    Send real-time notification to a user.
+
+    Args:
+        user_id (int): User ID to send the notification to.
+        event_type (str): Event type to send.
+        data (dict): Data to send.
+    """
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f"user_notif_{user_id}",
+        {
+            "type": 'send_notification',
+            "data": data,
+        },
     )
