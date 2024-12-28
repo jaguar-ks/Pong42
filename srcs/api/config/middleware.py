@@ -26,6 +26,14 @@ class WebSocketJWTMiddleware:
         # add user to scope
         scope["user"] = await self.get_user(jwt_token)
 
+        # refuse the connection if user not authenticated
+        if not scope["user"].is_authenticated:
+            await send({
+                "type": "websocket.close",
+                "code": 4001,
+            })
+            return
+
         return await self.inner(scope, receive, send)
 
     @database_sync_to_async
@@ -36,6 +44,10 @@ class WebSocketJWTMiddleware:
             token = SlidingToken(jwt_token)
             token.verify()
             user_id = token.get(settings.SIMPLE_JWT["USER_ID_CLAIM"])
-            return User.objects.get(id=user_id)
+            return User.objects.get(
+                id=user_id,
+                is_active=True,
+                is_email_verified=True,
+            )
         except:
             return AnonymousUser()

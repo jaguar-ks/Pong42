@@ -1,9 +1,10 @@
-"use client";
+'use client';
+
 import React, { useState, useEffect } from "react";
-import classes from './imageUpload.module.css';
 import Image from "next/image";
 import axios from "axios";
 import { useUserContext } from "@/context/UserContext";
+import styles from './imageUpload.module.css';
 
 interface ImageUploadProps {
   setCurrentPage: (page: string) => void;
@@ -110,37 +111,41 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
   };
 
   return (
-    <div className={classes.NotifNotif} onClick={handleOverlayClick}>
-      <div className={classes.bigWindowContainer}>
-        <div className={classes.windowContainer}>
-          <div className={classes.window}>
-            <div className={classes.element}>
-              <h2 className={classes.title}>Change Profile Picture</h2>
-              <Image className={classes.nextImage} alt="Avatar" src={newImage || userData.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} width={100} height={100} />
-              <input
-                type="file"
-                name="file"
-                onChange={uploadImage}
+    <div className={styles.overlay} onClick={handleOverlayClick}>
+      <div className={styles.modal}>
+        <div className={styles.modalContent}>
+          <h2 className={styles.title}>Change Profile Picture</h2>
+          <div className={styles.form}>
+            <Image 
+              className="rounded-full mx-auto mb-4"
+              alt="Avatar" 
+              src={newImage || userData.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} 
+              width={100} 
+              height={100} 
+            />
+            <input
+              type="file"
+              name="file"
+              onChange={uploadImage}
+              disabled={isLoading}
+              className={styles.input}
+            />
+            {error && <span className={styles.error}>{error}</span>}
+            <div className={styles.buttonContainer}>
+              <button
+                className={styles.button}
+                onClick={handleChangeAvatar}
+                disabled={isLoading || !newImage}
+              >
+                {isLoading ? "Updating..." : "Update"}
+              </button>
+              <button
+                className={`${styles.button} ${styles.cancelButton}`}
+                onClick={() => setCurrentPage("")}
                 disabled={isLoading}
-                className={classes.inputFile}
-              />
-              {error && <span className={classes.errors}>{error}</span>}
-              <div className={classes.buttonContainer}>
-                <button
-                  className={classes.button}
-                  onClick={handleChangeAvatar}
-                  disabled={isLoading || !newImage}
-                >
-                  {isLoading ? "Updating..." : "Update"}
-                </button>
-                <button
-                  className={classes.button}
-                  onClick={() => setCurrentPage("")}
-                  disabled={isLoading}
-                >
-                  Cancel
-                </button>
-              </div>
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>

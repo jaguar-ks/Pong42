@@ -70,7 +70,7 @@ const HorizontalNavbar = () => {
                             alt="player image"
                         />
                     </button>
-                    {selectedIcon === "profile" && <Profile username={userData.username} />}
+                    {selectedIcon === "profile" && <Profile setSelectedIcon={setSelectedIcon} username={userData.username} />}
                 </div>
                 {isSearchActive && (
                     <button className={classes.X} onClick={() => setIsSearchActive(false)}>
