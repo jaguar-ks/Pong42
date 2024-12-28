@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import User, Connection
+from .models import User, Connection, Notification
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -45,3 +45,11 @@ class ConnectionAdmin(admin.ModelAdmin):
     list_filter = ("status",)
     search_fields = ("initiator__username", "recipient__username")
     raw_id_fields = ("initiator", "recipient")
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ("user", "notification_type", "read", "created_at")
+    list_filter = ("notification_type", "read")
+    search_fields = ("user__username", "notification_type")
+    date_hierarchy = "created_at"
+    ordering = ("-created_at",)
