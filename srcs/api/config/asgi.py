@@ -32,7 +32,8 @@ application = ProtocolTypeRouter(
                 URLRouter(
                     [
                         re_path('ws/pongue/$', PongueConsumer.as_asgi()),
-                        re_path(r'ws/chat/$', ChatConsumer.as_asgi()),
+                        re_path(r'ws/chat/$', ChatConsumer.as_asgi(), {'type': 'chat'}),
+                        re_path(r"ws/notifications/(?P<user_id>\d+)/$", ChatConsumer.as_asgi(), {'type': 'notifications'}),
                         re_path(r'', unmatched_route), # catch all unmatched routes
                     ]
                 ),
