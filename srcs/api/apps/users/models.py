@@ -204,3 +204,25 @@ class Message(models.Model):
     def get_conversation(cls, connection):
         """Get all messages for a specific connection"""
         return cls.objects.filter(connection=connection).order_by('timestamp')
+
+class Notification(models.Model):
+    
+    NOTIFICATION_TYPES = {
+        'connections': 'Connections',
+        'messages': 'Messages',
+        'game': 'Game',
+    }
+
+    user = models.ForeignKey(
+            User,
+            on_delete=models.CASCADE,
+            related_name="notifications"
+        )
+    
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+    
+    def __str__(self) -> str:
+        return f'{self.user} - {self.notification_type}'
