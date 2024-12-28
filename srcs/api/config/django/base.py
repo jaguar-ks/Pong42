@@ -40,7 +40,6 @@ INSTALLED_APPS += [
         "users",
         "authentication",
         "pongue",
-        "notifications",
     ]
 ]
 
