@@ -1,4 +1,4 @@
-from config.env import env
+from config.env_dev import env
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"

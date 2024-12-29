@@ -1,4 +1,4 @@
-from config.env import BASE_DIR, env
+from config.env_dev import BASE_DIR, env
 import os
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -93,6 +93,11 @@ DATABASES = {
     }
 }
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

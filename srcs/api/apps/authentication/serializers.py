@@ -131,6 +131,8 @@ class EmailVerifySerializer(serializers.Serializer):
         user = validate_token_and_uid(uid=attrs["uid"], token=attrs["token"])
         if not user:
             raise PermissionDenied(f"Link is invalid or expired")
+        user.is_email_verified = True
+        user.save()
         return {
             "message": "email verified successfully",
         }

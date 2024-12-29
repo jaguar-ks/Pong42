@@ -1,6 +1,9 @@
 # version: '3.8'
 
 services:
+    #################################################################
+    #                          DATA BASE                            #
+    #################################################################
     pgdb:
         image: postgres:15
         container_name: postgres
@@ -12,43 +15,41 @@ services:
             - transcendance_net
             - elk
         restart: always
-        environment:
-            POSTGRES_PASSWORD: "halla123"
-            POSTGRES_DB: "pgdb"
-            POSTGRES_USER: "postgres"
+        env_file:
+            - ./srcs/postgres/.env
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
             interval: 30s
             timeout: 10s
             retries: 5
-
-
+    #################################################################
+    
+    #################################################################
+    #                            WEB APP                            #
+    #################################################################
     backend:
         image: django:trns
         container_name: backend
         build:
             context: ./srcs/api/
         volumes:
-            - ./srcs/api/:/var/www/
+            - ./srcs/api:/var/www
+            - ./srcs/vault/init/django-cred.json:/var/www/django-cred.json:ro
         networks:
             - transcendance_net
             - elk
         ports:
             - 8000:8000
-        # depends_on:zrvice_healthy
-
-        restart: always
         env_file:
-            - ./srcs/api/.env.example
-        # environment:
-        #     DEBUG: True # ['True', 'False']
-        #     DJANGO_SETTING_MODULE: config.django.local
-        #     DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pgdb:5432/${POSTGRES_DB}
-        #     DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME}
-        #     DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
-        #     DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
-        #     DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
-    
+            - ./srcs/api/.env
+        # depends_on:
+        #     vault:
+        #         condition: service_healthy
+        #     redis:
+        #         condition: service_healthy
+
+        restart: on-failure
+
     frontend:
         build: ./srcs/frontend
         container_name: nextJs
@@ -62,6 +63,34 @@ services:
             - transcendance_net
         restart: on-failure
 
+    #################################################################
+
+    #################################################################
+    #                             REDIS                             #
+    #################################################################
+    redis:
+        image: redis:alpine
+        container_name: redis
+        ports:
+            - "6379:6379"
+        networks:
+            - transcendance_net
+        volumes:
+            - ./srcs/redis/conf/redis.conf:/redis.conf
+            - ./srcs/redis/logs/:/var/log/redis/
+        command: ["redis-server", "/redis.conf"]
+        restart: always
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 10s
+    #################################################################
+
+    #################################################################
+    #                         ELK stack                             #
+    #################################################################
     elasticsearch:
         container_name: elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
@@ -72,7 +101,7 @@ services:
             - xpack.security.enabled=true
             - ELASTIC_USERNAME=elastic
         healthcheck:
-            test: ["CMD-SHELL", "curl -s -u elastic:lol123 http://localhost:9200/_cat/health >/dev/null || exit 1"]
+            test: ["CMD-SHELL", "curl -s -u $${ELASTIC_USERNAME}:$${ELASTIC_PASSWORD} http://localhost:9200/_cat/health >/dev/null || exit 1"]
             interval: 30s
             timeout: 30s
             retries: 3
@@ -108,6 +137,8 @@ services:
             - ./srcs/ELK/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
             - ./srcs/ELK/logstash/pipeline:/usr/share/logstash/pipeline
             - ./srcs/postgres/logs/:/var/log/postgres/
+            - ./srcs/vault/logs:/var/log/vault
+            - ./srcs/redis/logs:/var/log/redis
         ports:
             - "50000:50000"
             - "9600:9600"
@@ -116,8 +147,6 @@ services:
         environment:
             - ELASTICSEARCH_USERNAME=elastic
             - LS_JAVA_OPTS=-Xms256m -Xmx256m
-            # - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-            # - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
         networks:
             - elk
         depends_on:
@@ -138,10 +167,51 @@ services:
             - ELASTICSEARCH_SSL_VERIFICATIONMODE=none
         volumes:
             - ./srcs/ELK/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+            - ./srcs/ELK/tools/cert_gen.sh:/docker-entrypoint-init.d/cert_gen.sh
+        entrypoint: ["bash", "-c", "/docker-entrypoint-init.d/cert_gen.sh"]
         ports:
             - "5601:5601"
         networks:
             - elk 
+    #################################################################
+
+    #################################################################
+    #                           VAULT & WAF                         #
+    #################################################################
+    vault:
+        image: hashicorp/vault:1.18
+        container_name: vault
+        ports:
+            - "8200:8200"
+        cap_add:
+            - IPC_LOCK
+        networks:
+            - elk
+            - transcendance_net
+        volumes:
+            - ./srcs/vault/data:/vault/data
+            - ./srcs/vault/init:/vault/init
+            - ./srcs/vault/config:/vault/config
+            - ./srcs/vault/tools:/vault/tools
+            - ./srcs/vault/logs:/vault/logs
+            - ./srcs/vault/policies:/vault/policies
+        environment:
+            - VAULT_ADDR=http://127.0.0.1:8200
+        env_file:
+            - ./srcs/api/.env
+            - ./srcs/postgres/.env
+        command: ["/bin/sh", "-c", "/vault/tools/set_up.sh"]
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD", "sh", "-c", "ls /vault/init | grep django"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        depends_on:
+            pgdb:
+                condition: service_healthy
+    #################################################################
+
 
 volumes:
     postgres_data:
