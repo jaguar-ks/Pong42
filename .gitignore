@@ -42,3 +42,8 @@ htmlcov/
 # Migrations
 **/migrations/*
 !**/migrations/__init__.py
+
+#VAULT
+*/vault/data/*
+*/vault/init/*
+*cred*

@@ -1,6 +1,6 @@
 import logstash
 from pythonjsonlogger import jsonlogger
-from config.env import env
+from config.env_dev import env
 
 LOGGING = {
     'version': 1,

@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from apps.utils import validators
 from django.db.models import Q
-from .models import Connection, User, Message
+from .models import Connection, User, Message, Notification
+from ..utils import send_real_time_notif
 
 
 class AuthUserSerializer(serializers.ModelSerializer):
@@ -98,10 +99,21 @@ class ConnectionSerializer(serializers.Serializer):
         }
 
     def create(self, validated_data):
-        return Connection.objects.create(
+        connection = Connection.objects.create(
             initiator=self.context["request"].user,
             recipient=self.context["recipient"],
         )
+        
+        if connection:
+            notif = Notification.objects.create(
+                user=connection.recipient,
+                notification_type=Notification.NOTIFICATION_TYPES['connections'],
+                message=f"{connection.initiator.username} sent you a friend request",
+            )
+            data = NotificationSerializer(notif)
+            send_real_time_notif(notif.user.id, data.data)
+        return connection
+        
 
 
 class UserDetailSerializer(UserSerializer):
@@ -165,3 +177,19 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = ['id', 'content', 'timestamp', 'is_read', 'sender_username', 'recipient_id']
         read_only_fields = ['id', 'timestamp', 'is_read', 'sender_username']
+
+class NotificationSerializer(serializers.ModelSerializer):
+    
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())  # Ensures user is validated
+    
+    class Meta:
+        model = Notification
+        fields = [
+            'id',             # Include the primary key for API usage
+            'user',           # The user associated with the notification
+            'notification_type',  # Type of notification
+            'message',        # Notification message
+            'created_at',     # Timestamp for when the notification was created
+            'read',           # Boolean indicating if the notification is read
+        ]
+        read_only_fields = ['id', 'created_at']  # Mark id and created_at as read-only

@@ -21,6 +21,12 @@ delete_images:
 fclean: down delete_images
 	docker system prune -a --force
 
-.PHONY: all build up down delete_images fclean
+init_vault:
+	rm -rf ./srcs/vault/data/*
+	rm -rf ./srcs/vault/init/*
+	rm -rf ./srcs/api/cred.env
+	rm -rf ./srcs/api/django-cred.json
 
-.SILENT: all build up down delete_images fclean
+.PHONY: all build up down delete_images fclean init_vault
+
+.SILENT: all build up down delete_images fclean init_vault
