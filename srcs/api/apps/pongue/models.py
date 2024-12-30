@@ -10,6 +10,12 @@ def make_join_key():
 
 
 class Tournament(models.Model):
+
+    class STATUS(models.TextChoices):
+        PENDING = "pending", "Pending"
+        IN_PROGRESS = "in_progress", "In Progress"
+        FINISHED = "finished", "Finished"
+
     name = models.CharField(max_length=150)
     creator = models.ForeignKey(
         User, on_delete=models.SET_NULL, 
@@ -23,7 +29,9 @@ class Tournament(models.Model):
         null=True,
         blank=True,
     )
-    is_finished = models.BooleanField(default=False)
+    status = models.CharField(
+        max_length=12, default=STATUS.PENDING, choices=STATUS.choices
+    )
     join_key = models.CharField(max_length=10, default=make_join_key)
     invite_only = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
