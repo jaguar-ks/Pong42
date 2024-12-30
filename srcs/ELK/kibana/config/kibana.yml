@@ -1,7 +1,7 @@
 server.host: "0.0.0.0"
-elasticsearch.hosts: ["http://elasticsearch:9200"]
-elasticsearch.username: "kibana_system"
-elasticsearch.password: "lil123"
+elasticsearch.hosts: ["${ELASTICSEARCH_HOSTS}"]
+elasticsearch.username: "${ELASTICSEARCH_USERNAME}"
+elasticsearch.password: "${KIBANA_PASSWORD}"
 elasticsearch.ssl.verificationMode: none
 xpack.security.enabled: true
 xpack.reporting.roles.enabled: false
