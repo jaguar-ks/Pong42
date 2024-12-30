@@ -11,12 +11,25 @@ def make_join_key():
 
 class Tournament(models.Model):
     name = models.CharField(max_length=150)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='organized_tournaments')
-    winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='won_tournaments', null=True, blank=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    creator = models.ForeignKey(
+        User, on_delete=models.SET_NULL, 
+        related_name="organized_tournaments",
+        null=True
+    )
+    winner = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name="won_tournaments",
+        null=True,
+        blank=True,
+    )
     is_finished = models.BooleanField(default=False)
     join_key = models.CharField(max_length=10, default=make_join_key)
     invite_only = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["-created_at"]
 
 
 class TournamentParticipant(models.Model):
