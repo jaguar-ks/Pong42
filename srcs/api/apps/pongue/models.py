@@ -1,7 +1,12 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.hashers import get_random_string
 
 from apps.users.models import User
+
+
+def make_join_key():
+    return get_random_string(10)
 
 
 class Tournament(models.Model):
@@ -10,7 +15,7 @@ class Tournament(models.Model):
     winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='won_tournaments', null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     is_finished = models.BooleanField(default=False)
-    join_key = models.CharField(max_length=100, unique=True)
+    join_key = models.CharField(max_length=10, default=make_join_key)
     invite_only = models.BooleanField(default=False)
 
 
