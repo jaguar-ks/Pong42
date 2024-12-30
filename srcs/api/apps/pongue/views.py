@@ -8,7 +8,7 @@ from .serializers import (
 )
 from .models import (
     PongMatch,
-    Tournament
+    Tournament,
 )
 
 class   MatchHistoryView(ListAPIView):
@@ -25,3 +25,13 @@ class   TournamentDetailView(RetrieveAPIView):
     serializer_class = TournamentDetailSerializer
     queryset = Tournament.objects.all()
     lookup_url_kwarg = 'tournament_id'
+
+
+class   UserMatchHistoryView(ListAPIView):
+    serializer_class = MatchSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        return PongMatch.objects.filter(
+            participants__user_id=user_id
+        ).order_by('-played_at')
