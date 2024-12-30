@@ -79,3 +79,15 @@ class PongMatch(models.Model):
     @property
     def is_tournament_match(self):
         return self.tournament is not None
+
+
+class MatchParticipant(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="match_participations")
+    match = models.ForeignKey(
+        PongMatch, on_delete=models.CASCADE, related_name="participants"
+    )
+    score = models.SmallIntegerField(default=0)
+
+
+    class   Meta:
+        unique_together = ('match', 'user')
