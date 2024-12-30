@@ -33,9 +33,10 @@ class Tournament(models.Model):
     join_key = models.CharField(max_length=10, default=make_join_key)
     invite_only = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
+    ended_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["-ended_at", "-created_at"]
 
     def __str__(self):
         return self.name
