@@ -74,6 +74,7 @@ class PongMatch(models.Model):
         indexes = [
             models.Index(fields=['tournament', 'round'])
         ]
+        ordering = ['-played_at']
 
 
     @property
