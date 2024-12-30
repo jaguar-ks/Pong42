@@ -86,8 +86,8 @@ class PongMatch(models.Model):
         return self.tournament is not None
 
     def __str__(self):
-        participants = [str(p.user) for p in self.participants.all()]
-        return f"{participants[0]} vs {participants[1]}"
+        return f"match {self.id}"
+
 
 
 class MatchParticipant(models.Model):
