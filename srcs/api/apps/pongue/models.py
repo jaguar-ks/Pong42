@@ -69,5 +69,13 @@ class PongMatch(models.Model):
     )
     played_at = models.DateTimeField(default=timezone.now)
 
+
+    class   Meta:
+        indexes = [
+            models.Index(fields=['tournament', 'round'])
+        ]
+
+
+    @property
     def is_tournament_match(self):
         return self.tournament is not None
