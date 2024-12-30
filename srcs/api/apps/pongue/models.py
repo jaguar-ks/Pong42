@@ -23,4 +23,16 @@ class TournamentParticipant(models.Model):
 
     class Meta:
         unique_together = ('tournament', 'user')
-    
+
+
+class PongueMatch(models.Model):
+    players = models.ManyToManyField(User, related_name='matches')
+    tournament = models.ForeignKey(
+        Tournament, on_delete=models.SET_NULL, related_name='matches', null=True, blank=True
+    )
+    round = models.CharField(max_length=20, null=True, blank=True)
+    winner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='won_matches', null=True, blank=True)
+    played_at = models.DateTimeField(default=timezone.now)
+
+    def is_tournament_match(self):
+        return self.tournament is not None
