@@ -37,3 +37,12 @@ class MatchSerializer(serializers.ModelSerializer):
 
     def is_tournament_match(self, instance):
         return instance.is_tournament_match
+
+
+class TournamentSerializer(serializers.ModelSerializer):
+    creator = UserSerializer()
+    winner = UserSerializer()
+
+    class Meta:
+        model = Tournament
+        exclude = ("join_key",)
