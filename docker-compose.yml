@@ -99,13 +99,14 @@ services:
         environment:
             - discovery.type=single-node
             - xpack.security.enabled=true
-            - ES_JAVA_OPTS=-Xms2g -Xmx2g
+            - ES_JAVA_OPTS=-Xms1g -Xmx1g
         cap_add:
             - IPC_LOCK
         ulimits:
             memlock:
                 soft: -1
                 hard: -1
+        mem_limit: 2g
         healthcheck:
             test: ["CMD-SHELL", "curl -s -u $${ELASTIC_USERNAME}:$${ELASTIC_PASSWORD} http://localhost:9200/_cat/health >/dev/null || exit 1"]
             interval: 30s
