@@ -45,4 +45,42 @@ class TournamentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tournament
-        exclude = ("join_key",)
+        fields = (
+            "id",
+            "name",
+            "creator",
+            "winner",
+            "status",
+            "invite_only",
+            "created_at",
+            "ended_at",
+        )
+
+
+class TournamentParticipantSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = TournamentParticipant
+        fields = ("id", "user", "seed", "score", "eliminated", "alias_name")
+
+
+class TournamentMatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PongMatch
+        fields = (
+            "id",
+            "winner_id",
+            "played_at",
+            "participants",
+            "tournament_id",
+            "round",
+        )
+
+
+class TournamentDetailSerializer(TournamentSerializer):
+    participants = TournamentParticipantSerializer(many=True)
+    matches = TournamentMatchSerializer(many=True)
+
+    class Meta(TournamentSerializer.Meta):
+        fields = TournamentSerializer.Meta.fields + ("matches", "participants")
