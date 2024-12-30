@@ -37,6 +37,9 @@ class Tournament(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
+    def __str__(self):
+        return self.name
+
 
 class TournamentParticipant(models.Model):
     tournament = models.ForeignKey(
@@ -46,9 +49,13 @@ class TournamentParticipant(models.Model):
     seed = models.SmallIntegerField(default=0)
     score = models.SmallIntegerField(default=0)
     eliminated = models.BooleanField(default=False)
+    alias_name = models.CharField(max_length=100)
 
     class Meta:
-        unique_together = ("tournament", "user")
+        unique_together = (("tournament", "user"), ("tournament", "alias_name"))
+
+    def __str__(self):
+        return str(self.alias_name)
 
 
 class PongMatch(models.Model):
@@ -69,26 +76,30 @@ class PongMatch(models.Model):
     )
     played_at = models.DateTimeField(default=timezone.now)
 
-
-    class   Meta:
-        indexes = [
-            models.Index(fields=['tournament', 'round'])
-        ]
-        ordering = ['-played_at']
-
+    class Meta:
+        indexes = [models.Index(fields=["tournament", "round"])]
+        ordering = ["-played_at"]
 
     @property
     def is_tournament_match(self):
         return self.tournament is not None
 
+    def __str__(self):
+        participants = [str(p.user) for p in self.participants.all()]
+        return f"{participants[0]} vs {participants[1]}"
+
 
 class MatchParticipant(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="match_participations")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="match_participations"
+    )
     match = models.ForeignKey(
         PongMatch, on_delete=models.CASCADE, related_name="participants"
     )
     score = models.SmallIntegerField(default=0)
 
+    class Meta:
+        unique_together = ("match", "user")
 
-    class   Meta:
-        unique_together = ('match', 'user')
+    def __str__(self):
+        return f"{self.user}: {self.score}"
