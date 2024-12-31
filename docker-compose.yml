@@ -42,6 +42,8 @@ services:
             - 8000:8000
         env_file:
             - ./srcs/api/.env
+        environment:
+            - PROD=false
         # depends_on:
         #     vault:
         #         condition: service_healthy
@@ -206,7 +208,7 @@ services:
         command: ["/bin/sh", "-c", "/vault/tools/set_up.sh"]
         restart: unless-stopped
         healthcheck:
-            test: ["CMD", "sh", "-c", "ls /vault/init | grep django"]
+            test: ["CMD-SHELL", "[ -f /vault/init/django-cred.json ]"]
             interval: 10s
             timeout: 5s
             retries: 5
