@@ -1,4 +1,4 @@
-from config.env_dev import BASE_DIR, env
+from config.envm import BASE_DIR, env
 import os
 
 # SECURITY WARNING: keep the secret key used in production secret!

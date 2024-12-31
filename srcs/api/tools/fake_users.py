@@ -1,6 +1,6 @@
 from apps.users.models import User
 from faker import Faker
-from config.env_dev import env
+from config.envm import env
 from django.contrib.auth.hashers import make_password
 
 f = Faker()
