@@ -5,7 +5,7 @@ all: build
 build:
 	docker-compose -f docker-compose.yml build
 
-up: build
+up: 
 	docker-compose -f docker-compose.yml up
 
 down:
@@ -27,6 +27,11 @@ init_vault:
 	rm -rf ./srcs/api/cred.env
 	rm -rf ./srcs/api/django-cred.json
 
-.PHONY: all build up down delete_images fclean init_vault
+remove_log:
+	rm -rf ./srcs/postgres/logs/*
+	rm -rf ./srcs/vault/logs/*
+	rm -rf ./srcs/redis/logs/*
 
-.SILENT: all build up down delete_images fclean init_vault
+.PHONY: all build up down delete_images fclean init_vault remove_log
+
+.SILENT: all build up down delete_images fclean init_vault remove_log
