@@ -14,7 +14,7 @@ LOGGING = {
     },
     'handlers': {
         'logstash': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logstash.TCPLogstashHandler',
             'host': env('LOGSTASH_HOST', default='logstash'),
             'port': env.int('LOGSTASH_PORT', default=50000),
@@ -25,7 +25,7 @@ LOGGING = {
             'formatter': 'logstash',
         },
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
@@ -33,7 +33,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['logstash', 'console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
     }
