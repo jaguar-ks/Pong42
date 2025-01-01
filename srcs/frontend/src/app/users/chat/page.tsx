@@ -56,16 +56,18 @@ export default function BoxedChatInterface() {
   useEffect(() => {
     axios.get('http://localhost:8000/api/users/me/connections/', { withCredentials: true })
       .then((response) => {
-        const fetchedUsers: User[] = response.data.results.map((userData: any) => ({
-          conv_id: userData.id,
-          id: userData.user.id,
-          username: userData.user.username,
-          avatar_url: userData.user.avatar_url,
-          is_online: userData.user.is_online,
-          wins: userData.user.wins,
-          losses: userData.user.losses,
-          rating: userData.user.rating,
-        }));
+        const fetchedUsers: User[] = response.data.results
+          .filter((userData: any) => userData.status === "friends")
+          .map((userData: any) => ({
+            conv_id: userData.id,
+            id: userData.user.id,
+            username: userData.user.username,
+            avatar_url: userData.user.avatar_url,
+            is_online: userData.user.is_online,
+            wins: userData.user.wins,
+            losses: userData.user.losses,
+            rating: userData.user.rating,
+          }));
         setUsers(fetchedUsers);
         if (fetchedUsers.length > 0) {
           setActiveUser(fetchedUsers[0]);
@@ -82,16 +84,16 @@ export default function BoxedChatInterface() {
         const lastMessage = wsMessages[wsMessages.length - 1];
         const newMessage = {
           id: `${lastMessage.sender_id}-${lastMessage.timestamp}-${Math.random().toString(36).substr(2, 9)}`,
-          user: lastMessage.sender_id.toString(),
+          user: lastMessage.sender_id,
           content: lastMessage.message,
           timestamp: lastMessage.timestamp,
         };
 
-        const isDuplicate = prevMessages.some(
-          msg => msg.content === newMessage.content &&
-            msg.timestamp === newMessage.timestamp &&
-            msg.user === newMessage.user
-        );
+          const isDuplicate = prevMessages.some(
+            msg => msg.content === newMessage.content &&
+              msg.timestamp === newMessage.timestamp &&
+              msg.user === newMessage.user
+          );
 
         return isDuplicate ? prevMessages : [...prevMessages, newMessage];
       });
@@ -107,8 +109,10 @@ export default function BoxedChatInterface() {
             user: msgData.sender_username,
             content: msgData.content,
             timestamp: msgData.timestamp,
-          }));
-          console.log('Fetched Messages:', fetchedMessages);
+          }
+        ));
+        console.log(fetchedMessages)
+
           setMessages(prevMessages => {
             const uniqueMessages = [...new Set([...prevMessages, ...fetchedMessages].map(msg => msg.id))].map(id => {
               return [...prevMessages, ...fetchedMessages].find(msg => msg.id === id);
@@ -139,7 +143,6 @@ export default function BoxedChatInterface() {
   const handleUserClick = (user: User) => {
     setActiveUser(user);
   };
-  console.log("activeuser : msg user", user.username)
   return (
     <div className="w-full h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex">
       <div className="w-1/3 border-r border-gray-200 dark:border-gray-700">
@@ -186,20 +189,12 @@ export default function BoxedChatInterface() {
               <Phone className="h-5 w-5" />
               <span className="sr-only">Call</span>
             </Button>
-            <Button variant="ghost" size="icon">
-              <Video className="h-5 w-5" />
-              <span className="sr-only">Video call</span>
-            </Button>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="h-5 w-5" />
-              <span className="sr-only">More options</span>
-            </Button>
           </div>
         </div>
         <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
           {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.user == user?.username ? 'justify-end' : 'justify-start'} mb-4`}>
-              <p>{msg.user} -c {user?.username}</p>
+              <p>{msg.recipient_id} -> {user?.username}</p>
               <div className={`max-w-[70%] ${msg.user == user?.username ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-3`}>
                 <p>{msg.content}</p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{msg.timestamp}</p>

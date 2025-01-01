@@ -42,7 +42,7 @@ const SignInPage: React.FC = () => {
     
     try {
       await axios.post("http://localhost:8000/api/auth/sign-in/", {username, password}, {withCredentials: true})
-      console.log("logged")
+      console.log("Success")
       router.push("/users/home")
     } catch (err: any) {
       console.error("Error:", err.response)
