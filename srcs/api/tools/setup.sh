@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e  # Exit immediately if a command exits with a non-zero status
 
-# apk add jq
+apk add jq
 
 if [ ! -e cred.env ]; then
     echo "ROLE_ID=\"$(cat django-cred.json |  jq -r '.role_id')\"" >> cred.env
