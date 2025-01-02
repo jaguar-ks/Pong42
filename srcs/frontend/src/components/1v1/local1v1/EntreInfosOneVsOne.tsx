@@ -1,48 +1,79 @@
 "use client"
-import { useState } from "react";
-import styles from './EntreInfosOneVsOne.module.css'
-import { useUserContext } from "@/context/UserContext";
-const EntreInfosOneVsOne = ({setPage}) =>{
 
-    const {localOneVsOneNames, setLocalOneVsOneNames} = useUserContext();
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
-    const handleNameChange = (name: string, index) => {
-        setLocalOneVsOneNames((prevNames) => {
-            const updatedNames = [...prevNames]; // Create a copy of the array
-            updatedNames[index] = name; // Update the specific index
-            return updatedNames; // Return the updated array
-        });
-    };
+export default function UserGameInfoPage() {
+  const [user1, setUser1] = useState('')
+  const [user2, setUser2] = useState('')
+  const [isFormValid, setIsFormValid] = useState(false)
+  const router = useRouter()
 
-    return(
-        <div className={styles.container}>
-            <div className={styles.playerInputs}>
-                <h2 className={styles.title}>Enter Player Names :</h2>
-                <div className={styles.plyerInput}>
-                    <label className={styles.label}>Player 1:</label>
-                    <input
-                        className={styles.input}
-                        type={localOneVsOneNames[0]}
-                        onChange={(e) => handleNameChange(e.target.value, 0)}
-                        placeholder={`Player 1 Name`}
-                        />
-                </div>
-                <div className={styles.playerInput}>
+  // Validate form and update isFormValid state
+  const validateForm = () => {
+    setIsFormValid(user1.trim() !== '' && user2.trim() !== '')
+  }
 
-                <label className={styles.label}>Player 2:</label>
-                <input
-                    className={styles.input}
-                    type={localOneVsOneNames[1]}
-                    onChange={(e) => handleNameChange(e.target.value, 1)}
-                    placeholder={`Player 2 Name`}
-                />
-                </div>
-            </div>
-            <div className={styles.startButtonContainer}>
-                <button className={styles.startButton}>start game</button>
-            </div>
-        </div>
-    )
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (isFormValid) {
+        router.push(`/users/gameArena`)
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-md">
+        <h1 className="text-3xl font-bold text-center text-gray-800">Game Setup</h1>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="user1" className="text-sm font-medium text-gray-700">
+              Player 1 Nickname
+            </Label>
+            <Input
+              id="user1"
+              type="text"
+              value={user1}
+              onChange={(e) => {
+                setUser1(e.target.value)
+                validateForm()
+              }}
+              placeholder="Enter Player 1 Nickname"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="user2" className="text-sm font-medium text-gray-700">
+              Player 2 Nickname
+            </Label>
+            <Input
+              id="user2"
+              type="text"
+              value={user2}
+              onChange={(e) => {
+                setUser2(e.target.value)
+                validateForm()
+              }}
+              placeholder="Enter Player 2 Nickname"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <Button
+            type="submit"
+            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            disabled={!isFormValid}
+          >
+            Start Game
+          </Button>
+        </form>
+      </div>
+    </div>
+  )
 }
 
-export default EntreInfosOneVsOne;

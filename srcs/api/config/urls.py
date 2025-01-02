@@ -23,4 +23,6 @@ urlpatterns = [
     path("api/auth/", include("apps.authentication.urls")),
     # users
     path("api/users/", include("apps.users.urls")),
+    # game
+    path("api/pongue/", include("apps.pongue.urls")),
 ]

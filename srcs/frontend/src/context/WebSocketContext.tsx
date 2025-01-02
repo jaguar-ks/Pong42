@@ -36,7 +36,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
       ws.current.onmessage = (event) => {
         const message = JSON.parse(event.data);
         setMessages(prev => {
-          // Check if message already exists
+          //check if message already exists
           const messageExists = prev.some(
             msg => 
               msg.message === message.message && 
