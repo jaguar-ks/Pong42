@@ -20,7 +20,7 @@ class MatchParticipantSerializer(serializers.ModelSerializer):
 class MatchSerializer(serializers.ModelSerializer):
     participants = MatchParticipantSerializer(many=True)
     is_tournament_match = serializers.SerializerMethodField(
-        method_name="is_tournament_match"
+        method_name="get_is_tournament_match",
     )
 
     class Meta:
@@ -35,7 +35,7 @@ class MatchSerializer(serializers.ModelSerializer):
             "round",
         )
 
-    def is_tournament_match(self, instance):
+    def get_is_tournament_match(self, instance):
         return instance.is_tournament_match
 
 
