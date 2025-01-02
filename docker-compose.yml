@@ -208,7 +208,7 @@ services:
         command: ["/bin/sh", "-c", "/vault/tools/set_up.sh"]
         restart: unless-stopped
         healthcheck:
-            test: ["CMD-SHELL", "[ -f /vault/init/django-cred.json ]"]
+            test: ["CMD-SHELL", "[ -e /vault/init/django-cred.json ]"]
             interval: 10s
             timeout: 5s
             retries: 5
