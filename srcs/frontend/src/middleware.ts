@@ -31,6 +31,7 @@ export const config = {
         '/users/home', 
         '/users/settings', 
         '/users/logout', 
-        '/users/friend'
+        '/users/friend',
+        '/users/chat'
     ],
 };

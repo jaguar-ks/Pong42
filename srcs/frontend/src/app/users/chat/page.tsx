@@ -82,6 +82,7 @@ export default function BoxedChatInterface() {
     if (wsMessages.length > 0) {
       setMessages(prevMessages => {
         const lastMessage = wsMessages[wsMessages.length - 1];
+        console.log("lastmessage: ",lastMessage)
         const newMessage = {
           id: `${lastMessage.sender_id}-${lastMessage.timestamp}-${Math.random().toString(36).substr(2, 9)}`,
           user: lastMessage.sender_id,
@@ -104,14 +105,15 @@ export default function BoxedChatInterface() {
     if (activeUser) {
       axios.get(`http://localhost:8000/api/users/me/connections/${activeUser.conv_id}/messages/`, { withCredentials: true })
         .then((response) => {
+          const logs = response.data;
           const fetchedMessages: Message[] = response.data.results.map((msgData: any) => ({
             id: msgData.id,
-            user: msgData.sender_username,
+            user: msgData.sender_id,
             content: msgData.content,
             timestamp: msgData.timestamp,
           }
         ));
-        console.log(fetchedMessages)
+        console.log(logs)
 
           setMessages(prevMessages => {
             const uniqueMessages = [...new Set([...prevMessages, ...fetchedMessages].map(msg => msg.id))].map(id => {
@@ -193,9 +195,8 @@ export default function BoxedChatInterface() {
         </div>
         <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
           {messages.map((msg) => (
-            <div key={msg.id} className={`flex ${msg.user == user?.username ? 'justify-end' : 'justify-start'} mb-4`}>
-              <p>{msg.recipient_id} -> {user?.username}</p>
-              <div className={`max-w-[70%] ${msg.user == user?.username ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-3`}>
+            <div key={msg.id} className={`flex ${msg.user == user?.id ? 'justify-end' : 'justify-start'} mb-4`}>
+              <div className={`max-w-[70%] ${msg.user == user?.id ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-3`}>
                 <p>{msg.content}</p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{msg.timestamp}</p>
               </div>

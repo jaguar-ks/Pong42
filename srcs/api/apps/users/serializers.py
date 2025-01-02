@@ -170,13 +170,13 @@ class UpdateAuthUserSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 class MessageSerializer(serializers.ModelSerializer):
-    sender_username = serializers.CharField(source='sender.username', read_only=True)
+    sender_id = serializers.CharField(source='sender.id', read_only=True)
     recipient_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Message
-        fields = ['id', 'content', 'timestamp', 'is_read', 'sender_username', 'recipient_id']
-        read_only_fields = ['id', 'timestamp', 'is_read', 'sender_username']
+        fields = ['id', 'content', 'timestamp', 'is_read', 'sender_id', 'recipient_id']
+        read_only_fields = ['id', 'timestamp', 'is_read', 'sender_id']
 
 class NotificationSerializer(serializers.ModelSerializer):
     
