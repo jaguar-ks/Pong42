@@ -1,4 +1,4 @@
-from config.env_dev import env
+from config.envm import env
 
 OAUTH_PROVIDERS_SETTINGS = {
     "42": {

@@ -1,12 +1,16 @@
-server.host: "0.0.0.0"
-elasticsearch.hosts: ["http://elasticsearch:9200"]
-elasticsearch.username: "kibana_system"
-elasticsearch.password: "lil123"
+server.host: "kibana"
+elasticsearch.hosts: ["${ELASTICSEARCH_HOSTS}"]
+elasticsearch.username: "${ELASTICSEARCH_USERNAME}"
+elasticsearch.password: "${KIBANA_PASSWORD}"
 elasticsearch.ssl.verificationMode: none
 xpack.security.enabled: true
 xpack.reporting.roles.enabled: false
 xpack.security.encryptionKey: "er4366b%$&&^^*%^*n458$$drybnht$$btT"
 xpack.encryptedSavedObjects.encryptionKey: "jbtm45^$Y%ouy45y567^&5670i5n65697"
+xpack.reporting.encryptionKey: "hksdjgf346#$%^$%^ergr5$^45yy6$%YY$%%%qrw43"
 server.ssl.enabled: true
 server.ssl.certificate: "/usr/share/kibana/config/certs/kibana.crt"
 server.ssl.key: "/usr/share/kibana/config/certs/kibana.key"
+xpack.observabilityAIAssistant.enabled: false
+telemetry.enabled: false
+

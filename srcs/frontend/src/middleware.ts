@@ -14,7 +14,7 @@ export function middleware(req: NextRequest) {
     }
 
     // If there is no refresh token and user is trying to access protected user routes, redirect to /auth/signin
-    const protectedPaths = ['/users/home', '/users/settings', '/users/logout', '/users/friend'];
+    const protectedPaths = ['/users/home', '/users/settings', '/users/logout', '/users/friend', '/users/chat'];
     if (!refreshToken && protectedPaths.some((path) => pathname.startsWith(path))) {
         return NextResponse.redirect(new URL('/auth/signin', req.url));
     }

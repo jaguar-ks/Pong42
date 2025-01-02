@@ -6,7 +6,8 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.django.local")
+    mode = 'production' if os.getenv('PROD', 'false').lower() == 'true' else 'local'
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"config.django.{mode}")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

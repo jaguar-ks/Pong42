@@ -1,4 +1,4 @@
-from config.env_dev import env
+from config.envm import env
 from datetime import timedelta
 
 

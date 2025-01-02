@@ -42,6 +42,8 @@ services:
             - 8000:8000
         env_file:
             - ./srcs/api/.env
+        environment:
+            - PROD=false
         # depends_on:
         #     vault:
         #         condition: service_healthy
@@ -99,7 +101,14 @@ services:
         environment:
             - discovery.type=single-node
             - xpack.security.enabled=true
-            - ELASTIC_USERNAME=elastic
+            - ES_JAVA_OPTS=-Xms1g -Xmx1g
+        cap_add:
+            - IPC_LOCK
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        mem_limit: 2g
         healthcheck:
             test: ["CMD-SHELL", "curl -s -u $${ELASTIC_USERNAME}:$${ELASTIC_PASSWORD} http://localhost:9200/_cat/health >/dev/null || exit 1"]
             interval: 30s
@@ -109,6 +118,7 @@ services:
         volumes:
             - ./srcs/ELK/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
             - es_data:/usr/share/elasticsearch/data
+            - ./srcs/ELK/elasticsearch/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
         ports:
             - "9200:9200"
             - "9300:9300"
@@ -145,7 +155,6 @@ services:
         env_file:
             - ./srcs/ELK/.env
         environment:
-            - ELASTICSEARCH_USERNAME=elastic
             - LS_JAVA_OPTS=-Xms256m -Xmx256m
         networks:
             - elk
@@ -161,10 +170,6 @@ services:
                 condition: service_completed_successfully
         env_file:
             - ./srcs/ELK/.env
-        environment:
-            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-            - ELASTICSEARCH_USERNAME=kibana_system
-            - ELASTICSEARCH_SSL_VERIFICATIONMODE=none
         volumes:
             - ./srcs/ELK/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
             - ./srcs/ELK/tools/cert_gen.sh:/docker-entrypoint-init.d/cert_gen.sh
@@ -203,7 +208,7 @@ services:
         command: ["/bin/sh", "-c", "/vault/tools/set_up.sh"]
         restart: unless-stopped
         healthcheck:
-            test: ["CMD", "sh", "-c", "ls /vault/init | grep django"]
+            test: ["CMD-SHELL", "[ -e /vault/init/django-cred.json ]"]
             interval: 10s
             timeout: 5s
             retries: 5
@@ -217,7 +222,6 @@ volumes:
     postgres_data:
     backend_files:
     es_data:
-        driver: local
 
 networks:
     transcendance_net:

@@ -6,3 +6,6 @@ xpack.security.authc.api_key.enabled: true
 
 # Add these memory settings
 bootstrap.memory_lock: true
+xpack.ml.enabled: false
+# xpack.monitoring.collection.enabled: true
+xpack.watcher.enabled: false

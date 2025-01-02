@@ -1,4 +1,4 @@
-from config.env_dev import BASE_DIR, env
+from config.envm import BASE_DIR, env
 import os
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -83,21 +83,15 @@ TEMPLATES = [
 
 ASGI_APPLICATION = "config.asgi.application"
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+CORS_ALLOW_CREDENTIALS = True
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
+]
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
-}
+ALLOWED_HOSTS = ['*']
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
