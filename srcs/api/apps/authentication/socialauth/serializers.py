@@ -138,7 +138,11 @@ class OauthCallBackSerializer(serializers.Serializer):
 
         if "full_name" in validated_data:
             full_name = validated_data.pop("full_name")
-            first_name, last_name = full_name.split(" ", 1)
+            if full_name.count(" ") > 0:
+                first_name, last_name = full_name.split(" ", 1)
+            else:
+                first_name = full_name
+                last_name = ""
             validated_data["first_name"] = first_name.strip()
             validated_data["last_name"] = last_name.strip()
 
