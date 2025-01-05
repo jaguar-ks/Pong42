@@ -75,11 +75,17 @@
     .box {
         width: 100%;
     }
+
 }
 
 @media screen and (max-width: 800px) {
     .line {
         width: 100%;
+    }
+    .container {
+        gap: 20px;
+        margin: 2.5px;
+        padding: 10px;
     }
 }
 

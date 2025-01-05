@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import axios from 'axios'
 import { InputField } from '@/components/InputField'
-import styles from "./page.module.css"
+import styles from './page.module.css'
 import OtpForLogin from '../../../components/OtpForLogin/OtpForLogin'
 import { Header } from '@/components/Header'
 import imageee from '../../../../assets/syberPlayer.png'
+import googleIcon from '../../../../assets/googleSigninLogoBlack.svg'
+import githubIcon from '../../../../assets/githubSignInLogo.svg'
+import FTIcon from '../../../../assets/FTSignUnImage1.svg'
 
 interface Errors {
   details: string
@@ -57,6 +60,16 @@ const SignInPage: React.FC = () => {
     }
   }
 
+  const handleGoogleSignIn = () => {
+    // Implement Google sign-in logic here
+    console.log('Google sign-in clicked')
+  }
+
+  const handleGithubSignIn = () => {
+    // Implement GitHub sign-in logic here
+    console.log('GitHub sign-in clicked')
+  }
+
   return (
     <div className={styles.pageContainer}>
       <Header forWhat="Sign In"/>
@@ -98,6 +111,35 @@ const SignInPage: React.FC = () => {
                   </div>
                 </div>
               </form>
+              <div className={styles.socialButtonsContainer}>
+                <button onClick={handleGoogleSignIn} className={styles.socialButton}>
+                  <Image
+                    src={googleIcon}
+                    alt="Sign in with Google"
+                    width={40}
+                    height={40}
+                    className={styles.socialButtonImage}
+                  />
+                </button>
+                <button onClick={handleGithubSignIn} className={styles.socialButton}>
+                  <Image
+                    src={githubIcon}
+                    alt="Sign in with GitHub"
+                    width={40}
+                    height={40}
+                    className={styles.socialButtonImage}
+                  />
+                </button>
+                <button onClick={handleGithubSignIn} className={styles.socialButton}>
+                  <Image
+                    src={FTIcon}
+                    alt="Sign in with GitHub"
+                    width={40}
+                    height={40}
+                    className={styles.socialButtonImage}
+                  />
+                </button>
+              </div>
               <p className={styles.signUpText}>
                 Don't have an account?{' '}
                 <button

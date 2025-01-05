@@ -21,8 +21,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  width: calc(100% - 70px);
-  background-color: #FFFFFF;
+  width: 100%;
+  background-color: #ffffff;
 }
 
 .horizontalNavbarr {
@@ -47,7 +47,9 @@
 @media screen and (max-width: 880px) {
   .layout-container {
     flex-direction: column;
+    
   }
+  
 
   .verticalNavbarr {
     display: none;
