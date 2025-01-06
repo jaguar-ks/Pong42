@@ -54,8 +54,12 @@ class GameConsumer(AsyncWebsocketConsumer):
                     'message': json.dumps(game)
                 }
             )
-            self.in_game = True
-
+    
+    async def game_found(self, event):
+        self.is_waiting = False  # No longer waiting once game is found
+        await self.send(
+            text_data=event['message'],
+        )
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_name, self.channel_name)
