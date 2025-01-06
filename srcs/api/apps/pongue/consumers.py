@@ -1,64 +1,67 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-import json
-from datetime import datetime, timedelta
-import asyncio
+from channels.db import database_sync_to_async
+import os, json, asyncio, redis
+from asgiref.sync import sync_to_async
+from django.utils.crypto import get_random_string
+from apps.users.serializers import UserSerializer
 
-TIMEOUT = 30
+r = redis.Redis()
 
+class GameConsumer(AsyncWebsocketConsumer):
+    REDIS_SESSION_KEY = "game_matchmaking"
 
-class   PongueConsumer(AsyncWebsocketConsumer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    async def destroy_game_session(self):
+        sync_to_async(r.hdel)(GameConsumer.REDIS_SESSION_KEY)
 
-        self.is_routed = False
-        self.room_group_name = None
-        self.timeout_task = None
+    async def get_or_create_game(self):
+        game = await sync_to_async(r.hgetall)(GameConsumer.REDIS_SESSION_KEY)
+        game = {k.decode(): v.decode() for k, v in game.items()} if game else {}
+        
+        if not game:
+            room_name = get_random_string(10)
+            game = {
+                'room_name': room_name,
+                'current_player': json.dumps(UserSerializer(self.user).data),
+            }
+            await sync_to_async(r.hset)(self.REDIS_SESSION_KEY, mapping=game)
+            return [game, True]
 
+        self.destroy_game_session()
+
+        # Add new player to the game
+        game['players'] = [
+            json.loads(game['current_player']),
+            UserSerializer(self.user).data
+        ]
+        del game['current_player']
+        return [game, False]
+    
 
     async def connect(self):
+        self.user = self.scope["user"]
+        game, created = await self.get_or_create_game()
+        
+        self.room_name = game.pop('room_name')
+        await self.channel_layer.group_add(self.room_name, self.channel_name)
+        
         await self.accept()
-        self.timeout_task = asyncio.create_task(self.check_timeout())
-
-
-    async def send_json(self, event=None, error=None, data=None, close=False, code=None) -> None:
-        if not event and not error:
-            raise ValueError("event and error args cannot be both empty")
-        if event and error:
-            raise ValueError("event and error args cannot choose between them")
-
-        json_data = {}
-
-        for arg in ('event', 'error', 'data'):
-            if (value := locals().get(arg)) is not None:
-                json_data[arg] = value
-
-        await super().send(text_data=json.dumps(json_data))
-        if close:
-            await self.close(code=code)
-
-
-    async def receive(self, text_data=None, bytes_data=None):
-        super().receive()
-        if bytes_data is not None:
-            await self.send_json(error="invalid data is not allowed", close=True)
-        try:
-            data = json.dumps(text_data)
-            if not isinstance(data, dict) or 'action' not in data:
-                await self.send_json(error='invalid data format', close=True)
-            await self.receive_json(action=data.pop('action'), json_data=data)
-        except:
-            await self.send_json(error='invalid data format', close=True)
-
-
-    async def receive_json(self, action, json_data):
-        pass
-
-    async def check_timeout(self):
-        await asyncio.sleep(TIMEOUT)
-
-        if not self.is_routed:
-            await self.send_json(
-                error=f"no message within {TIMEOUT} seconds, disconnecting...",
-                close=True,
-                code=4002
+        
+        if not created:
+            await self.channel_layer.group_send(
+                self.room_name,
+                {
+                    "type": 'game.found',
+                    'message': json.dumps(game)
+                }
             )
+            self.in_game = True
+
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.room_name, self.channel_name)
+        in_game = getattr(self, 'in_game')
+        if not in_game:
+            self.destroy_game_session()
+            return
+        # annouce disconnnect event
+
