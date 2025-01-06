@@ -27,14 +27,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.group_name,
             self.channel_name,
         )
-
         await self.accept()
+        await self.change_online_status(self.user.id, True)
+        print(f"{self.user.username} connected [{self.connection_type}][{self.user.is_online}]", flush=True)
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(
-            self.group_name,
-            self.channel_name
-        )
+        await self.change_online_status(self.user.id, False)
+        print(f"{self.user.username} disconnected [{self.connection_type}][{self.user.is_online}]", flush=True)
+        if hasattr(self, 'group_name'):
+            await self.channel_layer.group_discard(
+                self.group_name,
+                self.channel_name
+            )
 
     # send a notification
     async def send_notification(self, event):
@@ -116,3 +120,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
         except (User.DoesNotExist, Connection.DoesNotExist):
             return None
+
+    @database_sync_to_async
+    def change_online_status(self, user_id, status):
+        user = User.objects.get(id=user_id)
+        user.is_online = status
+        user.save()
