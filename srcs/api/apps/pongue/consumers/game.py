@@ -56,7 +56,6 @@ class GameConsumer(AsyncWebsocketConsumer):
                     'message': json.dumps(game)
                 }
             )
-            asyncio.create_task()
 
 
     async def game_found(self, event):
