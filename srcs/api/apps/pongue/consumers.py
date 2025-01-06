@@ -11,7 +11,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     REDIS_SESSION_KEY = "game_matchmaking"
 
     async def destroy_game_session(self):
-        sync_to_async(r.hdel)(GameConsumer.REDIS_SESSION_KEY)
+        await sync_to_async(r.delete)(GameConsumer.REDIS_SESSION_KEY)
 
     async def get_or_create_game(self):
         game = await sync_to_async(r.hgetall)(GameConsumer.REDIS_SESSION_KEY)
@@ -26,7 +26,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             await sync_to_async(r.hset)(self.REDIS_SESSION_KEY, mapping=game)
             return [game, True]
 
-        self.destroy_game_session()
+        await self.destroy_game_session()
 
         # Add new player to the game
         game['players'] = [
@@ -35,13 +35,13 @@ class GameConsumer(AsyncWebsocketConsumer):
         ]
         del game['current_player']
         return [game, False]
-    
 
     async def connect(self):
         self.user = self.scope["user"]
         game, created = await self.get_or_create_game()
         
         self.room_name = game.pop('room_name')
+        self.is_waiting = created  # Track if player is waiting for opponent
         await self.channel_layer.group_add(self.room_name, self.channel_name)
         
         await self.accept()
