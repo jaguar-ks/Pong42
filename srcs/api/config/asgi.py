@@ -5,14 +5,14 @@ from django.core.asgi import get_asgi_application
 from config.middleware import WebSocketJWTMiddleware
 from channels.security.websocket import AllowedHostsOriginValidator
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.local")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.django.local")
 
 # Initialize Django ASGI application early to ensure the AppRegistry
 # is populated before importing code that may import ORM models.
 django_asgi_app = get_asgi_application()
 
 from django.urls import re_path
-from apps.pongue.consumers import PongueConsumer
+from apps.pongue.consumers import GameConsumer
 from apps.users.consumers import ChatConsumer
 
 async def unmatched_route(scope, receive, send):
@@ -31,7 +31,7 @@ application = ProtocolTypeRouter(
             WebSocketJWTMiddleware(
                 URLRouter(
                     [
-                        re_path('ws/pongue/$', PongueConsumer.as_asgi()),
+                        re_path('ws/game/$', GameConsumer.as_asgi()),
                         re_path(r'ws/chat/$', ChatConsumer.as_asgi(), {'type': 'chat'}),
                         re_path(r"ws/notifications/(?P<user_id>\d+)/$", ChatConsumer.as_asgi(), {'type': 'notifications'}),
                         re_path(r'', unmatched_route), # catch all unmatched routes
