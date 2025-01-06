@@ -62,10 +62,28 @@ class GameConsumer(AsyncWebsocketConsumer):
         )
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.room_name, self.channel_name)
-        in_game = getattr(self, 'in_game')
-        if not in_game:
-            self.destroy_game_session()
-            return
-        # annouce disconnnect event
+        try:
+            await self.channel_layer.group_discard(self.room_name, self.channel_name)
+            
+            # If player was waiting and hadn't found a game, remove their session
+            if getattr(self, 'is_waiting', False):
+                await self.destroy_game_session()
+            else:
+                # Announce disconnect to other player if game was in progress
+                await self.channel_layer.group_send(
+                    self.room_name,
+                    {
+                        "type": "player.disconnected",
+                        "message": json.dumps({
+                            "event": "player_disconnected",
+                            "player": UserSerializer(self.user).data
+                        })
+                    }
+                )
+        except Exception as e:
+            # Log the error appropriately
+            print(f"Error in disconnect: {str(e)}")
 
+    async def player_disconnected(self, event):
+        """Handle player disconnect notification"""
+        await self.send(text_data=event['message'])
