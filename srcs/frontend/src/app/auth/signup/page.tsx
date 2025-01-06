@@ -10,6 +10,9 @@ import { Footer } from '@/components/Footer'
 import { InputField } from '@/components/InputField'
 import styles from './page.module.css'
 import imageee from '../../../../assets/syberPlayer.png'
+import googleIcon from '../../../../assets/googleSigninLogoBlack.svg'
+import githubIcon from '../../../../assets/githubSignInLogo.svg'
+import FTIcon from '../../../../assets/FTSignUnImage1.svg'
 
 const schema = z.object({
   firstname: z.string().min(1, 'First name is required'),
@@ -51,7 +54,7 @@ export default function SignUpPage() {
     setIsLoading(true)
 
     const result = schema.safeParse(formData)
-    if (!result.success) {
+    if(!result.success) {
       setErrors(result.error.flatten().fieldErrors)
       setIsLoading(false)
       return
@@ -72,6 +75,27 @@ export default function SignUpPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleSignUp = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/api/auth/social/providers/')
+      console.log(res.data.providers[1].provider_url);
+      router.push(res.data.providers[1].provider_url);
+    } catch (err: any) {
+      console.error('Error:', err.response )
+      
+    } finally {
+      setIsLoading(false)
+    }
+    
+
+    console.log('Google sign-up clicked')
+  }
+
+  const handleGithubSignUp = () => {
+    // Implement GitHub sign-up logic here
+    console.log('GitHub sign-up clicked')
   }
 
   return (
@@ -113,6 +137,35 @@ export default function SignUpPage() {
                       </div>
                     </div>
                   </form>
+                  <div className={styles.socialButtonsContainer}>
+                    <button onClick={() => handleSignUp(1)} className={styles.socialButton}>
+                      <Image
+                        src={googleIcon}
+                        alt="Sign up with Google"
+                        width={40}
+                        height={40}
+                        className={styles.socialButtonImage}
+                      />
+                    </button>
+                    <button onClick={() => handleSignUp(2)} className={styles.socialButton}>
+                      <Image
+                        src={githubIcon}
+                        alt="Sign up with GitHub"
+                        width={40}
+                        height={40}
+                        className={styles.socialButtonImage}
+                      />
+                    </button>
+                    <button onClick={() => handleSignUp(0)} className={styles.socialButton}>
+                      <Image
+                        src={FTIcon}
+                        alt="Sign up with GitHub"
+                        width={40}
+                        height={40}
+                        className={styles.socialButtonImage}
+                      />
+                    </button>
+                  </div>
                   <p className={styles.signInText}>
                     Already have an account?{' '}
                     <button

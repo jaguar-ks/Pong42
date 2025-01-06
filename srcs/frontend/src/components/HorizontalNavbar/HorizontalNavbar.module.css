@@ -1,4 +1,4 @@
-.container {
+.navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -13,6 +13,7 @@
     justify-content: center;
     align-items: center;
     height: 100%;
+    width: 100%;
     position: relative;
     z-index: 1100;
 }
@@ -27,35 +28,40 @@
     z-index: 1100;
 }
 
-.iconsContainer {
+.iconButton {
     height: 40px;
     width: 40px;
     border-radius: 50%;
-    background-color: #ffffff;
-    border: 1px solid #ffffff;
+    background-color: rgba(128, 128, 128, 0.057);
+    border: 1px solid rgba(128, 128, 128, 0.208);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    padding: 5px;
 }
 
-.image {
+.iconImage {
     width: 20px;
     height: 20px;
 }
-.imageProfile {
+
+.profileImage {
     width: 100%;
     height: 100%;
+    border-radius: 50%;
 }
 
-.container2 {
+.flexWrapper {
+    flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 10px;
+    width: 100%;
 }
 
-.iconsContainerSelected {
+.iconButtonSelected {
     height: 40px;
     width: 40px;
     border-radius: 50%;
@@ -65,9 +71,10 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    padding: 5px;
 }
 
-.profile {
+.profileButton {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -76,24 +83,20 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    /* overflow: hidden; */
 }
 
-.X {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-.displayNone {
+.hidden {
     display: none;
 }
 
-.dropdownWrapper {
+.dropdown {
     position: relative;
+    flex: 1;
+    display: flex;
+    gap: 10px;
 }
 
-.dropdownContent {
+.dropdownMenu {
     position: absolute;
     top: 100%;
     right: 0;
@@ -106,36 +109,31 @@
     padding: 10px;
 }
 
-.notificationItem,
-.messageItem {
+.dropdownItem {
     display: flex;
     align-items: center;
     padding: 10px 0;
     border-bottom: 1px solid #EEEEE0;
 }
 
-.notificationItem:last-child,
-.messageItem:last-child {
+.dropdownItem:last-child {
     border-bottom: none;
 }
 
-.notificationImage,
-.messageImage {
+.dropdownImage {
     margin-right: 10px;
 }
 
-.notificationText,
-.messageText {
+.dropdownText {
     flex: 1;
 }
 
-.notificationTime,
-.messageTime {
+.timestamp {
     font-size: 12px;
     color: #999999;
 }
 
-.messageSender {
+.sender {
     font-weight: bold;
     margin-bottom: 5px;
 }
@@ -145,7 +143,7 @@
     margin-bottom: 10px;
 }
 
-.profileButton {
+.dropdownButton {
     display: block;
     width: 100%;
     padding: 8px 0;
@@ -155,11 +153,33 @@
     cursor: pointer;
 }
 
-.profileButton:hover {
+.dropdownButton:hover {
     background-color: #f5f5f5;
 }
 
-@media screen and (max-width: 419px) {
+.menuDots {
+    background-color: aqua;
+    text-align: center;
+}
+
+.menuDotsWrapper {
+    margin: 5px;
+}
+
+.menuDotImage {
+    border-radius: 50%;
+}
+
+.dropdownMenuWrapper {
+    position: relative;
+}
+
+.containerGroups {
+    display: flex;
+    gap: 20px;
+}
+
+@media screen and (max-width: 880px) {
     .searchBar {
         display: none;
     }
@@ -168,8 +188,14 @@
     }
 }
 
-@media screen and (min-width: 420px) {
-    .searchButton {
+@media screen and (min-width: 881px) {
+    .dropdownSearch {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 8px) {
+    .dropdownMenuWrapper {
         display: none;
     }
 }

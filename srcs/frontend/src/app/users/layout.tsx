@@ -27,9 +27,9 @@ export default function UsersLayout({
           <div className="horizontalNavbarr">
             <HorizontalNavbar />
           </div>
-          <div className="navBarContainer">
+          {/* <div className="navBarContainer">
             <NavBar />
-          </div>
+          </div> */}
           <div className="page-content">
             {children}
           </div>

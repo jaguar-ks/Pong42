@@ -12,6 +12,12 @@
     max-height: 400px;
     overflow-y: auto;
   }
+
+  @media screen and (min-width: 880px) {
+    .dropdownContent {
+          min-width: 500px;
+    }
+  }
   
   .dropdownTitle {
     font-size: 18px;
