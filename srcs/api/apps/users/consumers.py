@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.forms.models import model_to_dict
 from .serializers import NotificationSerializer
+from ..utils import send_real_time_notif
 
 User = get_user_model()
 
@@ -57,7 +58,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     }))
                     return
                 print(f'message = > {message} | recipient => {recipient_id}', flush=True)
-
+                
                 recipient_channel = f"user_{recipient_id}"
                 await self.channel_layer.group_send(
                     recipient_channel,
@@ -69,6 +70,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'timestamp': saved_message.timestamp.isoformat(),
                     }
                 )
+                
+                notif = Notification.objects.create(
+                    user=User.objects.get(id=recipient_id),
+                    notification_type=Notification.NOTIFICATION_TYPES['messages'],
+                    message=f"{self.user.username} sent you a new Message",
+                )
+                data_notif = NotificationSerializer(notif)
+                send_real_time_notif(recipient_id, data_notif.data)
 
                 await self.send(text_data=json.dumps({
                     'message': message,
