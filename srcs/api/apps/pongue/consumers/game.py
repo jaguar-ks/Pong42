@@ -74,7 +74,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.background_task = asyncio.create_task(self.game_loop())
 
     async def game_loop(self):
-        print("Game loop started", flush=True)
         try:
             while self.pong_game.player1.score < 6 and self.pong_game.player2.score < 6:
                 info = self.pong_game.loop()
@@ -85,7 +84,6 @@ class GameConsumer(AsyncWebsocketConsumer):
                         "message": json.dumps(info.to_json())
                     }
                 )
-                print(self.pong_game.player1.score, self.pong_game.player2.score, flush=True)
                 await asyncio.sleep(1 / 60)
         except asyncio.CancelledError:
             await self.send(text_data=json.dumps({
