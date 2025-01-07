@@ -8,3 +8,4 @@ from .user import (
 
 from .connections import ConnectionViewSet
 from .message import MessageViewSet
+from .notification import NotificationListView

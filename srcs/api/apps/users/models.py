@@ -226,3 +226,7 @@ class Notification(models.Model):
     
     def __str__(self) -> str:
         return f'{self.user} - {self.notification_type}'
+    
+    @classmethod
+    def get_notif(cls, user):
+        return cls.objects.filter(user=user).order_by('-created_at')
