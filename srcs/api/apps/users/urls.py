@@ -14,4 +14,5 @@ urlpatterns = [
     path("search/", views.UserSearchView.as_view(), name="user_search"),
     path("me/", views.AuthUserView.as_view(), name="auth_user_view"),
     path("me/", include(router.urls)),
+    path("me/notifications/", views.NotificationListView.as_view(), name="notification_list"),
 ]
