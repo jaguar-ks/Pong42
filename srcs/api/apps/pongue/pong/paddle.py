@@ -1,5 +1,5 @@
 class Paddle:
-    VAL = 4
+    VAL = 10
     WIDTH = 100
     HEIGHT = 20
     

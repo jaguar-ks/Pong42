@@ -24,8 +24,8 @@ class GameInfo:
                 'y': self.player2.y
             },
             'ball': {
-                'x': self.ball.x,
-                'y': self.ball.y
+                'x': int(self.ball.x),
+                'y': int(self.ball.y)
             },
         }
 
@@ -41,33 +41,39 @@ class Game:
         )
         self.player2 = Player(
             (self.WIDTH // 2) - (Paddle.WIDTH // 2),
-            Paddle.HEIGHT,
+            0,
             player2_id
         )
         self.ball = Ball(self.WIDTH // 2, self.HEIGHT // 2)
     
     def hit(self):
         ball = self.ball
-        pdl1 = self.player1
-        pdl2 = self.player2
         
-        if ball.y + ball.RADIUS >= pdl1.y and ball.y - ball.RADIUS <= pdl1.y + Paddle.HEIGHT:
-            if ball.x - ball.RADIUS <= pdl1.x + Paddle.WIDTH and ball.x + ball.RADIUS >= pdl1.x:
-                return self.player1
-        elif ball.y + ball.RADIUS >= pdl2.y and ball.y - ball.RADIUS <= pdl2.y + Paddle.HEIGHT:
-            if ball.x - ball.RADIUS <= pdl2.x + Paddle.WIDTH and ball.x + ball.RADIUS >= pdl2.x:
-                return self.player2
+        player = self.player1 if ball.y > self.HEIGHT / 2 else self.player2
+        
+        b_top = self.ball.y - self.ball.RADIUS
+        b_bot = self.ball.y + self.ball.RADIUS
+        b_left = self.ball.x - self.ball.RADIUS
+        b_right = self.ball.x + self.ball.RADIUS
+        
+        pl_top = player.y
+        pl_bot = player.y + Paddle.HEIGHT
+        pl_left = player.x
+        pl_right = player.x + Paddle.WIDTH
+        
+        if b_left < pl_right and b_right > pl_left and b_top < pl_bot and b_bot > pl_top:
+            return player
         return None 
     
     def loop(self):
         self.ball.move()
         player = self.hit()
-        if player:
-            col = (self.ball.x -(player.x + Paddle.WIDHT // 2)) / (Paddle.WIDTH // 2)
-            angl = col * (math.pi / 4)
-            dirc = 1 if self.ball.val_y > 0 else -1
-            self.ball.val_x = self.ball.MAX_VAL * math.cos(angl)
-            self.ball.val_y = self.ball.MAX_VAL * dirc * math.sin(angl)
+        if player is not None:
+            col = (self.ball.y - (player.y + Paddle.HEIGHT / 2)) / (Paddle.HEIGHT / 2)
+            angl = col * math.pi / 4
+            dirc = 1 if self.ball.y < self.HEIGHT / 2 else -1
+            self.ball.val_x = self.ball.speed * dirc * math.cos(angl)
+            self.ball.val_y = self.ball.speed * math.sin(angl)
             self.ball.speed += 0.4
         if self.ball.y + self.ball.RADIUS >= self.HEIGHT:
             self.player2.increase_score()
