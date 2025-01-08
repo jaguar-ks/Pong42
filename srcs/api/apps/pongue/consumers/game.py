@@ -5,6 +5,8 @@ from asgiref.sync import sync_to_async
 from django.utils.crypto import get_random_string
 from apps.users.serializers import UserSerializer
 from apps.pongue import pong
+from apps.pongue.models import PongMatch, MatchParticipant
+from apps.users.models import User
 
 r = redis.Redis(host='redis', port=6379, db=0)
 
@@ -70,7 +72,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def game_loop(self):
         try:
-            while self.pong_game.player1.score < 6 and self.pong_game.player2.score < 6:
+            while self.pong_game.player1.score < 3 and self.pong_game.player2.score < 3:
                 info = self.pong_game.loop()
                 await self.channel_layer.group_send(
                     self.room_name,
@@ -80,11 +82,27 @@ class GameConsumer(AsyncWebsocketConsumer):
                     }
                 )
                 await asyncio.sleep(1 / 60)
+            winner = self.pong_game.player1 if self.pong_game.player1.score > self.pong_game.player2.score else self.pong_game.player2
+            await self.channel_layer.group_send(
+                self.room_name,
+                {
+                    "type": "game_over",
+                    "message": json.dumps({
+                        "event": "game_over",
+                        "winner": winner.player_id
+                    })
+                }
+            )
         except asyncio.CancelledError:
             await self.send(text_data=json.dumps({
                 "error": "Game loop cancelled"
             }))
 
+    async def game_over(self, event):
+        print("game over", flush=True)
+        await self.send(text_data=event['message'])
+        await self.save_game_state()
+        await self.close()
 
     async def game_state(self, event):
         await self.send(text_data=event['message'])
@@ -121,7 +139,6 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def move_paddle(self, event):
         if hasattr(self, 'pong_game'):
             data = json.loads(event['message'])
-            print(data, flush=True)
             player_id = data.get('player_id')
             info = self.pong_game.move_paddle(player_id, right=(data.get('direction') == 'right'))
             await self.channel_layer.group_send(
@@ -154,6 +171,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                 )
             if hasattr(self, 'background_task'):
                 self.background_task.cancel()
+                # await self.save_game_state()
+                self.close()
         except Exception as e:
             # Log the error appropriately
             print(f"Error in disconnect: {str(e)}")
@@ -162,3 +181,24 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def player_disconnected(self, event):
         """Handle player disconnect notification"""
         await self.send(text_data=event['message'])
+
+    @database_sync_to_async
+    def save_game_state(self):
+        if hasattr(self, 'pong_game'):
+            winner = self.pong_game.player1 if self.pong_game.player1.score > self.pong_game.player2.score else self.pong_game.player2
+
+            match_played = PongMatch.objects.create(
+                winner=User.objects.get(id=winner.player_id)
+            )
+
+            MatchParticipant.objects.create(
+                user=User.objects.get(id=self.pong_game.player1.player_id),
+                score=self.pong_game.player1.score,
+                match=match_played
+            )
+
+            MatchParticipant.objects.create(
+                user=User.objects.get(id=self.pong_game.player2.player_id),
+                score=self.pong_game.player2.score,
+                match=match_played
+            )
