@@ -69,12 +69,13 @@ class Game:
         self.ball.move()
         player = self.hit()
         if player is not None:
-            col = (self.ball.y - (player.y + Paddle.HEIGHT / 2)) / (Paddle.HEIGHT / 2)
-            angl = col * math.pi / 4
-            dirc = 1 if self.ball.y < self.HEIGHT / 2 else -1
-            self.ball.val_x = self.ball.speed * dirc * math.cos(angl)
-            self.ball.val_y = self.ball.speed * math.sin(angl)
-            self.ball.speed += 0.4
+            col = (self.ball.x - (player.x + Paddle.WIDTH / 2)) / (Paddle.WIDTH / 2)
+            col = max(-1, min(1, col))
+            ang = col * math.radians(45)
+            dirc = -1 if player == self.player1 else 1 
+            self.ball.val_x = self.ball.speed * math.sin(ang)
+            self.ball.val_y = self.ball.speed * math.cos(ang) * dirc
+            self.ball.speed = min(self.ball.speed + 0.5, self.ball.MAX_SPEED)
         if self.ball.y + self.ball.RADIUS >= self.HEIGHT:
             self.player2.increase_score()
             self.ball.reset()

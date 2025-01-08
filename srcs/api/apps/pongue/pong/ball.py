@@ -2,7 +2,7 @@ import random
 import math
 
 class Ball:
-    MAX_VAL = 4
+    MAX_SPEED = 15
     RADIUS = 20
     
     def __init__(self, x, y):
@@ -10,8 +10,8 @@ class Ball:
         self.y = self.original_y = y
         pos = random.choice([1, -1])
         self.val_x = 0
-        self.val_y = self.MAX_VAL * pos
-        self.speed = 5.0
+        self.val_y = 5 * pos
+        self.speed = 10
     
     def move(self):
         from .game import Game
@@ -25,7 +25,9 @@ class Ball:
     def reset(self):
         self.x = self.original_x
         self.y = self.original_y
+
+        pos = random.choice([1, -1])
         
-        # self.val_x *= pos
+        self.val_x = 0
         self.val_y *= -1
-        self.speed = 5.0
+        self.speed = 10
