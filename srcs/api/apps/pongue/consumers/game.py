@@ -5,6 +5,8 @@ from asgiref.sync import sync_to_async
 from django.utils.crypto import get_random_string
 from apps.users.serializers import UserSerializer
 from apps.pongue import pong
+from apps.pongue.models import PongMatch, MatchParticipant
+from apps.users.models import User
 
 r = redis.Redis(host='redis', port=6379, db=0)
 
@@ -57,25 +59,20 @@ class GameConsumer(AsyncWebsocketConsumer):
                     'message': json.dumps(game)
                 }
             )
+            self.pong_game = pong.Game(game['players'][0]['id'], game['players'][1]['id'])
+            self.background_task = asyncio.create_task(self.game_loop())
 
 
     async def game_found(self, event):
-        self.is_waiting = False  # No longer waiting once game is found
+        data = json.loads(event['message'])
+        data['my_id'] = self.user.id
+        data['opp_id'] = data['players'][1]['id'] if data['players'][0]['id'] == self.user.id else data['players'][0]['id']
+        await self.send(text_data=json.dumps(data))
 
-        messaage = json.loads(event['message'])
-
-        oponent = messaage['players'][1] if self.user.id != messaage['players'][1]['id'] else messaage["players"][0]
-
-        await self.send(
-            text_data=json.dumps(oponent),
-        )
-
-        self.pong_game = pong.Game(self.user.id, oponent['id'])
-        self.background_task = asyncio.create_task(self.game_loop())
 
     async def game_loop(self):
         try:
-            while self.pong_game.player1.score < 6 and self.pong_game.player2.score < 6:
+            while self.pong_game.player1.score < 3 and self.pong_game.player2.score < 3:
                 info = self.pong_game.loop()
                 await self.channel_layer.group_send(
                     self.room_name,
@@ -85,40 +82,72 @@ class GameConsumer(AsyncWebsocketConsumer):
                     }
                 )
                 await asyncio.sleep(1 / 60)
+            winner = self.pong_game.player1 if self.pong_game.player1.score > self.pong_game.player2.score else self.pong_game.player2
+            await self.channel_layer.group_send(
+                self.room_name,
+                {
+                    "type": "game_over",
+                    "message": json.dumps({
+                        "event": "game_over",
+                        "winner": winner.player_id
+                    })
+                }
+            )
         except asyncio.CancelledError:
             await self.send(text_data=json.dumps({
                 "error": "Game loop cancelled"
             }))
 
+    async def game_over(self, event):
+        print("game over", flush=True)
+        await self.send(text_data=event['message'])
+        await self.save_game_state()
+        await self.close()
+
     async def game_state(self, event):
         await self.send(text_data=event['message'])
+
 
     async def receive(self, text_data=None, bytes_data=None):
         try:
             data = json.loads(text_data)
+            if 'action' not in data.keys() or 'player_id' not in data.keys() or 'direction' not in data.keys():
+                raise json.JSONDecodeError
             action = data.get('action')
             player = data.get('player_id')
             dirc = data.get('direction')
-            if not action or not player or not dirc:
-                raise json.JSONDecodeError
-            if player != self.pong_game.player1.player_id and player != self.pong_game.player2.player_id:
-                raise json.JSONDecodeError
             if dirc not in ['left', 'right']:
                 raise json.JSONDecodeError
             if action == 'move':
-                info = self.pong_game.move_paddle(player, right=(dirc == 'right'))
                 await self.channel_layer.group_send(
                     self.room_name,
                     {
-                        "type": "game_state",
-                        "message": json.dumps(info.to_json())
+                        "type": "move_paddle",
+                        "message": json.dumps({
+                            "action": action,
+                            "player_id": player,
+                            "direction": dirc
+                        })
                     }
                 )
         except json.JSONDecodeError:
             await self.send(text_data=json.dumps({
                 "error": "Invalid data format"
             }))
-        pass
+
+
+    async def move_paddle(self, event):
+        if hasattr(self, 'pong_game'):
+            data = json.loads(event['message'])
+            player_id = data.get('player_id')
+            info = self.pong_game.move_paddle(player_id, right=(data.get('direction') == 'right'))
+            await self.channel_layer.group_send(
+                self.room_name,
+                {
+                    "type": "game_state",
+                    "message": json.dumps(info.to_json())
+                }
+            )
 
 
     async def disconnect(self, close_code):
@@ -142,10 +171,34 @@ class GameConsumer(AsyncWebsocketConsumer):
                 )
             if hasattr(self, 'background_task'):
                 self.background_task.cancel()
+                # await self.save_game_state()
+                self.close()
         except Exception as e:
             # Log the error appropriately
             print(f"Error in disconnect: {str(e)}")
 
+
     async def player_disconnected(self, event):
         """Handle player disconnect notification"""
         await self.send(text_data=event['message'])
+
+    @database_sync_to_async
+    def save_game_state(self):
+        if hasattr(self, 'pong_game'):
+            winner = self.pong_game.player1 if self.pong_game.player1.score > self.pong_game.player2.score else self.pong_game.player2
+
+            match_played = PongMatch.objects.create(
+                winner=User.objects.get(id=winner.player_id)
+            )
+
+            MatchParticipant.objects.create(
+                user=User.objects.get(id=self.pong_game.player1.player_id),
+                score=self.pong_game.player1.score,
+                match=match_played
+            )
+
+            MatchParticipant.objects.create(
+                user=User.objects.get(id=self.pong_game.player2.player_id),
+                score=self.pong_game.player2.score,
+                match=match_played
+            )
