@@ -82,9 +82,10 @@ def send_real_time_notif(user_id, data):
         event_type (str): Event type to send.
         data (dict): Data to send.
     """
+    data['type'] = 'notification'
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
-        f"user_notif_{user_id}",
+        f"user_{user_id}",
         {
             "type": 'send_notification',
             "data": data,
