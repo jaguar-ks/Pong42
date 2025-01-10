@@ -77,11 +77,11 @@ export default function SignUpPage() {
     }
   }
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (index: number) => {
     try {
       const res = await axios.get('http://localhost:8000/api/auth/social/providers/')
-      console.log(res.data.providers[1].provider_url);
-      router.push(res.data.providers[1].provider_url);
+      console.log(res.data.providers[index].provider_url);
+      router.push(res.data.providers[index].provider_url);
     } catch (err: any) {
       console.error('Error:', err.response )
       
