@@ -1,5 +1,6 @@
-'use client'
+'use client';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { UserContext, UserContextProvider } from './UserContext';
 
 interface Message {
   message: string;
@@ -21,7 +22,8 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   const ws = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-
+  const { userData } = useContext(UserContext);
+  
   useEffect(() => {
     const connect = () => {
       const wsUrl = `ws://localhost:8000/ws/chat/`;
@@ -62,7 +64,9 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         setIsConnected(false);
       };
     };
-
+    if (!userData.id) {
+      return;
+    }
     connect();
 
     return () => {
@@ -70,7 +74,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         ws.current.close();
       }
     };
-  }, []);
+  }, [userData]);
 
   const sendMessage = (recipientId: number, message: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
