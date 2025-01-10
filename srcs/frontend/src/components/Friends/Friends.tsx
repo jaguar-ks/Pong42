@@ -130,6 +130,20 @@ const Friends = () => {
         }
     };
 
+    const handleRejectRequest = async (id: number) => {
+        try {
+            const resp = await axios.delete(`http://localhost:8000/api/users/me/connections/${id}/`, {
+                withCredentials: true,
+            });
+            if (resp.status === 204) {
+                setRequests((prevRequests) => prevRequests.filter((item) => item.id !== id));
+            }
+            console.log("Friend request rejected successfully");
+        } catch (error) {
+            console.error("Error rejecting friend request:", error);
+        }
+    };
+
     const Request = () => (
         <div>
             {requests.map((item) => (
@@ -149,6 +163,12 @@ const Friends = () => {
                             onClick={() => handleAcceptRequest(item.id)}
                         >
                             Accept
+                        </button>
+                        <button
+                            className={`${styles.actionButton} ${styles.blockButton}`}
+                            onClick={() => handleRejectRequest(item.id)}
+                        >
+                            Reject
                         </button>
                     </div>
                 </div>

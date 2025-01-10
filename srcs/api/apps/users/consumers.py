@@ -1,6 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.db import database_sync_to_async
+from channels.db import database_sync_to_async, sync_to_async
 from .models import Message, Notification, Connection
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -13,15 +13,7 @@ User = get_user_model()
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user = self.scope["user"]
-        self.connection_type = self.scope["url_route"]["kwargs"].get("type", "chat")
-
-        if self.connection_type == "chat":
-            self.group_name = f"user_{self.user.id}"
-        elif self.connection_type == "notifications":
-            self.group_name = f"user_notif_{self.user.id}"
-        else:
-            await self.close()
-            return
+        self.group_name = f"user_{self.user.id}"
 
         await self.channel_layer.group_add(
             self.group_name,
@@ -45,7 +37,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         try:
             data = json.loads(text_data)
-            if self.connection_type == 'chat':
+            if data.get('type') == 'message':
                 message = data.get('message')
                 recipient_id = data.get('recipient_id')
                 
@@ -68,16 +60,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'timestamp': saved_message.timestamp.isoformat(),
                     }
                 )
-                
-                notif = Notification.objects.create(
-                    user=User.objects.get(id=recipient_id),
-                    notification_type=Notification.NOTIFICATION_TYPES['messages'],
-                    message=f"{self.user.username} sent you a new Message",
-                )
-                data_notif = NotificationSerializer(notif)
-                send_real_time_notif(recipient_id, data_notif.data)
-
                 await self.send(text_data=json.dumps({
+                    'type': 'message',
                     'message': message,
                     'sender_id': self.user.id,
                     'sender_username': self.user.username,
@@ -91,6 +75,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
+            'type': 'message',
             'message': event['message'],
             'sender_id': event['sender_id'],
             'sender_username': event['sender_username'],

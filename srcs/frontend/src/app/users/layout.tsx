@@ -16,8 +16,8 @@ export default function UsersLayout({
   children: React.ReactNode;
 }) {
   return (
-    <WebSocketProvider>
-      <UserContextProvider>
+    <UserContextProvider>
+      <WebSocketProvider>
 
       <div className="layout-container">
         <div className="verticalNavbarr">
@@ -35,7 +35,7 @@ export default function UsersLayout({
           </div>
         </div>
       </div>
-      </UserContextProvider>
-    </WebSocketProvider>
+      </WebSocketProvider>
+    </UserContextProvider>
   );
 }
