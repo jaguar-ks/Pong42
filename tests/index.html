@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #messages {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            background: #f9f9f9;
+        }
+        .message {
+            margin: 5px 0;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Client</h1>
+    <div>
+        <label for="wsUrl">WebSocket URL:</label>
+        <input type="text" id="wsUrl" placeholder="ws://localhost:8000/ws/game/" value="ws://localhost:8000/ws/game/">
+        <button id="connectBtn">Connect</button>
+        <button id="closeBtn">Close</button>
+        <canvas id="game" width="600" height="800"></canvas>
+    </div>
+    <div id="messages"></div>
+
+    <script>
+        const connectBtn = document.getElementById("connectBtn");
+        const closeBtn = document.getElementById("closeBtn");
+        const wsUrlInput = document.getElementById("wsUrl");
+        const messagesDiv = document.getElementById("messages");
+        
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+
+        function drawRec(x, y, w, h, clr) {
+            ctx.fillStyle = clr;
+            ctx.fillRect(x, y, w, h);
+        }
+
+        const net = {
+            x: 0,
+            y: canvas.height / 2 - 1,
+            w: 15,
+            h: 5,
+            clr: 'white'
+        };
+
+        function drawNet() {
+            for (let i = 0; i <= canvas.width; i += 30)
+                drawRec(net.x, net.y+1, net.w, net.h, net.clr);
+        }
+        
+        function drawCrcl(x, y, r) {
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.fill();
+        } 
+        
+        function drawTxt(txt, x, y) {
+            ctx.fillStyle = 'white';
+            ctx.font = '50px Arial';
+            ctx.fillText(txt, x, y);
+        }
+        
+        function drawNet() {
+            for (let i = 0; i <= canvas.height; i += 25)
+                drawRec(net.x, net.y + i, net.w, net.h, net.clr);
+        }
+        
+        function render() {
+            drawRec(0, 0, canvas.width, canvas.height, 'black');
+            drawTxt(opp_paddle.score, canvas.width / 4 * 3, canvas.height / 5);
+            drawTxt(my_paddle.score, canvas.width / 4, canvas.height / 5);
+            drawRec(opp_paddle.x, opp_paddle.y, opp_paddle.w, opp_paddle.h, opp_paddle.clr);
+            drawRec(my_paddle.x, my_paddle.y, my_paddle.w, my_paddle.h, my_paddle.clr);
+            drawCrcl(ball.x, ball.y, ball.r);
+        }
+
+        const my_paddle = {
+            x:0,
+            y:0,
+            w:100,
+            h:20,
+            score:0,
+            clr:'white'
+        };
+
+        const opp_paddle = {
+            x:0,
+            y:0,
+            w:100,
+            h:20,
+            score:0,
+            clr:'white'
+        };
+
+        const ball = {
+            x:0,
+            y:0,
+            r:20,
+            clr:'white'
+        };
+
+        let socket = null;
+
+        function logMessage(message, type = "message") {
+            const msgDiv = document.createElement("div");
+            msgDiv.className = `message ${type}`;
+            msgDiv.textContent = message;
+            messagesDiv.appendChild(msgDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to the bottom
+        }
+
+        connectBtn.addEventListener("click", () => {
+            const wsUrl = wsUrlInput.value.trim();
+            if (!wsUrl) {
+                logMessage("Please enter a valid WebSocket URL.", "error");
+                return;
+            }
+
+            // Close any existing connection
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                logMessage("Closing existing connection before reconnecting.", "success");
+                socket.close();
+            }
+
+            logMessage(`Connecting to ${wsUrl}...`, "success");
+            socket = new WebSocket(wsUrl);
+
+            socket.onopen = () => {
+                logMessage("Connected successfully!", "success");
+            };
+
+            socket.onmessage = (event) => {
+                data = JSON.parse(event.data);
+                if ('players' in data && 'my_id' in data) {
+                    my_id = data.my_id;
+                    opp_id = data.opp_id;
+                    logMessage(`Message received: ${event.data}`);
+                }
+                opp_paddle.score = data[opp_id].score;
+                opp_paddle.x = data[opp_id].x;
+                opp_paddle.y = data[opp_id].y;
+                my_paddle.x = data[my_id].x;
+                my_paddle.y = data[my_id].y;
+                my_paddle.score = data[my_id].score;
+                ball.x = data.ball.x;
+                ball.y = data.ball.y;
+                render();
+                console.log(data);
+            };
+
+            socket.onerror = (error) => {
+                logMessage(`Error occurred: ${error}`, "error");
+            };
+
+            socket.onclose = (event) => {
+                logMessage(`Connection closed: ${event.reason || "No reason provided"}`, "error");
+            };
+            document.addEventListener("keydown", function(event) {
+                if (event.key === "ArrowLeft") {
+                    socket.send(JSON.stringify({action: "move", player_id: my_id, direction: "left"}));
+                } else if (event.key === "ArrowRight") {
+                    socket.send(JSON.stringify({action: "move", player_id: my_id, direction: "right"}));
+                }
+            });
+        });
+
+        closeBtn.addEventListener("click", () => {
+            if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+                logMessage("Closing WebSocket connection...", "success");
+                socket.close();
+            } else {
+                logMessage("No active WebSocket connection to close.", "error");
+            }
+        });
+    </script>
+</body>
+</html>
