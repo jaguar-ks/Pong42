@@ -42,7 +42,7 @@ const FriendsFR = ({id}) => {
   const confirmCancelRequest = async () => {
     try {
       await axios.delete(
-        `http://localhost:8000/api/users/me/connections/${id}/`,
+        `http://localhost:8000/api/users/me/connections/${searchedUserData.connection.id}/`,
         { withCredentials: true }
       );
       console.log("Friend request cancelled");
