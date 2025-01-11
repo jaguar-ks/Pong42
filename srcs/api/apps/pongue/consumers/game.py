@@ -191,14 +191,22 @@ class GameConsumer(AsyncWebsocketConsumer):
                 winner=User.objects.get(id=winner.player_id)
             )
 
-            MatchParticipant.objects.create(
+            pl1 = MatchParticipant.objects.create(
                 user=User.objects.get(id=self.pong_game.player1.player_id),
                 score=self.pong_game.player1.score,
                 match=match_played
             )
 
-            MatchParticipant.objects.create(
+            pl2 = MatchParticipant.objects.create(
                 user=User.objects.get(id=self.pong_game.player2.player_id),
                 score=self.pong_game.player2.score,
                 match=match_played
             )
+            if pl1.score > pl2.score:
+                pl1.user.wins += 1
+                pl2.user.loses += 1
+            else:
+                pl2.user.wins += 1
+                pl1.user.loses += 1
+            pl1.user.save()
+            pl2.user.save()

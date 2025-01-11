@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import axios from "axios";
 
 // Define a type for the context value
 interface UserContextType {
@@ -82,6 +83,7 @@ interface UserContextProviderProps {
 }
 
 export const UserContextProvider = ({ children }: UserContextProviderProps) => {
+    
     const [currentPage, setCurrentPage] = useState<string>("");
     const [userData, setUserData] = useState<UserDataType>({
         id: null,
@@ -170,5 +172,38 @@ export const useUserContext = () => {
     if (!context) {
         throw new Error("useUserContext must be used within a UserContextProvider");
     }
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await axios.get("http://localhost:8000/api/users/me/", { withCredentials: true });
+                context.updateUserData({
+                    id: res.data.id,
+                    otp_uri: res.data.otp_uri,
+                    last_login: res.data.last_login,
+                    is_superuser: res.data.is_superuser,
+                    username: res.data.username,
+                    first_name: res.data.first_name,
+                    last_name: res.data.last_name,
+                    email: res.data.email,
+                    is_staff: res.data.is_staff,
+                    is_active: res.data.is_active,
+                    date_joined: res.data.date_joined,
+                    two_fa_enabled: res.data.two_fa_enabled,
+                    is_online: res.data.is_online,
+                    avatar_url: res.data.avatar_url,
+                    wins: res.data.wins,
+                    loses: res.data.loses,
+                    rating: res.data.rating,
+                    rank: res.data.rank,
+                })
+            } catch (err: any) {
+                console.log("Error in fetching user data", err);
+            }
+        };
+
+        fetchData();
+    }, [context.updateUserData]);
+
     return context;
 };

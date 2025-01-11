@@ -6,4 +6,10 @@ class NotificationListView(generics.ListAPIView):
     serializer_class = NotificationSerializer
     
     def get_queryset(self):
-        return Notification.get_notif(self.request.user)
+        notifs = Notification.get_notif(self.request.user)
+        for notif in notifs:
+            if notif.read == True:
+                break
+            notif.read = True
+            notif.save()
+        return notifs
