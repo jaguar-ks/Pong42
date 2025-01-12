@@ -74,7 +74,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         ws.current.close();
       }
     };
-  }, [userData]);
+  }, [userData.id]);
 
   const sendMessage = (recipientId: number, message: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
