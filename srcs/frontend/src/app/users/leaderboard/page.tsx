@@ -85,7 +85,7 @@ const Leaderboard: React.FC = () => {
                   </div>
                   <span className={classes.username}>{player.username}</span>
                 </div>
-                <span className={classes.wl}>10/15</span>
+                <span className={classes.wl}>{player.wins}/{player.loses}</span>
                 <span className={classes.rating}>500</span>
               </div>
             ))}
