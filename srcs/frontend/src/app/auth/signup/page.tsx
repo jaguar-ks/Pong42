@@ -80,7 +80,7 @@ export default function SignUpPage() {
   const handleSignUp = async (index: number) => {
     try {
       const res = await axios.get('http://localhost:8000/api/auth/social/providers/')
-      console.log(res.data.providers[index].provider_url);
+      console.log(`${res.data.providers[index].provider_name} sign-up clicked`)
       router.push(res.data.providers[index].provider_url);
     } catch (err: any) {
       console.error('Error:', err.response )
@@ -88,15 +88,8 @@ export default function SignUpPage() {
     } finally {
       setIsLoading(false)
     }
-    
-
-    console.log('Google sign-up clicked')
   }
 
-  const handleGithubSignUp = () => {
-    // Implement GitHub sign-up logic here
-    console.log('GitHub sign-up clicked')
-  }
 
   return (
     <div className={styles.pageContainer}>
