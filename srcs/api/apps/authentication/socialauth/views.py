@@ -1,6 +1,7 @@
 from rest_framework import views, permissions
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
+from django.shortcuts import redirect
 
 from .serializers import OauthProvidersUrls, OauthCallBackSerializer
 from apps.utils import sing_in_response
@@ -18,9 +19,7 @@ class OauthCallbackView(views.APIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        response = Response(
-            {"message": "signed-in successfully", "user": serializer.data["user"]}
-        )
+        response = redirect("http://localhost:3000/users/home")
         sing_in_response(response, serializer.data["token"])
         return response
 
