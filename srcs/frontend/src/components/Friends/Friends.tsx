@@ -158,18 +158,20 @@ const Friends = () => {
                     <div className={styles.content}>
                         <h3 className={styles.name}>{item.user.username}</h3>
                         <p className={styles.message}>Friend request from {item.user.username}</p>
-                        <button
-                            className={`${styles.actionButton} ${styles.acceptButton}`}
-                            onClick={() => handleAcceptRequest(item.id)}
-                        >
-                            Accept
-                        </button>
-                        <button
-                            className={`${styles.actionButton} ${styles.blockButton}`}
-                            onClick={() => handleRejectRequest(item.id)}
-                        >
-                            Reject
-                        </button>
+                        <div className={styles.buttons}>
+                            <button
+                                className={`${styles.actionButton} ${styles.acceptButton}`}
+                                onClick={() => handleAcceptRequest(item.id)}
+                                >
+                                Accept
+                            </button>
+                            <button
+                                className={`${styles.actionButton} ${styles.blockButton}`}
+                                onClick={() => handleRejectRequest(item.id)}
+                                >
+                                Reject
+                            </button>
+                        </div>
                     </div>
                 </div>
             ))}
