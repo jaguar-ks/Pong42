@@ -53,7 +53,17 @@ class SignUpView(generics.CreateAPIView):
 class SignInView(TokenObtainSlidingView):
 
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
+        if request.data['username'] and request.data['password']:
+            response = super().post(request, *args, **kwargs)
+        elif request.data['user_id'] and 'otp_code' in request.data:
+            user = serializers.User.objects.get(id=request.data['user_id'])
+            if user.verify_otp(request.data['otp_code']):
+                token = SlidingToken.for_user(user=user)
+                response = Response({'message': 'Successfully signed in', 'token': str(token)})
+            else:
+                response = Response({"message": "Invalid OTP code"}, status=400)
+        else:
+            return Response({'Error' : 'Bad data format'}, status=400)
         if response.status_code == 200:
             sing_in_response(response, response.data.pop("token"))
             response.data["message"] = "Successfully signed in."

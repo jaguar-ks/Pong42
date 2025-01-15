@@ -19,6 +19,10 @@ class OauthCallbackView(views.APIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        user = serializer.data["user"]
+        if user['two_fa_enabled'] == True:
+            return redirect(f'http://localhost:3000/auth/signin?otp_required=true&user_id={user["id"]}')
+            pass
         response = redirect("http://localhost:3000/users/home")
         sing_in_response(response, serializer.data["token"])
         return response

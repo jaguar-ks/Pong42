@@ -31,6 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
             "wins",
             "loses",
             "rating",
+            "two_fa_enabled",
         )
 
 
