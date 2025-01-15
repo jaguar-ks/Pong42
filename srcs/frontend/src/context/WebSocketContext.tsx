@@ -37,26 +37,29 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
 
       ws.current.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        setMessages(prev => {
-          //check if message already exists
-          const messageExists = prev.some(
-            msg => 
-              msg.message === message.message && 
-              msg.timestamp === message.timestamp &&
-              msg.sender_id === message.sender_id
-          );
-          
-          if (messageExists) {
-            return prev;
-          }
-          return [...prev, message];
-        });
+        if (message.type === 'message') {
+          setMessages(prev => {
+            //check if message already exists
+            const messageExists = prev.some(
+              msg => 
+                msg.message === message.message && 
+                msg.timestamp === message.timestamp &&
+                msg.sender_id === message.sender_id
+            );
+            
+            if (messageExists) {
+              return prev;
+            }
+            return [...prev, message];
+          });
+        }
       };
 
       ws.current.onclose = () => {
         console.log('Disconnected from chat');
         setIsConnected(false);
-        setTimeout(connect, 3000);
+        if (userData.id)
+          setTimeout(connect, 3000);
       };
 
       ws.current.onerror = (error) => {
