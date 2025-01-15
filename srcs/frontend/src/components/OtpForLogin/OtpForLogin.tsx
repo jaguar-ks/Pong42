@@ -12,18 +12,19 @@ interface OtpForLoginProps {
   password: string;
 }
 
-const OtpForLogin: React.FC<OtpForLoginProps> = ({ setErrors, username, password }) => {
+const OtpForLogin: React.FC<OtpForLoginProps> = ({ setErrors, username, password, user_id }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
   const router = useRouter();
 
   const handleSignin = async (inputCode: string): Promise<void> => {
+    console.log(user_id);
     setIsLoading(true);
     try {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
       await axios.post(
         `http://localhost:8000/api/auth/sign-in/`, 
-        { username, password, otp_code: inputCode },
+        { username, password, user_id, otp_code: inputCode },
         { withCredentials: true }
       );
       router.push("/users/home");
