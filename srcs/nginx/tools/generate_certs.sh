@@ -18,11 +18,4 @@ else
     echo "SSL certificates already exist."
 fi
 
-if ! grep -q "$LOAD_MODULE" "$NGX_CONF"; then
-    sed -i "1s|^|$LOAD_MODULE\n\n|" "$NGX_CONF"
-    echo "Injecting [load_module] directive to $NGX_CONF"
-else
-    echo "load_module directive already present in  [$NGX_CONF]"
-fi
-
 exec nginx -g "daemon off;"

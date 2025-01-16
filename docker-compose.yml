@@ -149,6 +149,7 @@ services:
             - ./srcs/postgres/logs/:/var/log/postgres/
             - ./srcs/vault/logs:/var/log/vault
             - ./srcs/redis/logs:/var/log/redis
+            - ./srcs/nginx/logs:/var/log/nginx
         ports:
             - "50000:50000"
             - "9600:9600"
@@ -209,8 +210,8 @@ services:
         restart: unless-stopped
         healthcheck:
             test: ["CMD-SHELL", "[ -e /vault/init/django-cred.json ]"]
-            interval: 10s
-            timeout: 5s
+            interval: 30s
+            timeout: 10s
             retries: 5
         depends_on:
             pgdb:
@@ -226,13 +227,15 @@ services:
             - ./srcs/nginx/tools/generate_certs.sh:/usr/local/bin/generate_certs.sh
             - ./srcs/nginx/conf/default.conf:/etc/nginx/conf.d/default.conf:ro
             - ./srcs/nginx/modsecurity/modsecurity.conf:/etc/modsecurity.d/modsecurity.conf:ro
+            - ./srcs/nginx/logs/:/var/log/nginx/
+            - ./srcs/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
         command: "/bin/sh /usr/local/bin/generate_certs.sh"
         networks:
             - transcendance_net
         depends_on:
             - backend
             - frontend
-
+        restart: always
     #################################################################
 
 
