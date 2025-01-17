@@ -1,101 +1,100 @@
 .container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .playerCountButtons {
-    display: flex;
-    justify-content: center;
-    /* gap: 10px; */
-    margin-bottom: 20px;
-  }
-  
-  .button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #000000;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    width: 50%;
-    
-  }
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
 
-  .buttonNotClicked {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #ffffff;
-    border: 1px solid rgb(0, 0, 0);
-    color: rgb(0, 0, 0);
-    cursor: pointer;
-    transition: background-color 0.3s;
-    width: 50%;
-  }
-  
-  .button:hover {
-    background-color: #00000066;
-  }
-  
-  .playerInputs {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .playerInput {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .label {
-    min-width: 80px;
-    font-weight: bold;
-  }
-  
-  .input {
-    flex-grow: 1;
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    /* border-radius: 4px; */
-  }
+.playerCountButtons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
 
-  .startButtonContainer{
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #000000;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 50%;
+}
 
-  }
-  
-  .startButton {
-    margin-top: 20px;
-    padding: 12px 24px;
-    font-size: 18px;
-    background-color: #008CBA;
-    color: white;
-    border: none;
-    /* border-radius: 5px; */
-    cursor: pointer;
-    transition: background-color 0.3s;
-    max-width: 300px;
-    width: 100%;
-  }
-  
-  .startButton:hover {
-    background-color: #007B9A;
-  }
-  
-  .title {
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
-  }
-  
-  
+.buttonNotClicked {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #ffffff;
+  border: 1px solid rgb(0, 0, 0);
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 50%;
+}
+
+.button:hover {
+  background-color: #00000066;
+}
+
+.playerInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.playerInput {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.label {
+  min-width: 80px;
+  font-weight: bold;
+}
+
+.input {
+  flex-grow: 1;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+}
+
+.startButtonContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.startButton {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 18px;
+  background-color: #008CBA;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  max-width: 300px;
+  width: 100%;
+}
+
+.startButton:hover {
+  background-color: #007B9A;
+}
+
+.startButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.title {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
