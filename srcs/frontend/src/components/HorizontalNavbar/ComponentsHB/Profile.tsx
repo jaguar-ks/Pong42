@@ -16,15 +16,15 @@ const Profile: React.FC<ProfileProps> = ({ username, setSelectedIcon }) => {
   const router = useRouter();
 
   const handleGosettings = () =>{
-    setSelectedIcon("");
+    updateCurrentPage("");
     router.push('/users/settings');
   }
   const handlelLogout = () =>{
-    setSelectedIcon("");
+    updateCurrentPage("");
     router.push('/users/logout');
   }
   const handleViewProfile = () =>{
-    setSelectedIcon("");
+    updateCurrentPage("");
     router.push('/users/home');
   }
 
