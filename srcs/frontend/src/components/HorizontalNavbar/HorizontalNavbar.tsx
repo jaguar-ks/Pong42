@@ -17,7 +17,7 @@ import Messages from "./ComponentsHB/Messages";
 import Profile from "./ComponentsHB/Profile";
 import hamburgerDotsBlack from '../../../assets/hamburgerDotsBlack.svg';
 import NavBar from "../NavBar/NavBar";
-
+import { useWebSocket } from '@/context/WebSocketContext';
 
 
 const HorizontalNavbar = () => {
@@ -26,9 +26,13 @@ const HorizontalNavbar = () => {
     const { userData } = useUserContext();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navbarRef = useRef<HTMLDivElement>(null);
+    const { sendMessage, messages: wsMessages, isConnected , notification, setNotification} = useWebSocket();
+
+
 
     const handleIconToggle = (icon: string) => {
         setActiveIcon(prevIcon => prevIcon === icon ? "" : icon);
+        setNotification(false)
     };
 
     const handleMenuToggle = (status: boolean) => {
@@ -71,23 +75,25 @@ const HorizontalNavbar = () => {
                     </div>
                 </div>
                 <div className={styles.containerGroups}>
-                    <div className={styles.dropdown}>
+                <div className={styles.dropdown}>
+                <div className="relative">
                         <button
-                            className={isSearchActive ? styles.hidden : activeIcon === "messages" ? styles.iconButtonSelected : styles.iconButton}
-                            onClick={() => handleIconToggle("messages")}
-                        >
-                            <Image className={styles.menuDotImage} src={activeIcon !== "messages" ? MessagesBlack : MessagesWhite} alt="Messages Icon" />
-                        </button>
-                        {activeIcon === "messages" && <Messages />}
-                    </div>
-                    <div className={styles.dropdown}>
-                        <button
-                            className={isSearchActive ? styles.hidden : activeIcon === "notifications" ? styles.iconButtonSelected : styles.iconButton}
+                            className={`${
+                                isSearchActive ? 'hidden' : activeIcon === 'notifications' ? 'bg-blue-500' : 'bg-transparent'
+                            } flex items-center justify-center p-2 rounded-md hover:bg-gray-200`}
                             onClick={() => handleIconToggle("notifications")}
                         >
-                            <Image className={styles.menuDotImage} src={activeIcon !== "notifications" ? NotificationsBlack : NotificationsWhite} alt="Notifications Icon" />
+                            <Image
+                                className="w-6 h-6"
+                                src={activeIcon !== "notifications" ? NotificationsBlack : NotificationsWhite}
+                                alt="Notifications Icon"
+                            />
                         </button>
                         {activeIcon === "notifications" && <Notifications />}
+                        {notification && (
+                            <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
+                        )}
+                    </div>
                     </div>
                     <div className={styles.dropdown}>
                         <button

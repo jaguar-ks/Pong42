@@ -13,7 +13,7 @@ def notify_message(sender, instance, created, **kwargs):
         notif = Notification.objects.create(
             user=recipient,
             notification_type=Notification.NOTIFICATION_TYPES['messages'],
-            message=f'New message from {instance.sender.username}'
+            message=f"You have a new message from {instance.sender.username}: {instance.content}",
         )
         data = NotificationSerializer(notif)
         send_real_time_notif(recipient.id, data.data)

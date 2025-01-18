@@ -1,29 +1,40 @@
+'use client'
 import React from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import classes from './Notifications.module.css';
+import axios from 'axios';
+import { useWebSocket } from '@/context/WebSocketContext';
 
-interface Notification {
-  id: number;
-  image: string;
-  message: string;
-  time: string;
+type Notifications ={
+  id: number,
+  user: number,
+  notification_type: string,
+  message: string,
+  created_at: string,
+  read: boolean,
 }
 
-const notifications: Notification[] = [
-  { id: 1, image: '/match-notification.png', message: 'New match available', time: '2 min ago' },
-  { id: 2, image: '/friend-request.png', message: 'New friend request', time: '5 min ago' },
-];
 
 const Notifications: React.FC = () => {
+  const [notifications, setNotifications] = useState<Notifications[]>([]);
+  const { sendMessage, messages: wsMessages, isConnected , notification, setNotification} = useWebSocket();
+  useEffect(() => {
+    
+        axios.get(`http://localhost:8000/api/users/me/notifications/`, {withCredentials: true})
+        .then((res) => {
+            setNotifications(res.data.results)
+            console.log(res.data.results)
+        })
+  },[notification])
   return (
     <div className={classes.dropdownContent}>
       <h3 className={classes.dropdownTitle}>Notifications</h3>
       {notifications.map((notification) => (
         <div key={notification.id} className={classes.notificationItem}>
-          <Image src={notification.image} alt="Notification" width={40} height={40} className={classes.notificationImage} />
           <div className={classes.notificationText}>
             <p className={classes.notificationMessage}>{notification.message}</p>
-            <span className={classes.notificationTime}>{notification.time}</span>
+            <span className={classes.notificationTime}>{notification.created_at}</span>
           </div>
         </div>
       ))}
