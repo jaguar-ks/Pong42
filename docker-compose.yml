@@ -35,7 +35,7 @@ services:
             context: ./srcs/api/
         volumes:
             - ./srcs/api:/var/www
-            - vault_creds:/var/www/
+            - vault_creds:/var/www/cred.d/
         networks:
             - transcendance_net
             - elk
@@ -206,7 +206,7 @@ services:
             - ./srcs/postgres/.env
         restart: unless-stopped
         healthcheck:
-            test: ["CMD-SHELL", "[ -e /vault/init/django-cred.json ]"]
+            test: ["CMD-SHELL", "ls /vault/init | grep django"]
             interval: 30s
             timeout: 10s
             retries: 5

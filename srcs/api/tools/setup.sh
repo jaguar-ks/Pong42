@@ -4,8 +4,8 @@ set -e  # Exit immediately if a command exits with a non-zero status
 apk add jq
 
 if [ ! -e cred.env ]; then
-    echo "ROLE_ID=\"$(cat django-cred.json |  jq -r '.role_id')\"" >> cred.env
-    echo "SECRET_ID=\"$(cat django-cred.json |  jq -r '.secret_id')\"" >> cred.env
+    echo "ROLE_ID=\"$(cat cred.d/django-cred.json |  jq -r '.role_id')\"" >> cred.env
+    echo "SECRET_ID=\"$(cat cred.d/django-cred.json |  jq -r '.secret_id')\"" >> cred.env
     if [ ! -e db.sqlite3 ]; then
         echo "FIRST=\"1\"" >> cred.env
     else
