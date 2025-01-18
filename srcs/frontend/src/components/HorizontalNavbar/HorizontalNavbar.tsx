@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from './HorizontalNavbar.module.css';
 import SearchBar from "./SearchBar/SearchBar";
 import MessagesWhite from '../../../assets/MessagesWhite.svg';
@@ -18,14 +18,17 @@ import Profile from "./ComponentsHB/Profile";
 import hamburgerDotsBlack from '../../../assets/hamburgerDotsBlack.svg';
 import NavBar from "../NavBar/NavBar";
 
+
+
 const HorizontalNavbar = () => {
     const [activeIcon, setActiveIcon] = useState("");
     const [isSearchActive, setIsSearchActive] = useState(false);
     const { userData } = useUserContext();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const navbarRef = useRef<HTMLDivElement>(null);
 
     const handleIconToggle = (icon: string) => {
-        setActiveIcon(activeIcon === icon ? "" : icon);
+        setActiveIcon(prevIcon => prevIcon === icon ? "" : icon);
     };
 
     const handleMenuToggle = (status: boolean) => {
@@ -33,8 +36,21 @@ const HorizontalNavbar = () => {
         console.log("Menu status:", status);
     };
 
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (navbarRef.current && !navbarRef.current.contains(event.target as Node)) {
+                setActiveIcon("");
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
     return (
-        <div className={styles.navbar}>
+        <div className={styles.navbar} ref={navbarRef}>
             <div className={styles.searchBar}>
                 <SearchBar />
             </div>
@@ -117,3 +133,4 @@ const HorizontalNavbar = () => {
 };
 
 export default HorizontalNavbar;
+

@@ -1,78 +1,139 @@
-"use client"
+'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import Image from 'next/image'
+import { useUserContext } from '@/context/UserContext'
+import styles from './EntreInfosOneVsOne.module.css'
 
-export default function UserGameInfoPage() {
+export default function UserGameInfoPage({setPage}) {
   const [user1, setUser1] = useState('')
   const [user2, setUser2] = useState('')
+  const [user1Image, setUser1Image] = useState('/placeholder.svg?height=100&width=100')
+  const [user2Image, setUser2Image] = useState('/placeholder.svg?height=100&width=100')
+  const { setLocalOneVsOneNames } = useUserContext();
   const [isFormValid, setIsFormValid] = useState(false)
   const router = useRouter()
+  const fileInputRef1 = useRef<HTMLInputElement>(null)
+  const fileInputRef2 = useRef<HTMLInputElement>(null)
 
-  // Validate form and update isFormValid state
   const validateForm = () => {
     setIsFormValid(user1.trim() !== '' && user2.trim() !== '')
   }
 
-  // Handle form submission
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, setImage: (value: string) => void) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const objectUrl = URL.createObjectURL(file)
+      setImage(objectUrl)
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (isFormValid) {
-        router.push(`/users/gameArena`)
+      setLocalOneVsOneNames([
+        `${user1}|${user1Image}`,
+        `${user2}|${user2Image}`
+      ])
+      router.push(`/users/gameArenaLocal`)
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-md">
-        <h1 className="text-3xl font-bold text-center text-gray-800">Game Setup</h1>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="user1" className="text-sm font-medium text-gray-700">
-              Player 1 Nickname
-            </Label>
-            <Input
-              id="user1"
-              type="text"
-              value={user1}
-              onChange={(e) => {
-                setUser1(e.target.value)
-                validateForm()
-              }}
-              placeholder="Enter Player 1 Nickname"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+    <div className={styles.container}>
+      <h1 className={styles.title}>Game Setup</h1>
+      <form onSubmit={handleSubmit} className={styles.playerInputs}>
+        <div className={styles.playerInput}>
+          <label htmlFor="user1" className={styles.label}>
+            Player 1:
+          </label>
+          <input
+            id="user1"
+            type="text"
+            value={user1}
+            onChange={(e) => {
+              setUser1(e.target.value)
+              validateForm()
+            }}
+            placeholder="Enter Player 1 Nickname"
+            className={styles.input}
+            required
+          />
+          <div className={styles.imageUpload}>
+            <Image
+              src={user1Image || "/placeholder.svg"}
+              alt="Player 1 avatar"
+              width={100}
+              height={100}
+              className={styles.avatar}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef1.current?.click()}
+              className={styles.uploadButton}
+            >
+              Upload Image
+            </button>
+            <input
+              ref={fileInputRef1}
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e, setUser1Image)}
+              className={styles.hiddenInput}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="user2" className="text-sm font-medium text-gray-700">
-              Player 2 Nickname
-            </Label>
-            <Input
-              id="user2"
-              type="text"
-              value={user2}
-              onChange={(e) => {
-                setUser2(e.target.value)
-                validateForm()
-              }}
-              placeholder="Enter Player 2 Nickname"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+        </div>
+        <div className={styles.playerInput}>
+          <label htmlFor="user2" className={styles.label}>
+            Player 2:
+          </label>
+          <input
+            id="user2"
+            type="text"
+            value={user2}
+            onChange={(e) => {
+              setUser2(e.target.value)
+              validateForm()
+            }}
+            placeholder="Enter Player 2 Nickname"
+            className={styles.input}
+            required
+          />
+          <div className={styles.imageUpload}>
+            <Image
+              src={user2Image || "/placeholder.svg"}
+              alt="Player 2 avatar"
+              width={100}
+              height={100}
+              className={styles.avatar}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef2.current?.click()}
+              className={styles.uploadButton}
+            >
+              Upload Image
+            </button>
+            <input
+              ref={fileInputRef2}
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e, setUser2Image)}
+              className={styles.hiddenInput}
             />
           </div>
-          <Button
+        </div>
+        <div className={styles.startButtonContainer}>
+          <button
             type="submit"
-            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className={styles.startButton}
             disabled={!isFormValid}
           >
             Start Game
-          </Button>
-        </form>
-      </div>
+          </button>
+        </div>
+      </form>
     </div>
   )
 }

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import styles from '../styles/Game.module.css'
-import twoPlayers from '../../../../../assets/2players.svg'
+import twoPlayers from '../../../../../assets/4players_1.svg'
 import fourPlayers from '../../../../../assets/4players_1.svg'
 import { useRouter } from 'next/navigation'
 
