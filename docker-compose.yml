@@ -35,7 +35,7 @@ services:
             context: ./srcs/api/
         volumes:
             - ./srcs/api:/var/www
-            - vault_creds:/var/www/
+            - vault_creds:/var/www/cred.d/
         networks:
             - transcendance_net
             - elk
