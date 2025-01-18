@@ -1,29 +1,42 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { useUserContext } from '@/context/UserContext'
 import styles from './EntreInfosOneVsOne.module.css'
 
 export default function UserGameInfoPage({setPage}) {
   const [user1, setUser1] = useState('')
   const [user2, setUser2] = useState('')
-  const { localOneVsOneNames, setLocalOneVsOneNames } = useUserContext();
+  const [user1Image, setUser1Image] = useState('/placeholder.svg?height=100&width=100')
+  const [user2Image, setUser2Image] = useState('/placeholder.svg?height=100&width=100')
+  const { setLocalOneVsOneNames } = useUserContext();
   const [isFormValid, setIsFormValid] = useState(false)
   const router = useRouter()
+  const fileInputRef1 = useRef<HTMLInputElement>(null)
+  const fileInputRef2 = useRef<HTMLInputElement>(null)
 
-  // Validate form and update isFormValid state
   const validateForm = () => {
     setIsFormValid(user1.trim() !== '' && user2.trim() !== '')
   }
 
-  // Handle form submission
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, setImage: (value: string) => void) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const objectUrl = URL.createObjectURL(file)
+      setImage(objectUrl)
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (isFormValid) {
-      setLocalOneVsOneNames({ user1, user2 })
-      // router.push(`/users/gameArena`)
-      console.log("the game will start");
+      setLocalOneVsOneNames([
+        `${user1}|${user1Image}`,
+        `${user2}|${user2Image}`
+      ])
+      router.push(`/users/gameArenaLocal`)
     }
   }
 
@@ -47,6 +60,29 @@ export default function UserGameInfoPage({setPage}) {
             className={styles.input}
             required
           />
+          <div className={styles.imageUpload}>
+            <Image
+              src={user1Image || "/placeholder.svg"}
+              alt="Player 1 avatar"
+              width={100}
+              height={100}
+              className={styles.avatar}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef1.current?.click()}
+              className={styles.uploadButton}
+            >
+              Upload Image
+            </button>
+            <input
+              ref={fileInputRef1}
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e, setUser1Image)}
+              className={styles.hiddenInput}
+            />
+          </div>
         </div>
         <div className={styles.playerInput}>
           <label htmlFor="user2" className={styles.label}>
@@ -64,6 +100,29 @@ export default function UserGameInfoPage({setPage}) {
             className={styles.input}
             required
           />
+          <div className={styles.imageUpload}>
+            <Image
+              src={user2Image || "/placeholder.svg"}
+              alt="Player 2 avatar"
+              width={100}
+              height={100}
+              className={styles.avatar}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef2.current?.click()}
+              className={styles.uploadButton}
+            >
+              Upload Image
+            </button>
+            <input
+              ref={fileInputRef2}
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e, setUser2Image)}
+              className={styles.hiddenInput}
+            />
+          </div>
         </div>
         <div className={styles.startButtonContainer}>
           <button
