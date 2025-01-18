@@ -186,12 +186,6 @@ export default function BoxedChatInterface() {
               <p className="text-sm text-gray-500 dark:text-gray-400">{activeUser?.is_online ? 'Online' : 'Offline'}</p>
             </div>
           </div>
-          <div className="flex space-x-2">
-            <Button variant="ghost" size="icon">
-              <Phone className="h-5 w-5" />
-              <span className="sr-only">Call</span>
-            </Button>
-          </div>
         </div>
         <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
           {messages.map((msg) => (

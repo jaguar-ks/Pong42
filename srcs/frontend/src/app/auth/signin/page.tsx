@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import axios from 'axios'
 import { InputField } from '@/components/InputField'
@@ -24,6 +24,7 @@ const SignInPage: React.FC = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [showOtpPopup, setShowOtpPopup] = useState<boolean>(false)
   const [errors, setErrors] = useState<Errors>({
     details: '',
     username: '',
@@ -32,6 +33,17 @@ const SignInPage: React.FC = () => {
   })
 
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const user_id: string = searchParams.get('user_id')
+  const otp_required = searchParams.get('otp_required') === 'true'
+  console.log('component mounted')
+  // Listen for changes in the query params
+  useEffect(() => {
+    console.log('otp_required:', otp_required)
+    if (otp_required) {
+      setShowOtpPopup(true)
+    }
+  }, [otp_required]) // Runs when query params change
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
@@ -60,14 +72,17 @@ const SignInPage: React.FC = () => {
     }
   }
 
-  const handleGoogleSignIn = () => {
-    // Implement Google sign-in logic here
-    console.log('Google sign-in clicked')
-  }
-
-  const handleGithubSignIn = () => {
-    // Implement GitHub sign-in logic here
-    console.log('GitHub sign-in clicked')
+  const handleSignUp = async (index: number) => {
+    try {
+      const res = await axios.get('http://localhost:8000/api/auth/social/providers/')
+      console.log(`${res.data.providers[index].provider_name} sign-up clicked`)
+      router.push(res.data.providers[index].provider_url);
+    } catch (err: any) {
+      console.error('Error:', err.response )
+      
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -112,7 +127,7 @@ const SignInPage: React.FC = () => {
                 </div>
               </form>
               <div className={styles.socialButtonsContainer}>
-                <button onClick={handleGoogleSignIn} className={styles.socialButton}>
+                <button onClick={() => handleSignUp(1)} className={styles.socialButton}>
                   <Image
                     src={googleIcon}
                     alt="Sign in with Google"
@@ -121,7 +136,7 @@ const SignInPage: React.FC = () => {
                     className={styles.socialButtonImage}
                   />
                 </button>
-                <button onClick={handleGithubSignIn} className={styles.socialButton}>
+                <button onClick={() => handleSignUp(2)} className={styles.socialButton}>
                   <Image
                     src={githubIcon}
                     alt="Sign in with GitHub"
@@ -130,7 +145,7 @@ const SignInPage: React.FC = () => {
                     className={styles.socialButtonImage}
                   />
                 </button>
-                <button onClick={handleGithubSignIn} className={styles.socialButton}>
+                <button onClick={() => handleSignUp(0)} className={styles.socialButton}>
                   <Image
                     src={FTIcon}
                     alt="Sign in with GitHub"
@@ -166,6 +181,7 @@ const SignInPage: React.FC = () => {
           </div>
         </div>
       </main>
+      {showOtpPopup && <OtpForLogin setErrors={setErrors} user_id={user_id} username={username} password={password}/>}
       {errors.otp && <OtpForLogin setErrors={setErrors} username={username} password={password} />}
     </div>
   )
