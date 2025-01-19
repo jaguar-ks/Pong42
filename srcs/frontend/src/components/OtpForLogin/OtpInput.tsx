@@ -64,6 +64,7 @@ const OtpInput: React.FC<OtpInputProps> = ({setErrorBack, errorback, onComplete,
             onChange={e => handleChange(index, e.target.value)}
             onKeyDown={e => handleKeyDown(index, e)}
             placeholder="•"
+            onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
           />
         ))}
       </div>
