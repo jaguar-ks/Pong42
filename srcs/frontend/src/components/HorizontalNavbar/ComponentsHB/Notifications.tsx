@@ -15,6 +15,11 @@ type Notifications ={
   read: boolean,
 }
 
+function printTime(time: string){
+  let str = time.split('T')[1];
+  str = time.split('T')[0] + ' | ' + str.split(':')[0] + ':' + str.split(':')[1];
+  return str;
+}
 
 const Notifications: React.FC = () => {
   const [notifications, setNotifications] = useState<Notifications[]>([]);
@@ -34,11 +39,10 @@ const Notifications: React.FC = () => {
         <div key={notification.id} className={classes.notificationItem}>
           <div className={classes.notificationText}>
             <p className={classes.notificationMessage}>{notification.message}</p>
-            <span className={classes.notificationTime}>{notification.created_at}</span>
+            <span className={classes.notificationTime}>{printTime(notification.created_at)}</span>
           </div>
         </div>
       ))}
-      <button className={classes.viewAllButton}>View All Notifications</button>
     </div>
   );
 };
