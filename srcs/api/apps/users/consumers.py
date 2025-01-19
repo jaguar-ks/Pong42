@@ -47,7 +47,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'error': 'Failed to save message'
                     }))
                     return
-                print(f'message = > {message} | recipient => {recipient_id}', flush=True)
                 
                 recipient_channel = f"user_{recipient_id}"
                 await self.channel_layer.group_send(

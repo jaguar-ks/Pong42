@@ -14,6 +14,8 @@ interface WebSocketContextType {
   messages: Message[];
   isConnected: boolean;
   clearMessages: () => void;
+  notification: boolean;
+  setNotification: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
@@ -23,9 +25,8 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const { userData } = useContext(UserContext);
-  
+  const [notification, setNotification] = useState(true)
   useEffect(() => {
-    const connect = () => {
       const wsUrl = `ws://localhost:8000/ws/chat/`;
       
       ws.current = new WebSocket(wsUrl);
@@ -37,7 +38,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
 
       ws.current.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        if (message.type === 'message') {
+        if(message.type === 'message'){
           setMessages(prev => {
             //check if message already exists
             const messageExists = prev.some(
@@ -47,37 +48,37 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
                 msg.sender_id === message.sender_id
             );
             
-            if (messageExists) {
-              return prev;
-            }
-            return [...prev, message];
-          });
+              if (messageExists) {
+                return prev;
+              }
+              return [...prev, message];
+            });
+          }
+        if (message.type === 'notification'){
+          setNotification(true)
         }
       };
 
       ws.current.onclose = () => {
         console.log('Disconnected from chat');
         setIsConnected(false);
-        if (userData.id)
-          setTimeout(connect, 3000);
+        // setTimeout(connect, 3000);
       };
 
       ws.current.onerror = (error) => {
         console.error('WebSocket error:', error);
         setIsConnected(false);
       };
-    };
     if (!userData.id) {
       return;
     }
-    connect();
 
     return () => {
       if (ws.current) {
         ws.current.close();
       }
     };
-  }, [userData.id]);
+  }, []);
 
   const sendMessage = (recipientId: number, message: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
@@ -94,7 +95,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   };
 
   return (
-    <WebSocketContext.Provider value={{ sendMessage, messages, isConnected, clearMessages }}>
+    <WebSocketContext.Provider value={{ sendMessage, messages, isConnected, clearMessages, notification ,setNotification}}>
       {children}
     </WebSocketContext.Provider>
   );

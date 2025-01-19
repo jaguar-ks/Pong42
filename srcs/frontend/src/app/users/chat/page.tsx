@@ -113,7 +113,6 @@ export default function BoxedChatInterface() {
             timestamp: msgData.timestamp,
           }
         ));
-        console.log(logs)
 
           setMessages(prevMessages => {
             const uniqueMessages = [...new Set([...prevMessages, ...fetchedMessages].map(msg => msg.id))].map(id => {
@@ -127,7 +126,11 @@ export default function BoxedChatInterface() {
         });
     }
   }, [activeUser]);
-
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
   useEffect(() => {
     if (activeUser) {
       setMessages([]);
