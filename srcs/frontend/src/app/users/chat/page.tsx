@@ -201,20 +201,20 @@ export default function BoxedChatInterface() {
           {messages.map((msg, i, msgs) => {
             const newDay = i > 0 && msg.timestamp.split('T')[0] > msgs[i - 1].timestamp.split('T')[0];
             return (
-              <React.Fragment key={msg.id}>
+              <>
                 {newDay && (
-                    <div key={`day-${msg.id}`} className="text-center text-gray-500 dark:text-gray-400 text-sm my-4">
+                    <p className="text-center text-gray-500 dark:text-gray-400 text-sm my-4">
                       {msg.timestamp.split('T')[0]}
-                    </div>
+                    </p>
                   )
                 }
                 <div key={msg.id} className={`flex ${msg.user == user?.id ? 'justify-end' : 'justify-start'} mb-4`}>
-                  <div className={`max-w-[70%] ${msg.user == user?.id ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-3`}>
-                    <p>{msg.content}</p>
+                  <div className={`max-w-[60%] ${msg.user == user?.id ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-3`}>
+                    <p style={{wordWrap: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-wrap'}}>{msg.content}</p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{printTime(msg.timestamp)}</p>
                   </div>
                 </div>
-              </React.Fragment>
+              </>
             );
             })
           }
