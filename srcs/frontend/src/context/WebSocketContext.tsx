@@ -9,6 +9,15 @@ interface Message {
   timestamp: string;
 }
 
+type Notifications ={
+  id: number,
+  user: number,
+  notification_type: string,
+  message: string,
+  created_at: string,
+  read: boolean,
+}
+
 interface WebSocketContextType {
   sendMessage: (recipientId: number, message: string) => void;
   messages: Message[];
@@ -25,7 +34,8 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const { userData } = useContext(UserContext);
-  const [notification, setNotification] = useState(true)
+  const [notification, setNotification] = useState(false)
+  const [notifications, setNotifications] = useState<Notifications[]>([])
   useEffect(() => {
       const wsUrl = `ws://localhost:8000/ws/chat/`;
       
@@ -55,6 +65,18 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
             });
           }
         if (message.type === 'notification'){
+          setNotifications(prev => {
+            const notificationExists = prev.some(
+              notif =>
+                notif.message === message.message &&
+                notif.created_at === message.created_at &&
+                notif.user === message.user
+            );
+            if (notificationExists){
+              return prev;
+            }
+            return [...prev, message];
+          });
           setNotification(true)
         }
       };
