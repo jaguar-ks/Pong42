@@ -5,12 +5,13 @@ services:
     #                          DATA BASE                            #
     #################################################################
     pgdb:
-        image: postgres:15
+        image: postgres:trns
         container_name: postgres
+        build:
+            context: ./srcs/postgres/
         volumes:
             - postgres_data:/var/lib/postgresql/data/
             - ./srcs/postgres/logs/:/var/log/postgresql/
-            - ./srcs/postgres/tools/dump_logs.sh:/docker-entrypoint-initdb.d/dump_logs.sh
         networks:
             - transcendance_net
             - elk
@@ -34,7 +35,7 @@ services:
             context: ./srcs/api/
         volumes:
             - ./srcs/api:/var/www
-            - ./srcs/vault/init/django-cred.json:/var/www/django-cred.json:ro
+            - vault_creds:/var/www/cred.d/
         networks:
             - transcendance_net
             - elk
@@ -43,16 +44,17 @@ services:
         env_file:
             - ./srcs/api/.env
         environment:
-            - PROD=false
-        # depends_on:
-        #     vault:
-        #         condition: service_healthy
-        #     redis:
-        #         condition: service_healthy
+            - PROD=true
+        depends_on:
+            vault:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
 
         restart: on-failure
 
     frontend:
+        image: frontend:trns
         build: ./srcs/frontend
         container_name: nextJs
         ports:
@@ -71,16 +73,16 @@ services:
     #                             REDIS                             #
     #################################################################
     redis:
-        image: redis:alpine
+        image: redis:trns
         container_name: redis
+        build:
+            context: ./srcs/redis/
         ports:
             - "6379:6379"
         networks:
             - transcendance_net
         volumes:
-            - ./srcs/redis/conf/redis.conf:/redis.conf
             - ./srcs/redis/logs/:/var/log/redis/
-        command: ["redis-server", "/redis.conf"]
         restart: always
         healthcheck:
             test: ["CMD", "redis-cli", "ping"]
@@ -95,7 +97,9 @@ services:
     #################################################################
     elasticsearch:
         container_name: elasticsearch
-        image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
+        image: elastic:trns
+        build:
+            context: ./srcs/ELK/elasticsearch/
         env_file:
             - ./srcs/ELK/.env
         environment:
@@ -116,9 +120,7 @@ services:
             retries: 3
             start_period: 60s
         volumes:
-            - ./srcs/ELK/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
             - es_data:/usr/share/elasticsearch/data
-            - ./srcs/ELK/elasticsearch/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
         ports:
             - "9200:9200"
             - "9300:9300"
@@ -142,13 +144,14 @@ services:
     
     logstash:
         container_name: logstash
-        image: docker.elastic.co/logstash/logstash:8.10.1
+        image: logstash:trns
+        build:
+            context: ./srcs/ELK/logstash/
         volumes:
-            - ./srcs/ELK/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-            - ./srcs/ELK/logstash/pipeline:/usr/share/logstash/pipeline
             - ./srcs/postgres/logs/:/var/log/postgres/
             - ./srcs/vault/logs:/var/log/vault
             - ./srcs/redis/logs:/var/log/redis
+            - ./srcs/nginx/logs:/var/log/nginx
         ports:
             - "50000:50000"
             - "9600:9600"
@@ -164,16 +167,14 @@ services:
 
     kibana:
         container_name: kibana
-        image: docker.elastic.co/kibana/kibana:8.10.1
+        image: kibana:trns
+        build:
+            context: ./srcs/ELK/kibana/
         depends_on:
             setup_kibana:
                 condition: service_completed_successfully
         env_file:
             - ./srcs/ELK/.env
-        volumes:
-            - ./srcs/ELK/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
-            - ./srcs/ELK/tools/cert_gen.sh:/docker-entrypoint-init.d/cert_gen.sh
-        entrypoint: ["bash", "-c", "/docker-entrypoint-init.d/cert_gen.sh"]
         ports:
             - "5601:5601"
         networks:
@@ -184,8 +185,10 @@ services:
     #                           VAULT & WAF                         #
     #################################################################
     vault:
-        image: hashicorp/vault:1.18
+        image: vault:trns
         container_name: vault
+        build:
+            context: ./srcs/vault/
         ports:
             - "8200:8200"
         cap_add:
@@ -194,33 +197,46 @@ services:
             - elk
             - transcendance_net
         volumes:
-            - ./srcs/vault/data:/vault/data
-            - ./srcs/vault/init:/vault/init
-            - ./srcs/vault/config:/vault/config
-            - ./srcs/vault/tools:/vault/tools
+            - vault_creds:/vault/init/
             - ./srcs/vault/logs:/vault/logs
-            - ./srcs/vault/policies:/vault/policies
         environment:
             - VAULT_ADDR=http://127.0.0.1:8200
         env_file:
             - ./srcs/api/.env
             - ./srcs/postgres/.env
-        command: ["/bin/sh", "-c", "/vault/tools/set_up.sh"]
         restart: unless-stopped
         healthcheck:
-            test: ["CMD-SHELL", "[ -e /vault/init/django-cred.json ]"]
-            interval: 10s
-            timeout: 5s
+            test: ["CMD-SHELL", "ls /vault/init | grep django"]
+            interval: 30s
+            timeout: 10s
             retries: 5
         depends_on:
             pgdb:
                 condition: service_healthy
+    
+    nginx:
+        image: ngnix:trns
+        container_name: nginx
+        build:
+            context: ./srcs/nginx/
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./srcs/nginx/logs/:/var/log/nginx/
+        networks:
+            - transcendance_net
+        depends_on:
+            - backend
+            - frontend
+        restart: always
     #################################################################
 
 
 volumes:
     postgres_data:
-    backend_files:
+    vault_creds:
+        name: vault_creds
     es_data:
 
 networks:

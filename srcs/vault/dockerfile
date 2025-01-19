@@ -1,0 +1,7 @@
+FROM hashicorp/vault:1.18
+
+COPY ./config/vault.hcl /vault/config/vault.hcl
+COPY ./tools/ /vault/tools/
+COPY ./policies/ /vault/policies/
+
+CMD ["/bin/sh", "-c", "/vault/tools/set_up.sh"]
