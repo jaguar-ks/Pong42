@@ -27,6 +27,12 @@ type User = {
   rating: number;
 };
 
+function printTime(time: string) {
+  let str = time.split('T')[1];
+  str = str.split(':')[0] + ':' + str.split(':')[1];
+  return str;
+}
+
 export default function BoxedChatInterface() {
   const { sendMessage, messages: wsMessages, isConnected } = useWebSocket();
   const [user, setUser] = useState<User>({
@@ -148,6 +154,7 @@ export default function BoxedChatInterface() {
   const handleUserClick = (user: User) => {
     setActiveUser(user);
   };
+
   return (
     <div className="w-full h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex">
       <div className="w-1/3 border-r border-gray-200 dark:border-gray-700">
@@ -191,14 +198,26 @@ export default function BoxedChatInterface() {
           </div>
         </div>
         <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-          {messages.map((msg) => (
-            <div key={msg.id} className={`flex ${msg.user == user?.id ? 'justify-end' : 'justify-start'} mb-4`}>
-              <div className={`max-w-[70%] ${msg.user == user?.id ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-3`}>
-                <p>{msg.content}</p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{msg.timestamp}</p>
-              </div>
-            </div>
-          ))}
+          {messages.map((msg, i, msgs) => {
+            const newDay = i > 0 && msg.timestamp.split('T')[0] > msgs[i - 1].timestamp.split('T')[0];
+            return (
+              <React.Fragment key={msg.id}>
+                {newDay && (
+                    <div key={`day-${msg.id}`} className="text-center text-gray-500 dark:text-gray-400 text-sm my-4">
+                      {msg.timestamp.split('T')[0]}
+                    </div>
+                  )
+                }
+                <div key={msg.id} className={`flex ${msg.user == user?.id ? 'justify-end' : 'justify-start'} mb-4`}>
+                  <div className={`max-w-[70%] ${msg.user == user?.id ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-3`}>
+                    <p>{msg.content}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{printTime(msg.timestamp)}</p>
+                  </div>
+                </div>
+              </React.Fragment>
+            );
+            })
+          }
           <div ref={messagesEndRef} />
         </ScrollArea>
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
