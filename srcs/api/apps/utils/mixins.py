@@ -27,5 +27,4 @@ class AllUsersMixins:
         return queryset.exclude(
             Q(id__in=Subquery(blocked_subquery.values("initiator_id")))
             | Q(id__in=Subquery(blocked_subquery.values("recipient_id")))
-            | Q(id=current_user.id)
         )
