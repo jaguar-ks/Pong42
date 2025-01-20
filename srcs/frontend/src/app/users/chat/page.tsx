@@ -203,14 +203,14 @@ export default function BoxedChatInterface() {
             return (
               <>
                 {newDay && (
-                    <p className="text-center text-gray-500 dark:text-gray-400 text-sm my-4">
+                    <p className="flex-1 text-center text-gray-500 dark:text-gray-400 text-sm mb-3">
                       {msg.timestamp.split('T')[0]}
                     </p>
                   )
                 }
-                <div key={msg.id} className={`flex ${msg.user == user?.id ? 'justify-end' : 'justify-start'} mb-4`}>
-                  <div className={`max-w-[60%] ${msg.user == user?.id ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-3`}>
-                    <p style={{wordWrap: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-wrap'}}>{msg.content}</p>
+                <div key={msg.id} className={`flex ${msg.user == user?.id ? 'justify-end' : 'justify-start'} mb-3`}>
+                  <div className={`max-w-[70%] ${msg.user == user?.id ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-4`}>
+                    <p className="break-words whitespace-pre-wrap">{msg.content}</p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{printTime(msg.timestamp)}</p>
                   </div>
                 </div>
