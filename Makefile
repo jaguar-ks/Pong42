@@ -25,8 +25,7 @@ init_vault:
 	rm -rf ./srcs/vault/data/*
 	rm -rf ./srcs/vault/init/*
 	rm -rf ./srcs/api/cred.env
-	rm -rf ./srcs/api/django-cred.json
-
+	rm -rf ./srcs/api/cred.d
 remove_log:
 	rm -rf ./srcs/postgres/logs/*
 	rm -rf ./srcs/vault/logs/*

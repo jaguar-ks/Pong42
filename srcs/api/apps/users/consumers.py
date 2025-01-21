@@ -10,6 +10,8 @@ from ..utils import send_real_time_notif
 
 User = get_user_model()
 
+online_users = []
+
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user = self.scope["user"]
@@ -20,10 +22,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name,
         )
         await self.accept()
+        online_users.append(self.user.id)
         await self.change_online_status(self.user.id, True)
+        print('IN =>', online_users, flush=True)
 
     async def disconnect(self, close_code):
-        await self.change_online_status(self.user.id, False)
+        online_users.remove(self.user.id)
+        print('OUT =>', online_users, flush=True)
+        if self.user.id not in online_users:
+            await self.change_online_status(self.user.id, False)
         if hasattr(self, 'group_name'):
             await self.channel_layer.group_discard(
                 self.group_name,
