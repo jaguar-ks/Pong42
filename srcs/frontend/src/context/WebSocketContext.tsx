@@ -19,6 +19,7 @@ type Notifications ={
 }
 
 interface WebSocketContextType {
+  close: () => void;
   sendMessage: (recipientId: number, message: string) => void;
   messages: Message[];
   isConnected: boolean;
@@ -39,7 +40,8 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   useEffect(() => {
       const wsUrl = `ws://localhost:8000/ws/chat/`;
       
-      ws.current = new WebSocket(wsUrl);
+      if (!ws.current)
+        ws.current = new WebSocket(wsUrl);
 
       ws.current.onopen = () => {
         console.log('Connected to chat');
@@ -102,6 +104,12 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
     };
   }, []);
 
+  const close = () => {
+    if (ws.current) {
+      ws.current.close();
+    }
+  }
+
   const sendMessage = (recipientId: number, message: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify({
@@ -117,7 +125,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   };
 
   return (
-    <WebSocketContext.Provider value={{ sendMessage, messages, isConnected, clearMessages, notification ,setNotification}}>
+    <WebSocketContext.Provider value={{close, sendMessage, messages, isConnected, clearMessages, notification ,setNotification}}>
       {children}
     </WebSocketContext.Provider>
   );

@@ -5,11 +5,13 @@ import { useContext, useEffect, useState } from 'react';
 import classes from './page.module.css';
 import axios from 'axios';
 import { useUserContext } from '@/context/UserContext';
+import { useWebSocket } from '@/context/WebSocketContext';
 
 const Logout: React.FC = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { currentPage, updateCurrentPage } = useUserContext();
+  const { close } = useWebSocket();
 
 
   useEffect(() => {
@@ -39,7 +41,7 @@ const Logout: React.FC = () => {
 
       // Call the sign-out API
       await axios.post("http://localhost:8000/api/auth/sign-out/", {}, { withCredentials: true });
-
+      close();
       router.push('/auth/signin');
     } catch (error) {
       console.error('Logout error:', error);
