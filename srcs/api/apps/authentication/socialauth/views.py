@@ -1,4 +1,4 @@
-from rest_framework import views, permissions
+from rest_framework import views, permissions, serializers
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from django.shortcuts import redirect
@@ -14,18 +14,21 @@ class OauthCallbackView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, provider):
-        serializer = self.serializer_class(
-            data=request.GET, context={"provider": provider}
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        user = serializer.data["user"]
-        if user['two_fa_enabled'] == True:
-            return redirect(f'http://localhost:3000/auth/signin?otp_required=true&user_id={user["id"]}')
-            pass
-        response = redirect("http://localhost:3000/users/home")
-        sing_in_response(response, serializer.data["token"])
-        return response
+        try:
+            serializer = self.serializer_class(
+                data=request.GET, context={"provider": provider}
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            user = serializer.data["user"]
+            if user['two_fa_enabled'] == True:
+                return redirect(f'http://localhost:3000/auth/signin?otp_required=true&user_id={user["id"]}')
+                pass
+            response = redirect("http://localhost:3000/users/home")
+            sing_in_response(response, serializer.data["token"])
+            return response
+        except serializers.ValidationError as e:
+            return redirect(f'http://localhost:3000/auth/signin?error={e.detail[0]}')
 
 
 @extend_schema(**OAUTH_AUTHORIZE_SCHEMA)
