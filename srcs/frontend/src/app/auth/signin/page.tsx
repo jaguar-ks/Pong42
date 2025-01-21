@@ -24,7 +24,6 @@ const SignInPage: React.FC = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [showOtpPopup, setShowOtpPopup] = useState<boolean>(false)
   const [errors, setErrors] = useState<Errors>({
     details: '',
     username: '',
@@ -34,16 +33,33 @@ const SignInPage: React.FC = () => {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const user_id: string = searchParams.get('user_id')
+  const social_error: string = searchParams.get('error')
   const otp_required = searchParams.get('otp_required') === 'true'
   console.log('component mounted')
   // Listen for changes in the query params
   useEffect(() => {
     console.log('otp_required:', otp_required)
     if (otp_required) {
-      setShowOtpPopup(true)
+      setErrors({
+        details: '',
+        username: '',
+        password: '',
+        otp: 'OTP is required',
+      })
     }
   }, [otp_required]) // Runs when query params change
+
+  useEffect(() => {
+    console.log('social_error:', social_error)
+    if (social_error) {
+      setErrors({
+        details: social_error,
+        username: '',
+        password: '',
+        otp: '',
+      })
+    }
+  }, [social_error]) // Runs when query params change
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
@@ -134,6 +150,7 @@ const SignInPage: React.FC = () => {
                     width={40}
                     height={40}
                     className={styles.socialButtonImage}
+                    error={errors.details}
                   />
                 </button>
                 <button onClick={() => handleSignUp(2)} className={styles.socialButton}>
@@ -143,7 +160,8 @@ const SignInPage: React.FC = () => {
                     width={40}
                     height={40}
                     className={styles.socialButtonImage}
-                  />
+                    error={errors.details}
+                    />
                 </button>
                 <button onClick={() => handleSignUp(0)} className={styles.socialButton}>
                   <Image
@@ -152,6 +170,7 @@ const SignInPage: React.FC = () => {
                     width={40}
                     height={40}
                     className={styles.socialButtonImage}
+                    error={errors.details}
                   />
                 </button>
               </div>
@@ -181,7 +200,6 @@ const SignInPage: React.FC = () => {
           </div>
         </div>
       </main>
-      {showOtpPopup && <OtpForLogin setErrors={setErrors} user_id={user_id} username={username} password={password}/>}
       {errors.otp && <OtpForLogin setErrors={setErrors} username={username} password={password} />}
     </div>
   )

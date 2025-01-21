@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenObtainSlidingView
 from rest_framework_simplejwt.tokens import SlidingToken
 from django.conf import settings
 from drf_spectacular.utils import extend_schema
-
+from django.core import signing
 from . import serializers
 from apps.utils import sing_in_response
 from .docs import (
@@ -53,10 +53,12 @@ class SignUpView(generics.CreateAPIView):
 class SignInView(TokenObtainSlidingView):
 
     def post(self, request, *args, **kwargs):
-        if request.data['username'] and request.data['password']:
+        if request.data.get('username') != '' and request.data.get('password') != '':
             response = super().post(request, *args, **kwargs)
-        elif request.data['user_id'] and 'otp_code' in request.data:
-            user = serializers.User.objects.get(id=request.data['user_id'])
+        elif request.COOKIES.get('tmp_token') and 'otp_code' in request.data:
+            token = request.COOKIES.pop('tmp_token')
+            id = signing.loads(token, settings.SECRET_KEY)['user']
+            user = serializers.User.objects.get(id=id)
             if user.verify_otp(request.data['otp_code']):
                 token = SlidingToken.for_user(user=user)
                 response = Response({'message': 'Successfully signed in', 'token': str(token)})
