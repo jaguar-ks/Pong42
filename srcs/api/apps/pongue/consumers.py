@@ -1,12 +1,12 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.db import database_sync_to_async
-import os, json, asyncio, redis
+# from channels.db import database_sync_to_async
+import json, asyncio, redis
 from asgiref.sync import sync_to_async
 from django.utils.crypto import get_random_string
 from apps.users.serializers import UserSerializer
 from apps.pongue import pong
-from apps.pongue.models import PongMatch, MatchParticipant
-from apps.users.models import User
+# from apps.pongue.models import PongMatch, MatchParticipant
+# from apps.users.models import User
 
 r = redis.Redis(host='redis', port=6379, db=0)
 
@@ -101,7 +101,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def game_over(self, event):
         print("game over", flush=True)
         await self.send(text_data=event['message'])
-        await self.save_game_state()
+        # await self.save_game_state()
         await self.close()
 
     async def game_state(self, event):
@@ -182,31 +182,31 @@ class GameConsumer(AsyncWebsocketConsumer):
         """Handle player disconnect notification"""
         await self.send(text_data=event['message'])
 
-    @database_sync_to_async
-    def save_game_state(self):
-        if hasattr(self, 'pong_game'):
-            winner = self.pong_game.player1 if self.pong_game.player1.score > self.pong_game.player2.score else self.pong_game.player2
-
-            match_played = PongMatch.objects.create(
-                winner=User.objects.get(id=winner.player_id)
-            )
-
-            pl1 = MatchParticipant.objects.create(
-                user=User.objects.get(id=self.pong_game.player1.player_id),
-                score=self.pong_game.player1.score,
-                match=match_played
-            )
-
-            pl2 = MatchParticipant.objects.create(
-                user=User.objects.get(id=self.pong_game.player2.player_id),
-                score=self.pong_game.player2.score,
-                match=match_played
-            )
-            if pl1.score > pl2.score:
-                pl1.user.wins += 1
-                pl2.user.loses += 1
-            else:
-                pl2.user.wins += 1
-                pl1.user.loses += 1
-            pl1.user.save()
-            pl2.user.save()
+    # @database_sync_to_async
+    # def save_game_state(self):
+    #     if hasattr(self, 'pong_game'):
+    #         winner = self.pong_game.player1 if self.pong_game.player1.score > self.pong_game.player2.score else self.pong_game.player2
+    #
+    #         match_played = PongMatch.objects.create(
+    #             winner=User.objects.get(id=winner.player_id)
+    #         )
+    #
+    #         pl1 = MatchParticipant.objects.create(
+    #             user=User.objects.get(id=self.pong_game.player1.player_id),
+    #             score=self.pong_game.player1.score,
+    #             match=match_played
+    #         )
+    #
+    #         pl2 = MatchParticipant.objects.create(
+    #             user=User.objects.get(id=self.pong_game.player2.player_id),
+    #             score=self.pong_game.player2.score,
+    #             match=match_played
+    #         )
+    #         if pl1.score > pl2.score:
+    #             pl1.user.wins += 1
+    #             pl2.user.loses += 1
+    #         else:
+    #             pl2.user.wins += 1
+    #             pl1.user.loses += 1
+    #         pl1.user.save()
+    #         pl2.user.save()
