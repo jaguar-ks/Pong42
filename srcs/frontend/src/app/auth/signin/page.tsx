@@ -24,7 +24,6 @@ const SignInPage: React.FC = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [showOtpPopup, setShowOtpPopup] = useState<boolean>(false)
   const [errors, setErrors] = useState<Errors>({
     details: '',
     username: '',
@@ -34,7 +33,6 @@ const SignInPage: React.FC = () => {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const user_id: string = searchParams.get('user_id')
   const social_error: string = searchParams.get('error')
   const otp_required = searchParams.get('otp_required') === 'true'
   console.log('component mounted')
@@ -42,7 +40,12 @@ const SignInPage: React.FC = () => {
   useEffect(() => {
     console.log('otp_required:', otp_required)
     if (otp_required) {
-      setShowOtpPopup(true)
+      setErrors({
+        details: '',
+        username: '',
+        password: '',
+        otp: 'OTP is required',
+      })
     }
   }, [otp_required]) // Runs when query params change
 
@@ -197,9 +200,7 @@ const SignInPage: React.FC = () => {
           </div>
         </div>
       </main>
-      {showOtpPopup && <OtpForLogin setErrors={setErrors} user_id={user_id} username={username} password={password}/>}
       {errors.otp && <OtpForLogin setErrors={setErrors} username={username} password={password} />}
-      {/* {errors.details && <>} */}
     </div>
   )
 }
