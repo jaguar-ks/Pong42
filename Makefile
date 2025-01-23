@@ -30,6 +30,8 @@ remove_log:
 	rm -rf ./srcs/postgres/logs/*
 	rm -rf ./srcs/vault/logs/*
 	rm -rf ./srcs/redis/logs/*
+	rm -rf ./srcs/nginx/logs/*
+	rm -rf ./srcs/nginx/modlogs/*
 
 .PHONY: all build up down delete_images fclean init_vault remove_log
 
