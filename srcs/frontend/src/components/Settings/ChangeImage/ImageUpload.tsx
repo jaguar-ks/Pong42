@@ -19,7 +19,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/");
+        const res = await axios.get("https://localhost/api/users/me/");
         setNewImage(res.data.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png");
       } catch (err: any) {
         console.log("Error in fetching user data", err);
@@ -87,7 +87,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
     setIsLoading(true);
     try {
       const res = await axios.patch(
-        "http://localhost:8000/api/users/me/",
+        "https://localhost/api/users/me/",
         {
           avatar_url: newImage,
         },

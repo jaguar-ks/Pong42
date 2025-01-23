@@ -27,7 +27,7 @@ const SearchProfile = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get(`http://localhost:8000/api/users/${id}/`, {
+        const res = await axios.get(`https://localhost/api/users/${id}/`, {
           withCredentials: true,
         });
         console.log("Fetched Data:", res.data);

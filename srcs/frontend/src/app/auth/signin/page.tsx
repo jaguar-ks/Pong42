@@ -72,7 +72,7 @@ const SignInPage: React.FC = () => {
     setIsLoading(true)
     
     try {
-      await axios.post("http://localhost:8000/api/auth/sign-in/", {username, password}, {withCredentials: true})
+      await axios.post("https://localhost/api/auth/sign-in/", {username, password}, {withCredentials: true})
       console.log("Success")
       router.push("/users/home")
     } catch (err: any) {
@@ -90,7 +90,7 @@ const SignInPage: React.FC = () => {
 
   const handleSignUp = async (index: number) => {
     try {
-      const res = await axios.get('http://localhost:8000/api/auth/social/providers/')
+      const res = await axios.get('https://localhost/api/auth/social/providers/')
       console.log(`${res.data.providers[index].provider_name} sign-up clicked`)
       router.push(res.data.providers[index].provider_url);
     } catch (err: any) {

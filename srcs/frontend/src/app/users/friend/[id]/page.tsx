@@ -27,7 +27,7 @@ const FriendPage = ({ params }) => {
     updateCurrentPage("Friend");
     const fetchData = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/api/users/${id}/`);
+        const res = await axios.get(`https://localhost/api/users/${id}/`);
         // console.log(res.data.first_name);
         updateSearchedUserData({
           avatar_url: res.data.avatar_url,

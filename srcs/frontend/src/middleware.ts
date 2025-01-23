@@ -26,7 +26,7 @@ export async function middleware(req: NextRequest) {
     // If there is a token and user is trying to access protected routes, validate the token
     if (accessToken && protectedPaths.some((path) => pathname.startsWith(path))) {
         // try {
-        //     const res = await fetch(`http://backend:8000/api/auth/test_auth/`, {
+        //     const res = await fetch(`https://localhost/api/auth/test_auth/`, {
         //         headers: {
         //             'Cookie': `access_token=${accessToken}`
         //         }

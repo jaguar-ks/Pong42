@@ -53,14 +53,14 @@ export default function BoxedChatInterface() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(()=>{
-    axios.get('http://localhost:8000/api/users/me/', { withCredentials: true })
+    axios.get('https://localhost/api/users/me/', { withCredentials: true })
     .then((response)=>{
       setUser(response.data)
     })
   },[])
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/users/me/connections/', { withCredentials: true })
+    axios.get('https://localhost/api/users/me/connections/', { withCredentials: true })
       .then((response) => {
         const fetchedUsers: User[] = response.data.results
           .filter((userData: any) => userData.status === "friends")
@@ -109,7 +109,7 @@ export default function BoxedChatInterface() {
 
   const fetchMessages = useCallback((page: number) => {
     if (activeUser) {
-      axios.get(`http://localhost:8000/api/users/me/connections/${activeUser.conv_id}/messages/`, { withCredentials: true })
+      axios.get(`https://localhost/api/users/me/connections/${activeUser.conv_id}/messages/`, { withCredentials: true })
         .then((response) => {
           const logs = response.data;
           const fetchedMessages: Message[] = response.data.results.map((msgData: any) => ({
@@ -201,7 +201,7 @@ export default function BoxedChatInterface() {
           {messages.map((msg, i, msgs) => {
             const newDay = i > 0 && msg.timestamp.split('T')[0] > msgs[i - 1].timestamp.split('T')[0];
             return (
-              <>
+              <React.Fragment key={msg.id}>
                 {newDay && (
                     <p className="flex-1 text-center text-gray-500 dark:text-gray-400 text-sm mb-3">
                       {msg.timestamp.split('T')[0]}
@@ -214,7 +214,7 @@ export default function BoxedChatInterface() {
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{printTime(msg.timestamp)}</p>
                   </div>
                 </div>
-              </>
+              </React.Fragment>
             );
             })
           }

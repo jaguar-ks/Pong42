@@ -26,7 +26,7 @@ const Notifications: React.FC = () => {
   const { sendMessage, messages: wsMessages, isConnected , notification, setNotification} = useWebSocket();
   useEffect(() => {
     
-        axios.get(`http://localhost:8000/api/users/me/notifications/`, {withCredentials: true})
+        axios.get(`https://localhost/api/users/me/notifications/`, {withCredentials: true})
         .then((res) => {
             setNotifications(res.data.results)
             console.log(res.data.results)

@@ -176,7 +176,7 @@ export const useUserContext = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get("http://localhost:8000/api/users/me/", { withCredentials: true });
+                const res = await axios.get("https://localhost/api/users/me/", { withCredentials: true });
                 context.updateUserData({
                     id: res.data.id,
                     otp_uri: res.data.otp_uri,

@@ -23,7 +23,7 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
     const fetchUserData = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/", { withCredentials: true });
+        const res = await axios.get("https://localhost/api/users/me/", { withCredentials: true });
         setIsActive(res.data.two_fa_enabled);
       } catch (err) {
         console.error("Failed to fetch user data:", err);
@@ -41,7 +41,7 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
     } else {
       setIsLoading(true);
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/", { withCredentials: true });
+        const res = await axios.get("https://localhost/api/users/me/", { withCredentials: true });
         setCode(res.data.otp_uri);
         setShowInput(true);
       } catch (err) {
@@ -59,7 +59,7 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
     try {
       if (isActive) {
         await axios.post(
-          "http://localhost:8000/api/auth/2fa/disable/",
+          "https://localhost/api/auth/2fa/disable/",
           { otp_code: inputCode },
           { withCredentials: true }
         );
@@ -67,7 +67,7 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
         setIsActive(false);
       } else {
         await axios.post(
-          "http://localhost:8000/api/auth/2fa/enable/",
+          "https://localhost/api/auth/2fa/enable/",
           { otp_code: inputCode },
           { withCredentials: true }
         );
