@@ -1,9 +1,29 @@
-.container{
+.containerGlobal{
     display: flex;
+    flex-direction: column;
     width: 100%;
     height: 100%;
     gap: 10px;
     padding: 20px;
+}
+
+.container{
+    display: flex;
+    width: 100%;
+    height: calc(100% - 70px);
+    gap: 10px;
+    padding: 20px;
+}
+.playBtnContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.PlayBtn{
+    height: 50px;
+    max-width: 500px;
+    min-width: 200px;
+    background-color: aqua;
 }
 .twoPlayers{
     height: 100%;
@@ -94,4 +114,9 @@
     font-size: 14px;
     font-weight: 600;
     color: #333333;
+}
+
+
+.containerwinnerFstRound{
+    background-color: #ffd700;
 }
