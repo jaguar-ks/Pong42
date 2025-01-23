@@ -225,6 +225,7 @@ services:
             - "443:443"
         volumes:
             - ./srcs/nginx/logs/:/var/log/nginx/
+            - ./srcs/nginx/modlogs/:/var/log/modsecurity/
         networks:
             - transcendance_net
         depends_on:
