@@ -25,36 +25,36 @@ export async function middleware(req: NextRequest) {
 
     // If there is a token and user is trying to access protected routes, validate the token
     if (accessToken && protectedPaths.some((path) => pathname.startsWith(path))) {
-        try {
-            const res = await fetch(`http://backend:8000/api/auth/test_auth/`, {
-                headers: {
-                    'Cookie': `access_token=${accessToken}`
-                }
-            });
+        // try {
+        //     const res = await fetch(`http://backend:8000/api/auth/test_auth/`, {
+        //         headers: {
+        //             'Cookie': `access_token=${accessToken}`
+        //         }
+        //     });
 
-            if (!res.ok) {
-                throw new Error('Token validation failed');
-            }
+        //     if (!res.ok) {
+        //         throw new Error('Token validation failed');
+        //     }
 
-            console.log("Token validated successfully");
-            return NextResponse.next();
-        } catch (err) {
-            console.log("Token validation error:", err);
+        //     console.log("Token validated successfully");
+        //     return NextResponse.next();
+        // } catch (err) {
+        //     console.log("Token validation error:", err);
             
-            // Create a response that redirects to the signin page
-            const response = NextResponse.redirect(new URL('/auth/signin', req.url));
+        //     // Create a response that redirects to the signin page
+        //     const response = NextResponse.redirect(new URL('/auth/signin', req.url));
             
-            // Delete the access_token by setting it to expire in the past
-            response.cookies.set('access_token', '', { 
-                httpOnly: true, 
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                expires: new Date(0),
-                path: '/'
-            });
+        //     // Delete the access_token by setting it to expire in the past
+        //     response.cookies.set('access_token', '', { 
+        //         httpOnly: true, 
+        //         secure: process.env.NODE_ENV === 'production',
+        //         sameSite: 'strict',
+        //         expires: new Date(0),
+        //         path: '/'
+        //     });
 
-            return response;
-        } 
+        //     return response;
+        // } 
     }
 
     // For all other cases, continue with the request

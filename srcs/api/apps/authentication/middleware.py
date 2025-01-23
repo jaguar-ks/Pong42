@@ -1,6 +1,7 @@
 from django.utils.functional import SimpleLazyObject
 from rest_framework_simplejwt.tokens import SlidingToken
 from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework.authentication import BaseAuthentication
 from django.conf import settings
 
 from apps.users.models import User
@@ -11,16 +12,16 @@ class JWTAuthenticationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Authenticate token and get user
-        token = self._authenticate(request)
+        token, user = self._authenticate(request)
         if token:
-            user = self._get_user_from_access_token(token)
-            # Set attributes on the request
             setattr(request, "_auth", token)
             setattr(request, "_user", SimpleLazyObject(lambda: user))
-            setattr(request, "is_authenticated_using_middleware", user is not None)
+            setattr(request, "is_authenticated_using_middleware", True)
 
         response = self.get_response(request)
+
+        if request.META.get("token_should_be_removed"):
+            response.delete_cookie(settings.AUTH_TOKEN_NAME)
 
         return response
 
@@ -28,23 +29,16 @@ class JWTAuthenticationMiddleware:
         access_token = request.COOKIES.get(settings.AUTH_TOKEN_NAME)
 
         if not access_token:
-            return None
+            return None, None
 
         try:
             token = SlidingToken(access_token)
-            return token
-        except TokenError:
-            return None
+            user_id = token["user_id"]
+            return token, User.objects.get(id=user_id, is_active=True)
+        except (TokenError, User.DoesNotExist) as e:
+            request.META["token_should_be_removed"] = True
 
-    def _get_user_from_access_token(self, validated_token):
-        try:
-            user_id = validated_token["user_id"]
-            return User.objects.get(id=user_id, is_active=True)
-        except User.DoesNotExist:
-            return None
-
-
-from rest_framework.authentication import BaseAuthentication
+        return None, None
 
 
 class SessionJWTAuth(BaseAuthentication):
