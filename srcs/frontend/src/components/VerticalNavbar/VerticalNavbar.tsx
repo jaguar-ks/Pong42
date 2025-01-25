@@ -6,7 +6,7 @@ import Image from "next/image";
 import mainLogo from '../../../assets/Main-Logo.svg';
 import chatLogoWithe from '../../../assets/chatLogoWithe.svg';
 import chatLogoBlack from '../../../assets/chatLogoBlack.svg';
-import gameLogoWithe from '../../../assets/gameLogoBlack.svg';
+import gameLogoWithe from '../../../assets/gameLogoWhite.svg';
 import gameLogoBlack from '../../../assets/gameLogoBlack.svg';
 import homeLogoWithe from '../../../assets/homeLogoWithe.svg';
 import homeLogoBlack from '../../../assets/homeLogoBlack.svg';
