@@ -24,14 +24,14 @@ class OauthCallbackView(views.APIView):
             user = serializer.data["user"]
             if user['two_fa_enabled'] == True:
                 token = signing.dumps({'user':user['id']}, settings.SECRET_KEY)
-                rsp = redirect(f'http://localhost:3000/auth/signin?otp_required=true')
+                rsp = redirect(settings.FRONT_BASE_URL + 'auth/signin?otp_required=true')
                 rsp.set_cookie('tmp_token', token, httponly=True, max_age=60)
                 return rsp
-            response = redirect("http://localhost:3000/users/home")
+            response = redirect(settings.FRONT_BASE_URL + "users/home")
             sing_in_response(response, serializer.data["token"])
             return response
         except serializers.ValidationError as e:
-            return redirect(f'http://localhost:3000/auth/signin?error={e.detail[0]}')
+            return redirect(settings.FRONT_BASE_URL + f'auth/signin?error={e.detail[0]}')
 
 
 @extend_schema(**OAUTH_AUTHORIZE_SCHEMA)
