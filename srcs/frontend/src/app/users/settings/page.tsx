@@ -22,7 +22,7 @@ const Settings: React.FC = () => {
     updateCurrentPage("settings");
     const fetchData = async () => {
       try {
-        const res = await axios.get("https://localhost/api/users/me/", { withCredentials: true });
+        const res = await axios.get("http://localhost:8000/api/users/me/", { withCredentials: true });
         updateUserData({
           id: res.data.id,
           otp_uri: res.data.otp_uri,

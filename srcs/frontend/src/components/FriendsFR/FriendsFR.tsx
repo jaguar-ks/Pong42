@@ -16,7 +16,7 @@ const FriendsFR = ({id}) => {
   const sendFriendRequest = async () => {
     try {
       const response = await axios.post(
-        `https://localhost/api/users/me/connections/`,
+        `http://localhost:8000/api/users/me/connections/`,
         {
             "recipient_id": id
         },
@@ -42,7 +42,7 @@ const FriendsFR = ({id}) => {
   const confirmCancelRequest = async () => {
     try {
       await axios.delete(
-        `https://localhost/api/users/me/connections/${searchedUserData.connection.id}/`,
+        `http://localhost:8000/api/users/me/connections/${searchedUserData.connection.id}/`,
         { withCredentials: true }
       );
       console.log("Friend request cancelled");
@@ -72,7 +72,7 @@ const FriendsFR = ({id}) => {
   const blockUser = async () => {
     try {
       const response = await axios.post(
-        `https://localhost/api/users/me/connections/block/`,
+        `http://localhost:8000/api/users/me/connections/block/`,
         {
           "recipient_id": id
         },

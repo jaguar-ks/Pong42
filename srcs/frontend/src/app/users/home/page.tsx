@@ -25,7 +25,7 @@ const Home = () => {
     const checkToken = async () => {
       try {
         // Use the test_auth endpoint to verify authentication
-        await axios.get("https://localhost/api/auth/test_auth/",{withCredentials: true})
+        await axios.get("http://localhost:8000/api/auth/test_auth/",{withCredentials: true})
       } catch (err) {
         console.log("Token validation error:", err);
         router.push("/auth/signin");

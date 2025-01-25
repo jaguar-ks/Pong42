@@ -41,7 +41,7 @@ const Friends = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get(`https://localhost/api/users/me/connections/`, {
+                const res = await axios.get(`http://localhost:8000/api/users/me/connections/`, {
                     withCredentials: true,
                 });
                 setRequests(res.data.results.filter((item: any) => item.status === "incoming_request"));
@@ -59,7 +59,7 @@ const Friends = () => {
     const handleBlock = async (id: number) => {
         try {
             const response = await axios.post(
-                `https://localhost/api/users/me/connections/block/`,
+                `http://localhost:8000/api/users/me/connections/block/`,
                 {
                     "recipient_id": id
                 },
@@ -106,7 +106,7 @@ const Friends = () => {
 
     const handleAcceptRequest = async (id: number) => {
         try {
-            const response = await axios.get(`https://localhost/api/users/me/connections/${id}/accept/`, {
+            const response = await axios.get(`http://localhost:8000/api/users/me/connections/${id}/accept/`, {
                 withCredentials: true,
             });
             const acceptedRequest = requests.find((item) => item.id === id);
@@ -132,7 +132,7 @@ const Friends = () => {
 
     const handleRejectRequest = async (id: number) => {
         try {
-            const resp = await axios.delete(`https://localhost/api/users/me/connections/${id}/`, {
+            const resp = await axios.delete(`http://localhost:8000/api/users/me/connections/${id}/`, {
                 withCredentials: true,
             });
             if (resp.status === 204) {
@@ -182,7 +182,7 @@ const Friends = () => {
         console.log("id : " + id);
         const idd = id + 1;
         try {
-            await axios.delete(`https://localhost/api/users/me/connections/${id}/`, {
+            await axios.delete(`http://localhost:8000/api/users/me/connections/${id}/`, {
                 withCredentials: true,
             });
             setBlocked(blocked.filter((item) => item.id !== id));
@@ -190,7 +190,7 @@ const Friends = () => {
             console.log("User unblocked successfully 1");
         } catch (errr) {
             try {
-                await axios.delete(`https://localhost/api/users/me/connections/${idd}/`, {
+                await axios.delete(`http://localhost:8000/api/users/me/connections/${idd}/`, {
                     withCredentials: true,
                 });
                 setBlocked(blocked.filter((item) => item.id !== idd - 1));

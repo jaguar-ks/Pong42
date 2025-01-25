@@ -7,7 +7,7 @@ export const fetchUserConnections = async (
   setFriends: React.Dispatch<React.SetStateAction<UserConnection[]>>
 ) => {
   try {
-    const res = await axios.get(`https://localhost/api/users/me/connections/`, {
+    const res = await axios.get(`http://localhost:8000/api/users/me/connections/`, {
       withCredentials: true,
     });
     setRequests(res.data.results.filter((item: UserConnection) => item.status === "incoming_request"));

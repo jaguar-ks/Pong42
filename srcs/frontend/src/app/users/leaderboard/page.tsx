@@ -36,7 +36,7 @@ const Leaderboard: React.FC = () => {
   const fetchLeaderboard = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get<LeaderboardResponse>(`https://localhost/api/users/leaderboard/?page=${currentPage}`, { withCredentials: true });
+      const response = await axios.get<LeaderboardResponse>(`http://localhost:8000/api/users/leaderboard/?page=${currentPage}`, { withCredentials: true });
       setLeaderboardData(response.data);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);

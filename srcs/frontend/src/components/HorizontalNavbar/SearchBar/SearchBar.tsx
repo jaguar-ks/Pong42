@@ -125,7 +125,7 @@ const SearchBar: React.FC = () => {
     const fetchSearchResults = async (page = 1) => {
         try {
             const response = await axios.get<SearchResponse>(
-                "https://localhost/api/users/search/",
+                "http://localhost:8000/api/users/search/",
                 {
                     params: { page, search: debouncedSearch },
                     withCredentials: true,

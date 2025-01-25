@@ -23,7 +23,7 @@ const OtpForLogin: React.FC<OtpForLoginProps> = ({ setErrors, username, password
     try {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
       await axios.post(
-        `https://localhost/api/auth/sign-in/`, 
+        `http://localhost:8000/api/auth/sign-in/`, 
         { username, password, otp_code: inputCode },
         { withCredentials: true }
       );

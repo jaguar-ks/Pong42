@@ -33,7 +33,7 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({ setCurrentPage }) => {
     e.preventDefault();
     try {
       const res = await axios.patch(
-        "https://localhost/api/users/me/",
+        "http://localhost:8000/api/users/me/",
         { username: newUsername },
         { withCredentials: true }
       );

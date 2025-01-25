@@ -53,14 +53,14 @@ export default function BoxedChatInterface() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(()=>{
-    axios.get('https://localhost/api/users/me/', { withCredentials: true })
+    axios.get('http://localhost:8000/api/users/me/', { withCredentials: true })
     .then((response)=>{
       setUser(response.data)
     })
   },[])
 
   useEffect(() => {
-    axios.get('https://localhost/api/users/me/connections/', { withCredentials: true })
+    axios.get('http://localhost:8000/api/users/me/connections/', { withCredentials: true })
       .then((response) => {
         const fetchedUsers: User[] = response.data.results
           .filter((userData: any) => userData.status === "friends")
@@ -109,7 +109,7 @@ export default function BoxedChatInterface() {
 
   const fetchMessages = useCallback((page: number) => {
     if (activeUser) {
-      axios.get(`https://localhost/api/users/me/connections/${activeUser.conv_id}/messages/`, { withCredentials: true })
+      axios.get(`http://localhost:8000/api/users/me/connections/${activeUser.conv_id}/messages/`, { withCredentials: true })
         .then((response) => {
           const logs = response.data;
           const fetchedMessages: Message[] = response.data.results.map((msgData: any) => ({
