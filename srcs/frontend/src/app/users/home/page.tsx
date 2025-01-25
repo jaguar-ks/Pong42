@@ -11,6 +11,7 @@ import Friends from "../../../components/Friends/Friends"
 import { Achievements } from "../../../components/Achievements/Achievements"
 import { useUserContext } from "@/context/UserContext"
 import axios from "axios"
+import { MatchHistory } from "@/components/MatchHistory/MatchHistory"
 
 
 
@@ -57,7 +58,7 @@ const Home = () => {
         <div className={`${classes.box} ${classes.box5}`}>
           <Achievements />
         </div>
-        <div className={`${classes.box} ${classes.box6}`}>{/* Content for box6 */}</div>
+        <div className={`${classes.box} ${classes.box6}`}><MatchHistory /></div>
       </div>
     </div>
   )
