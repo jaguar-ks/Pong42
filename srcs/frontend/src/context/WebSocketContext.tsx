@@ -38,7 +38,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   const [notification, setNotification] = useState(false)
   const [notifications, setNotifications] = useState<Notifications[]>([])
   useEffect(() => {
-      const wsUrl = `wss://localhost/ws/chat/`;
+      const wsUrl = `ws://localhost:8000/ws/chat/`;
       
       if (!ws.current)
         ws.current = new WebSocket(wsUrl);
