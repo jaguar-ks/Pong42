@@ -1,6 +1,4 @@
-#!/bin/sh
-
-set -e
+#! /bin/sh
 
 activate_secrets_engine() {
     service=$1
@@ -39,7 +37,8 @@ create_django_secrets() {
         GITHUB_OAUTH_CLIENT_SECRET="${GITHUB_OAUTH_CLIENT_SECRET}" \
         GITHUB_OAUTH_REDIRECT_URI="${GITHUB_OAUTH_REDIRECT_URI}" \
         DB_NAME="${DB_NAME}" \
-        POSTGRES_DB="${POSTGRES_DB}"
+        POSTGRES_DB="${POSTGRES_DB}" \
+        FRONT_BASE_URL="${FRONT_BASE_URL}"
 }
 
 create_approle() {
@@ -68,7 +67,7 @@ EOF
     fi
 }
 
-config_db (){
+config_db () {
     vault write database/config/${DB_NAME} \
         plugin_name=postgresql-database-plugin \
         allowed_roles="postgres-role" \
@@ -101,14 +100,3 @@ create_approle django
 create_django_secrets
 
 config_db
-
-# CREDS=$(vault read -format=json database/creds/postgres-role)
-# USERNAME=$(echo $CREDS | jq -r '.data.username')
-# PASSWORD=$(echo $CREDS | jq -r '.data.password')
-
-# cat << EOF > /vault/init/postgres-cred.json
-# {
-#     "username": "${USERNAME}",
-#     "password": "${PASSWORD}"
-# }
-# EOF

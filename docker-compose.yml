@@ -45,7 +45,7 @@ services:
             - ./srcs/api/.env
         environment:
             - PROD=false
-            # - PROD=true
+        #     - PROD=true
         # depends_on:
         #     vault:
         #         condition: service_healthy

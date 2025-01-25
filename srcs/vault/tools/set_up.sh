@@ -37,7 +37,8 @@ EOF
 vault_login() {
     if [ -e $VAULT_KEYS_FILE ]; then
         source $VAULT_KEYS_FILE
-        if vault status | grep -q "Sealed.*true"; then
+        SEALED=$(vault status | grep "Sealed" | awk '{print $2}')
+        if "$SEALED" == "false"; then
             vault operator unseal $UNSEAL_KEY_1
             vault operator unseal $UNSEAL_KEY_2
             vault operator unseal $UNSEAL_KEY_3

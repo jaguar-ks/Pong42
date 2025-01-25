@@ -17,6 +17,7 @@ import ProgressBarFr from '@/components/FriendPage/ProgressBar/ProgressBarFr'
 import FriendsFr from '@/components/FriendPage/Friends/FriendsFr'
 import { AchievementsFr } from '@/components/FriendPage/Achievements/AchievementsFr'
 import FriendActions from '@/components/FriendPage/FriendActions/FriendActions'
+import { MatchHistoryFr } from '@/components/MatchHistory/MatchHistory'
 // import loadMyData from '@/Components/LoadMyData'
 const FriendPage = ({ params }) => {
   const { id } = params;
@@ -25,6 +26,17 @@ const FriendPage = ({ params }) => {
   const router = useRouter();
   useEffect(() => {
     updateCurrentPage("Friend");
+    const checkToken = async () => {
+      try {
+        // Use the test_auth endpoint to verify authentication
+        await axios.get("http://localhost:8000/api/auth/test_auth/",{withCredentials: true})
+      } catch (err) {
+        console.log("Token validation error:", err);
+        router.push("/auth/signin");
+      } finally{
+      }
+    }
+    checkToken();
     const fetchData = async () => {
       try {
         const res = await axios.get(`http://localhost:8000/api/users/${id}/`);
@@ -59,7 +71,7 @@ const FriendPage = ({ params }) => {
         <div className={classes.line}><ProgressBarFr/></div>
         <div className={classes.box4}><FriendActions/></div>
         <div className={classes.box5}><AchievementsFr/></div>
-        <div className={classes.box6}>lin6</div>
+        <div className={classes.box6}>testttt</div>
       </div>
     </div>)
 }
