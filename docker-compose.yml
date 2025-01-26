@@ -45,7 +45,7 @@ services:
             - ./srcs/api/.env
         environment:
             - PROD=false
-            # - PROD=true
+        #     - PROD=true
         # depends_on:
         #     vault:
         #         condition: service_healthy
@@ -225,6 +225,7 @@ services:
             - "443:443"
         volumes:
             - ./srcs/nginx/logs/:/var/log/nginx/
+            - ./srcs/nginx/modlogs/:/var/log/modsecurity/
         networks:
             - transcendance_net
         depends_on:

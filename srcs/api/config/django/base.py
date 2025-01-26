@@ -89,6 +89,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:8000",
+    "https://127.0.0.1",
+    "https://localhost",
 ]
 
 ALLOWED_HOSTS = ['*']
@@ -138,5 +140,6 @@ AUTH_USER_MODEL = "users.User"
 
 WEBSITE_DOMAIN_NAME = env("DOMAIN_NAME")
 WEBSITE_NAME = env("WEBSITE_NAME")
+FRONT_BASE_URL = env("FRONT_BASE_URL", default="http://localhost:3000/")
 
 from config.settings import *
