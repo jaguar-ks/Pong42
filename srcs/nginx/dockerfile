@@ -3,6 +3,7 @@ FROM owasp/modsecurity-crs:nginx-alpine
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
 COPY ./modsecurity/modsecurity.conf /etc/modsecurity.d/modsecurity.conf
+COPY ./modsecurity/crs-setup.conf /opt/owasp-crs/crs-setup.conf
 COPY ./tools/generate_certs.sh /usr/local/bin/generate_certs.sh
 
 CMD [ "/bin/sh", "-c", "/usr/local/bin/generate_certs.sh"]
