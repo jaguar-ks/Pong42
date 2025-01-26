@@ -5,16 +5,33 @@ from django.utils.crypto import get_random_string
 from apps.users.models import Connection
 from asgiref.sync import sync_to_async
 from collections import defaultdict
-
+from dataclasses import dataclass, asdict
 
 class GameException(Exception):
     pass
 
 
+@dataclass
+class Participant:
+    id: int
+    username: int
+    avatar_url: int
+    rating: int
+
+    @classmethod
+    def from_user(cls, user):
+        return cls(
+            id=user.id,
+            username=user.username,
+            avatar_url=user.avatar_url,
+            rating=user.rating
+        )
+
+
 class GameRoom:
-    def __init__(self, name: str, participants: Set[int], is_invite_only: bool = False):
+    def __init__(self, name: str, participants: Dict[int, Participant], is_invite_only: bool = False):
         self.name = name
-        self.participants = set(participants)
+        self.participants = participants
         self.is_invite_only = is_invite_only
         self.game_task: asyncio.Task = None
         self.room_lock: asyncio.Lock = asyncio.Lock()
@@ -23,7 +40,7 @@ class GameRoom:
     def as_dict(self):
         return {
             "room_name": self.name,
-            "participants": list(self.participants),
+            "participants": [asdict(p) for _, p in self.participants.items()],
             "is_invite_only": self.is_invite_only,
             "status": "ready" if len(self.participants) == 2 else "waiting",
         }
@@ -34,9 +51,9 @@ class GameRoom:
                 if len(self.participants) >= 2:
                     raise GameException("this room already have 2 players")
                 blocked_ids = await sync_to_async(Connection.get_blocked_ids)(user)
-                if self.participants & blocked_ids:
+                if self.participants.keys() & blocked_ids:
                     raise GameException("this room contains a blocked user")
-            self.participants.add(user.id)
+            self.participants[user.id] = Participant.from_user(user)
 
 
 class RoomsManager:
@@ -77,8 +94,6 @@ class RoomsManager:
                     await room.game_task
                 except asyncio.CancelledError:
                     pass
-                if room.game:
-                    room.game = None
 
         async with cls.rooms_lock:
             del cls.rooms[room_name]

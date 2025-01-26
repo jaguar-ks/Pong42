@@ -11,7 +11,7 @@ class UserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {"fields": ("username", "email", "password")}),
         ("Personal info", {"fields": ("first_name", "last_name", "avatar_url")}),
-        ("Game Stats", {"fields": ("wins", "loses", "rating", "rank")}),
+        ("Game Stats", {"fields": ("wins", "loses", "rating")}),
         ("Permissions", {"fields": ("is_admin", "is_active", "is_email_verified")}),
         (
             "Two Factor Authentication",

@@ -3,11 +3,14 @@ import json, asyncio
 from asgiref.sync import sync_to_async
 from apps.users.models import Connection
 from apps.pongue import pong
-
-from apps.pongue.managers import GameRoom, RoomsManager, GameException
-
 from typing import Tuple
 
+from .elo import save_game
+from apps.pongue.managers import GameRoom, RoomsManager, GameException, Participant
+
+
+NUMBER_OF_ROUNDS = 2
+FRAMES = 1 / 60
 
 class GameConsumer(AsyncJsonWebsocketConsumer):
     manager = RoomsManager
@@ -17,7 +20,9 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         room = await self.manager.get_room(room_name=room_name)
         if not room:
             room = await self.manager.create_new_room(
-                room_name=room_name, participants={self.user.id}, is_invite_only=True
+                room_name=room_name,
+                participants={self.user.id: Participant.from_user(self.user)},
+                is_invite_only=True,
             )
             return room, False
         await room.add_participant(self.user)
@@ -30,11 +35,13 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             if (
                 not room.is_invite_only
                 and len(room.participants) < 2
-                and not blocked_ids & room.participants
+                and not blocked_ids & room.participants.keys()
             ):
                 await room.add_participant(self.user, safe=True)
                 return room, True
-        room = await self.manager.create_new_room(participants={self.user.id})
+        room = await self.manager.create_new_room(
+            participants={self.user.id: Participant.from_user(self.user)}
+        )
         return room, False
 
     async def __mark_user(self):
@@ -46,7 +53,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             self.manager.participants[self.user.id] -= 1
             if not self.manager.participants[self.user.id]:
                 del self.manager.participants[self.user.id]
-                
+
     async def __clear_resources(self):
         await self.__unmark_user()
         if hasattr(self, "room_name"):
@@ -70,7 +77,6 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                 room, ready = await self.__handle_public_matchmaking()
 
             self.room_name = room.name
-            print(f'room found: {self.room_name}')
             await self.channel_layer.group_add(self.room_name, self.channel_name)
 
             if not ready:
@@ -86,7 +92,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             raise e
 
     def start_game(self, room: GameRoom):
-        participants = list(room.participants)
+        participants = list(room.participants.values())
         room.game = pong.Game(
             participants[0],
             participants[1],
@@ -103,10 +109,13 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             },
         )
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(2)
 
         try:
-            while room.game.player1.score < 5 and room.game.player2.score < 5:
+            while (
+                room.game.player1.score < NUMBER_OF_ROUNDS and
+                room.game.player2.score < NUMBER_OF_ROUNDS
+            ):
                 async with room.room_lock:
                     info = room.game.loop()
 
@@ -120,7 +129,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                     },
                 )
 
-                await asyncio.sleep(1 / 60)
+                await asyncio.sleep(FRAMES)
 
             winner = (
                 room.game.player1
@@ -136,12 +145,13 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                     ),
                 },
             )
+            await save_game(room.game)
         except asyncio.CancelledError:
             pass
 
     async def disconnect(self, code):
         await self.__clear_resources()
-        if hasattr(self, 'room_name'):
+        if hasattr(self, "room_name"):
             await self.channel_layer.group_send(
                 self.room_name,
                 {
@@ -162,11 +172,9 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             assert direction in ["left", "right"]
 
             room = await self.manager.get_room(self.room_name)
-            
+
             async with room.room_lock:
-                info = room.game.move_paddle(
-                    self.user.id, right=(direction == 'right')
-                )
+                info = room.game.move_paddle(self.user.id, right=(direction == "right"))
             await self.channel_layer.group_send(
                 self.room_name,
                 await self.channel_layer.group_send(
@@ -177,25 +185,25 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                             {"type": "game.update", "data": info.to_json()}
                         ),
                     },
-                )
+                ),
             )
         except Exception as e:
             await self.send_json({"error": f"invalid data: {json.dumps(content)}"})
 
     async def game_start(self, event):
-
         # TODO: remove 3 lines bellow
-        data = json.loads(event['message'])
-        data['data']['my_id'] = self.user.id
-        data['data']['opp_id'] = data['data']['participants'][0] if self.user.id != data['data']['participants'][0] else data['data']['participants'][1]
-        self.opp_id = data['data']['opp_id']
+        data = json.loads(event["message"])
+        data["data"]["my_id"] = self.user.id
+        data["data"]["opp_id"] = (
+            data["data"]["participants"][0]["id"]
+            if self.user.id != data["data"]["participants"][0]["id"]
+            else data["data"]["participants"][1]["id"]
+        )
+        self.opp_id = data["data"]["opp_id"]
         await self.send_json(data)
 
     async def game_update(self, event):
-        message = json.loads(event["message"])
-        message["data"]["me"] = message["data"][str(self.user.id)]
-        message["data"]["opp"] = message["data"][str(self.opp_id)]
-        await self.send_json(message)
+        await self.send(event["message"])
 
     async def game_over(self, event):
         await self.send(event["message"])
@@ -206,4 +214,3 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         await self.send(event["message"])
         await self.__clear_resources()
         await self.close()
-

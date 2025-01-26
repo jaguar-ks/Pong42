@@ -154,23 +154,32 @@
             };
 
             socket.onmessage = (event) => {
-                data = JSON.parse(event.data);
-                if ('players' in data && 'my_id' in data) {
-                    my_id = data.my_id;
-                    opp_id = data.opp_id;
-                    logMessage(`Message received: ${event.data}`);
+                const data = JSON.parse(event.data);
+                logMessage(`Message received: ${event.data}`);
+
+                if (data.type === 'game.start') {
+                    my_id = data.data.my_id;
+                    opp_id = data.data.opp_id;
+                    logMessage(`Game started! My ID: ${my_id}, Opponent ID: ${opp_id}`);
                 }
-                opp_paddle.score = data[opp_id].score;
-                opp_paddle.x = data[opp_id].x;
-                opp_paddle.y = data[opp_id].y;
-                my_paddle.x = data[my_id].x;
-                my_paddle.y = data[my_id].y;
-                my_paddle.score = data[my_id].score;
-                ball.x = data.ball.x;
-                ball.y = data.ball.y;
+
+                if (data.type === 'game.update') {
+                    my_paddle.x = data.data[my_id].x;
+                    my_paddle.y = data.data[my_id].y;
+                    my_paddle.score = data.data[my_id].score;
+
+                    opp_paddle.x = data.data[opp_id].x;
+                    opp_paddle.y = data.data[opp_id].y;
+                    opp_paddle.score = data.data[opp_id].score;
+
+                    ball.x = data.data.ball.x;
+                    ball.y = data.data.ball.y;
+                }
+
                 render();
                 console.log(data);
             };
+
 
             socket.onerror = (error) => {
                 logMessage(`Error occurred: ${error}`, "error");

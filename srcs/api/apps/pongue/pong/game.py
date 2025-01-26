@@ -3,6 +3,8 @@ from .ball import Ball
 from .player import Player
 import math
 
+from apps.pongue.managers import Participant
+
 class GameInfo:
     def __init__(self, player1, player2, ball):
         self.player1 = player1
@@ -12,13 +14,11 @@ class GameInfo:
     def to_json(self):
         return {
             f'{self.player1.player_id}': {
-                # 'id': self.player1.player_id,
                 'score': self.player1.score,
                 'x': self.player1.x,
                 'y': self.player1.y
             },
             f'{self.player2.player_id}': {
-                # 'id': self.player2.player_id,
                 'score': self.player2.score,
                 'x': self.player2.x,
                 'y': self.player2.y
@@ -33,16 +33,18 @@ class Game:
     WIDTH = 600
     HEIGHT = 800
 
-    def __init__(self, player1_id: int, player2_id: int):
+    def __init__(self, p1: Participant, p2: Participant):
         self.player1 = Player(
             (self.WIDTH // 2) - (Paddle.WIDTH // 2),
             self.HEIGHT - Paddle.HEIGHT,
-            player1_id
+            p1.id,
+            p1.rating
         )
         self.player2 = Player(
             (self.WIDTH // 2) - (Paddle.WIDTH // 2),
             0,
-            player2_id
+            p2.id,
+            p2.rating
         )
         self.ball = Ball(self.WIDTH // 2, self.HEIGHT // 2)
     
