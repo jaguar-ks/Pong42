@@ -1,217 +1,209 @@
-from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.db import database_sync_to_async
-import json, asyncio, redis
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
+import json, asyncio
 from asgiref.sync import sync_to_async
-from django.utils.crypto import get_random_string
-from apps.users.serializers import UserSerializer
+from apps.users.models import Connection
 from apps.pongue import pong
-from apps.pongue.models import GameMatch
-from apps.users.models import User
 
-r = redis.Redis(host='redis', port=6379, db=0)
+from apps.pongue.managers import GameRoom, RoomsManager, GameException
 
-ply = []
+from typing import Tuple
 
-class GameConsumer(AsyncWebsocketConsumer):
 
-    REDIS_SESSION_KEY = "game_matchmaking"
+class GameConsumer(AsyncJsonWebsocketConsumer):
+    manager = RoomsManager
 
-    async def destroy_game_session(self):
-        await sync_to_async(r.delete)(GameConsumer.REDIS_SESSION_KEY)
+    async def __handle_private_room(self, room_name: str) -> Tuple[GameRoom, bool]:
+        """Handle joining/creating private rooms"""
+        room = await self.manager.get_room(room_name=room_name)
+        if not room:
+            room = await self.manager.create_new_room(
+                room_name=room_name, participants={self.user.id}, is_invite_only=True
+            )
+            return room, False
+        await room.add_participant(self.user)
+        return room, True
 
-    async def get_or_create_game(self):
-        game = await sync_to_async(r.hgetall)(GameConsumer.REDIS_SESSION_KEY)
-        game = {k.decode(): v.decode() for k, v in game.items()} if game else {}
+    async def __handle_public_matchmaking(self) -> Tuple[GameRoom, bool]:
+        """Handle public matchmaking logic"""
+        blocked_ids = await sync_to_async(Connection.get_blocked_ids)(self.user)
+        for room in self.manager.rooms.values():
+            if (
+                not room.is_invite_only
+                and len(room.participants) < 2
+                and not blocked_ids & room.participants
+            ):
+                await room.add_participant(self.user, safe=True)
+                return room, True
+        room = await self.manager.create_new_room(participants={self.user.id})
+        return room, False
 
-        if not game:
-            room_name = get_random_string(10)
-            game = {
-                'room_name': room_name,
-                'current_player': json.dumps(UserSerializer(self.user).data),
-            }
-            await sync_to_async(r.hset)(self.REDIS_SESSION_KEY, mapping=game)
-            return [game, True]
-        # elif game:
-        #     player = json.loads(game['current_player'])
-        #     if player['id'] == self.user.id:
-        #         return [game, True]
+    async def __mark_user(self):
+        async with self.manager.participants_lock:
+            self.manager.participants[self.user.id] += 1
 
-        await self.destroy_game_session()
-        
-        # Add new player to the game
-        game['players'] = [
-            json.loads(game['current_player']),
-            UserSerializer(self.user).data
-        ]
-        del game['current_player']
-        return [game, False]
-
+    async def __unmark_user(self):
+        async with self.manager.participants_lock:
+            self.manager.participants[self.user.id] -= 1
+            if not self.manager.participants[self.user.id]:
+                del self.manager.participants[self.user.id]
+                
+    async def __clear_resources(self):
+        await self.__unmark_user()
+        if hasattr(self, "room_name"):
+            await self.channel_layer.group_discard(self.room_name, self.channel_name)
+            await self.manager.destroy_room(self.room_name)
 
     async def connect(self):
-        print(ply, flush=True)
         self.user = self.scope["user"]
-        if self.user.id in ply:
-            await self.close()
-            return
-        ply.append(self.user.id)
-        game, created = await self.get_or_create_game()
-
-        self.room_name = game.pop('room_name')
-        self.is_waiting = created  # Track if player is waiting for opponent
-        await self.channel_layer.group_add(self.room_name, self.channel_name)
-
         await self.accept()
 
-        if not created:
-            await self.channel_layer.group_send(
-                self.room_name,
-                {
-                    "type": 'game.found',
-                    'message': json.dumps(game)
-                }
-            )
-            self.pong_game = pong.Game(game['players'][0]['id'], game['players'][1]['id'])
-            self.background_task = asyncio.create_task(self.game_loop())
+        room_name = self.scope["url_route"]["kwargs"].get("room_name", None)
 
-
-    async def game_found(self, event):
-        data = json.loads(event['message'])
-        data['my_id'] = self.user.id
-        data['opp_id'] = data['players'][1]['id'] if data['players'][0]['id'] == self.user.id else data['players'][0]['id']
-        await self.send(text_data=json.dumps(data))
-
-
-    async def game_loop(self):
-        await asyncio.sleep(5)
         try:
-            while self.pong_game.player1.score < 3 and self.pong_game.player2.score < 3:
-                info = self.pong_game.loop()
+            await self.__mark_user()
+            if self.manager.participants[self.user.id] > 1:
+                raise GameException("you already have another active game session")
+
+            if room_name:
+                room, ready = await self.__handle_private_room(room_name=room_name)
+            else:
+                room, ready = await self.__handle_public_matchmaking()
+
+            self.room_name = room.name
+            print(f'room found: {self.room_name}')
+            await self.channel_layer.group_add(self.room_name, self.channel_name)
+
+            if not ready:
+                await self.send_json({"type": "room.waiting", "data": room.as_dict()})
+                return
+            self.start_game(room)
+
+        except GameException as e:
+            await self.send_json({"error": str(e)}, close=True)
+
+        except Exception as e:  # DEBUG:
+            await self.send_json({"warning": str(e)}, close=True)
+            raise e
+
+    def start_game(self, room: GameRoom):
+        participants = list(room.participants)
+        room.game = pong.Game(
+            participants[0],
+            participants[1],
+        )
+        room.game_task = asyncio.create_task(self.game_loop(room))
+
+    async def game_loop(self, room: GameRoom):
+
+        await self.channel_layer.group_send(
+            room.name,
+            {
+                "type": "game.start",
+                "message": json.dumps({"type": "game.start", "data": room.as_dict()}),
+            },
+        )
+
+        await asyncio.sleep(5)
+
+        try:
+            while room.game.player1.score < 5 and room.game.player2.score < 5:
+                async with room.room_lock:
+                    info = room.game.loop()
+
                 await self.channel_layer.group_send(
                     self.room_name,
                     {
-                        "type": "game_state",
-                        "message": json.dumps(info.to_json())
-                    }
+                        "type": "game.update",
+                        "message": json.dumps(
+                            {"type": "game.update", "data": info.to_json()}
+                        ),
+                    },
                 )
+
                 await asyncio.sleep(1 / 60)
-            winner = self.pong_game.player1 if self.pong_game.player1.score > self.pong_game.player2.score else self.pong_game.player2
+
+            winner = (
+                room.game.player1
+                if room.game.player1.score > room.game.player2.score
+                else room.game.player2
+            )
             await self.channel_layer.group_send(
                 self.room_name,
                 {
-                    "type": "game_over",
-                    "message": json.dumps({
-                        "event": "game_over",
-                        "winner": winner.player_id
-                    })
-                }
+                    "type": "game.over",
+                    "message": json.dumps(
+                        {"event": "game.over", "data": {"winner": winner.player_id}}
+                    ),
+                },
             )
         except asyncio.CancelledError:
-            await self.send(text_data=json.dumps({
-                "error": "Game loop cancelled"
-            }))
+            pass
 
-    async def game_over(self, event):
-        print("game over", flush=True)
-        await self.send(text_data=event['message'])
-        await self.save_game_state()
-        await self.close()
-
-    async def game_state(self, event):
-        await self.send(text_data=event['message'])
-
-
-    async def receive(self, text_data=None, bytes_data=None):
-        try:
-            data = json.loads(text_data)
-            if 'action' not in data.keys() or 'player_id' not in data.keys() or 'direction' not in data.keys():
-                raise json.JSONDecodeError
-            action = data.get('action')
-            player = data.get('player_id')
-            dirc = data.get('direction')
-            if dirc not in ['left', 'right']:
-                raise json.JSONDecodeError
-            if action == 'move':
-                await self.channel_layer.group_send(
-                    self.room_name,
-                    {
-                        "type": "move_paddle",
-                        "message": json.dumps({
-                            "action": action,
-                            "player_id": player,
-                            "direction": dirc
-                        })
-                    }
-                )
-        except json.JSONDecodeError:
-            await self.send(text_data=json.dumps({
-                "error": "Invalid data format"
-            }))
-
-
-    async def move_paddle(self, event):
-        if hasattr(self, 'pong_game'):
-            data = json.loads(event['message'])
-            player_id = data.get('player_id')
-            info = self.pong_game.move_paddle(player_id, right=(data.get('direction') == 'right'))
+    async def disconnect(self, code):
+        await self.__clear_resources()
+        if hasattr(self, 'room_name'):
             await self.channel_layer.group_send(
                 self.room_name,
                 {
-                    "type": "game_state",
-                    "message": json.dumps(info.to_json())
-                }
+                    "type": "opponent.disconnected",
+                    "message": json.dumps(
+                        {
+                            "type": "opponent.disconnected",
+                        }
+                    ),
+                },
             )
 
-
-    async def disconnect(self, close_code):
+    async def receive_json(self, content, **kwargs):
         try:
-            if self.user.id in ply:
-                ply.remove(self.user.id)
-            # If player was waiting and hadn't found a game, remove their session
-            if getattr(self, 'is_waiting', False):
-                await self.destroy_game_session()
-            else:
-                # Announce disconnect to other player if game was in progress
+            action = content.get("action")
+            direction = content.get("direction")
+            assert action == "move"
+            assert direction in ["left", "right"]
+
+            room = await self.manager.get_room(self.room_name)
+            
+            async with room.room_lock:
+                info = room.game.move_paddle(
+                    self.user.id, right=(direction == 'right')
+                )
+            await self.channel_layer.group_send(
+                self.room_name,
                 await self.channel_layer.group_send(
                     self.room_name,
                     {
-                        "type": "player.disconnected",
-                        "message": json.dumps({
-                            "event": "player_disconnected",
-                            "player": UserSerializer(self.user).data
-                        })
-                    }
+                        "type": "game.update",
+                        "message": json.dumps(
+                            {"type": "game.update", "data": info.to_json()}
+                        ),
+                    },
                 )
-
-            if hasattr(self, 'room_name'):
-                await self.channel_layer.group_discard(self.room_name, self.channel_name)
-            if hasattr(self, 'background_task'):
-                self.background_task.cancel()
-                # await self.save_game_state()
-                self.close()
-        except Exception as e:
-            # Log the error appropriately
-            print(f"Error in disconnect: {str(e)}")
-
-
-    async def player_disconnected(self, event):
-        """Handle player disconnect notification"""
-        await self.send(text_data=event['message'])
-
-    @database_sync_to_async
-    def save_game_state(self):
-        if hasattr(self, 'pong_game'):
-            winner = self.pong_game.player1 if self.pong_game.player1.score > self.pong_game.player2.score else self.pong_game.player2
-    
-            match = GameMatch.objects.create(
-                player1=User.objects.get(id=self.pong_game.player1.player_id),
-                player2=User.objects.get(id=self.pong_game.player2.player_id),
-                player1score=self.pong_game.player1.score,
-                player2score=self.pong_game.player2.score
             )
-            match.player1.wins += 1 if winner.player_id == match.player1.id else 0
-            match.player2.wins += 1 if winner.player_id == match.player2.id else 0
-            match.player1.loses += 1 if winner.player_id == match.player2.id else 0
-            match.player2.loses += 1 if winner.player_id == match.player1.id else 0
-            match.player1.save()
-            match.player2.save()
-            match.save()
+        except Exception as e:
+            await self.send_json({"error": f"invalid data: {json.dumps(content)}"})
+
+    async def game_start(self, event):
+
+        # TODO: remove 3 lines bellow
+        data = json.loads(event['message'])
+        data['data']['my_id'] = self.user.id
+        data['data']['opp_id'] = data['data']['participants'][0] if self.user.id != data['data']['participants'][0] else data['data']['participants'][1]
+        self.opp_id = data['data']['opp_id']
+        await self.send_json(data)
+
+    async def game_update(self, event):
+        message = json.loads(event["message"])
+        message["data"]["me"] = message["data"][str(self.user.id)]
+        message["data"]["opp"] = message["data"][str(self.opp_id)]
+        await self.send_json(message)
+
+    async def game_over(self, event):
+        await self.send(event["message"])
+        await self.__clear_resources()
+        await self.close()
+
+    async def opponent_disconnected(self, event):
+        await self.send(event["message"])
+        await self.__clear_resources()
+        await self.close()
+

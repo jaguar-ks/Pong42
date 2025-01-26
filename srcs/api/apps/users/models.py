@@ -181,6 +181,18 @@ class Connection(models.Model):
             "recipient"
         )
 
+    @classmethod
+    def get_blocked_ids(cls, user):
+        users = cls.objects.filter(
+            (Q(initiator=user) | Q(recipient=user)) & Q(status=cls.BLOCKED)
+        ).values_list('initiator_id', 'recipient_id')
+        ans = set()
+        for i, j in users:
+            ans.add(i)
+            ans.add(j)
+        ans.discard(user.id)
+        return ans
+
     def get_other_user(self, user):
         """
         Get the other user in the connection.
