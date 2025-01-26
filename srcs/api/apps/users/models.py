@@ -6,6 +6,8 @@ from django.db.models import Q
 from django.utils import timezone
 
 
+DEFAULT_ELO_RATING = 1000.0
+
 class UserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **kwargs):
 
@@ -45,8 +47,7 @@ class User(AbstractBaseUser):
     avatar_url = models.URLField(max_length=200, null=True, blank=True)
     wins = models.PositiveSmallIntegerField(default=0)
     loses = models.PositiveSmallIntegerField(default=0)
-    rating = models.PositiveIntegerField(default=0)
-    rank = models.PositiveIntegerField(default=500)
+    rating = models.FloatField(default=DEFAULT_ELO_RATING)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_email_verified = models.BooleanField(default=False)
