@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.users.serializers import UserSerializer
-from .models import GameMatch
+from .models import GameMatch, RatingHistory
 
 
 class GameMatchSerializer(serializers.ModelSerializer):
@@ -11,5 +11,10 @@ class GameMatchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GameMatch
-        fields = '__all__'
-    
+        fields = "__all__"
+
+
+class RatingHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RatingHistory
+        fields = ["date", "rating"]

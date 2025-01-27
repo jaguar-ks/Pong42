@@ -3,8 +3,9 @@ from asgiref.sync import sync_to_async
 import math
 
 from apps.users.models import User
-from apps.pongue.models import GameMatch
+from apps.pongue.models import GameMatch, RatingHistory
 from apps.pongue import pong
+
 
 @sync_to_async
 def save_game(game: pong.Game):
@@ -19,7 +20,7 @@ def save_game(game: pong.Game):
     expected_winner = 1 / (1 + math.pow(10, exponent))
     expected_loser = 1 - expected_winner
 
-    k_factor = 32 
+    k_factor = 32
     winner_elo = round(winner.rating + k_factor * (1 - expected_winner), 2)
     loser_elo = round(loser.rating + k_factor * (0 - expected_loser), 2)
 
@@ -27,12 +28,14 @@ def save_game(game: pong.Game):
         player1_id=game.player1.player_id,
         player1score=game.player1.score,
         player2_id=game.player2.player_id,
-        player2score=game.player2.score
+        player2score=game.player2.score,
     )
 
     User.objects.filter(id__in=[winner.player_id, loser.player_id]).update(
         rating=Case(
-            When(id=winner.player_id, then=Value(winner_elo, output_field=FloatField())),
+            When(
+                id=winner.player_id, then=Value(winner_elo, output_field=FloatField())
+            ),
             When(id=loser.player_id, then=Value(loser_elo, output_field=FloatField())),
             default=F("rating"),
         ),
@@ -48,3 +51,9 @@ def save_game(game: pong.Game):
         ),
     )
 
+    RatingHistory.objects.bulk_create(
+        [
+            RatingHistory(user_id=winner.player_id, rating=winner_elo),
+            RatingHistory(user_id=loser.player_id, rating=loser_elo),
+        ]
+    )

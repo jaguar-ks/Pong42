@@ -34,7 +34,6 @@ while len(users) < num_of_fake_users:
             last_name=f.last_name(),
             is_email_verified=True,
             is_active=True,
-            avatar_url=f.image_url(width=300, height=300),
         )
     )
 

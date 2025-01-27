@@ -4,9 +4,11 @@ import pyotp
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.utils import timezone
+from config.envm import env
 
 
-DEFAULT_ELO_RATING = 1000.0
+DEFAULT_ELO_RATING = 500.0
+
 
 class UserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **kwargs):
@@ -34,6 +36,7 @@ class UserManager(BaseUserManager):
             username=username, email=email, password=password, **kwargs
         )
 
+
 class User(AbstractBaseUser):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(max_length=150, unique=True)
@@ -42,7 +45,9 @@ class User(AbstractBaseUser):
     otp_secret = models.CharField(max_length=32, default=pyotp.random_base32)
     two_fa_enabled = models.BooleanField(default=False)
     is_online = models.BooleanField(default=False)
-    avatar_url = models.URLField(max_length=200, null=True, blank=True)
+    avatar_url = models.URLField(
+        max_length=200, default=env("DEFAULT_PROFILE_IMAGE_URL"), null=True, blank=True
+    )
     wins = models.PositiveSmallIntegerField(default=0)
     loses = models.PositiveSmallIntegerField(default=0)
     rating = models.FloatField(default=DEFAULT_ELO_RATING)
@@ -80,6 +85,7 @@ class User(AbstractBaseUser):
 
     def get_all_permissions(self):
         return []
+
 
 class Connection(models.Model):
     PENDING = "pending"
@@ -184,7 +190,7 @@ class Connection(models.Model):
     def get_blocked_ids(cls, user):
         users = cls.objects.filter(
             (Q(initiator=user) | Q(recipient=user)) & Q(status=cls.BLOCKED)
-        ).values_list('initiator_id', 'recipient_id')
+        ).values_list("initiator_id", "recipient_id")
         ans = set()
         for i, j in users:
             ans.add(i)
@@ -198,15 +204,20 @@ class Connection(models.Model):
         """
         return self.recipient if self.initiator == user else self.initiator
 
+
 class Message(models.Model):
-    connection = models.ForeignKey(Connection, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    connection = models.ForeignKey(
+        Connection, on_delete=models.CASCADE, related_name="messages"
+    )
+    sender = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="sent_messages"
+    )
     content = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
     is_read = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['timestamp']
+        ordering = ["timestamp"]
 
     def __str__(self):
         return f"{self.sender.username} to {self.connection.get_other_user(self.sender).username}: {self.content[:50]}"
@@ -214,30 +225,29 @@ class Message(models.Model):
     @classmethod
     def get_conversation(cls, connection):
         """Get all messages for a specific connection"""
-        return cls.objects.filter(connection=connection).order_by('timestamp')
+        return cls.objects.filter(connection=connection).order_by("timestamp")
+
 
 class Notification(models.Model):
-    
+
     NOTIFICATION_TYPES = {
-        'connections': 'Connections',
-        'messages': 'Messages',
-        'game': 'Game',
+        "connections": "Connections",
+        "messages": "Messages",
+        "game": "Game",
     }
 
     user = models.ForeignKey(
-            User,
-            on_delete=models.CASCADE,
-            related_name="notifications"
-        )
-    
+        User, on_delete=models.CASCADE, related_name="notifications"
+    )
+
     notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
-    
+
     def __str__(self) -> str:
-        return f'{self.user} - {self.notification_type}'
-    
+        return f"{self.user} - {self.notification_type}"
+
     @classmethod
     def get_notif(cls, user):
-        return cls.objects.filter(user=user).order_by('-created_at')
+        return cls.objects.filter(user=user).order_by("-created_at")
