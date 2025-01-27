@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import GameMatch
+from .models import GameMatch, RatingHistory
 
 
 @admin.register(GameMatch)
@@ -9,6 +9,8 @@ class GameMatchAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     ordering = ('-created_at',)
     search_fields = ('player1__username', 'player2__username')
-    
-    pass
 
+
+@admin.register(RatingHistory)
+class UserRatingOverTimeAdmin(admin.ModelAdmin):
+    pass
