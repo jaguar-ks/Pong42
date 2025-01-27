@@ -104,7 +104,7 @@ const HorizontalNavbar = () => {
                                 width={40}
                                 height={40}
                                 className={styles.profileImage}
-                                src={userData.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"}
+                                src={userData.avatar_url || playerExample}
                                 alt="Player Avatar"
                             />
                         </button>

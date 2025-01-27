@@ -184,7 +184,7 @@ export default function BoxedChatInterface() {
           ))}
         </ScrollArea>
       </div>
-      <div className="flex-1 flex flex-col">
+      <div className="h-full flex-1 flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-4">
             <Avatar>
@@ -201,7 +201,7 @@ export default function BoxedChatInterface() {
           {messages.map((msg, i, msgs) => {
             const newDay = i > 0 && msg.timestamp.split('T')[0] > msgs[i - 1].timestamp.split('T')[0];
             return (
-              <React.Fragment key={msg.id}>
+              <>
                 {newDay && (
                     <p className="flex-1 text-center text-gray-500 dark:text-gray-400 text-sm mb-3">
                       {msg.timestamp.split('T')[0]}
@@ -209,12 +209,12 @@ export default function BoxedChatInterface() {
                   )
                 }
                 <div key={msg.id} className={`flex ${msg.user == user?.id ? 'justify-end' : 'justify-start'} mb-3`}>
-                  <div className={`max-w-[70%] ${msg.user == user?.id ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-4`}>
+                  <div className={`max-w-[50vw] ${msg.user == user?.id ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-4`}>
                     <p className="break-words whitespace-pre-wrap">{msg.content}</p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{printTime(msg.timestamp)}</p>
                   </div>
                 </div>
-              </React.Fragment>
+              </>
             );
             })
           }

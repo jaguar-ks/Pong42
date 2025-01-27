@@ -42,6 +42,18 @@ export const Achievements = () => {
       isUnlocked: userData.wins >= 1
     },
     {
+      title: 'Friendly Player',
+      desc: 'Add your first friend',
+      imgUrl: achieImage,
+      isUnlocked: userData.friendsCount >= 1
+    },
+    {
+      title: 'Social Butterfly',
+      desc: 'Chat with another player',
+      imgUrl: achieImage,
+      isUnlocked: userData.chatsCount >= 1
+    },
+    {
       title: 'Participation Badge',
       desc: 'Play 10 games in total',
       imgUrl: achieImage,
@@ -73,6 +85,26 @@ export const Achievements = () => {
       imgUrl: achieImage,
       isUnlocked: userData.rating >= 1500
     },
+    {
+      title: 'Marathoner',
+      desc: 'Play for 10 hours in total',
+      imgUrl: achieImage,
+      isUnlocked: userData.playTime >= 10 * 60 * 60 // Assuming playtime is tracked in seconds
+    },
+    {
+      title: 'Strategist',
+      desc: 'Win 5 games with less than 1 minute on the clock',
+      imgUrl: achieImage,
+      isUnlocked: userData.lastMinuteWins >= 5 // Requires additional tracking
+    },
+    {
+      title: 'Community Builder',
+      desc: 'Invite 5 friends to the platform',
+      imgUrl: achieImage,
+      isUnlocked: userData.invitesSent >= 5
+    },
+  
+    // Hard Achievements
     {
       title: 'Master',
       desc: 'Win 1000 games',

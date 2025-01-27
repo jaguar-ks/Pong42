@@ -12,8 +12,6 @@ class UserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **kwargs):
 
         kwargs.setdefault("is_active", True)
-
-        # test :: change it to False
         kwargs.setdefault("is_email_verified", False)
         kwargs.setdefault("is_admin", False)
 

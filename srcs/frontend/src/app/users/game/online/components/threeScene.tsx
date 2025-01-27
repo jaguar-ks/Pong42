@@ -1,18 +1,19 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { Sphere } from '@react-three/drei'
 import { OrbitControls } from '@react-three/drei'
-import Plane from './plane'
-import SuperBall from './superBall'
-import Paddle from './paddle'
+import Plane from '../components/plane'
+import Paddle from '../components/paddle'
 
 const planeH = 15
 const planeW = 10
 
-export default function ThreeScene({ onScoreUpdate, player1, player2, setPage}) {
+export default function ThreeScene({ onScoreUpdate, player1, player2}) {
   const [paddle1Pos, setPaddle1Pos] = useState([0, 0, (planeH / 2) - 0.1])
   const [paddle2Pos, setPaddle2Pos] = useState([0, 0, -(planeH / 2) + 0.1])
+  const ballRef = useRef()
 
   useEffect(() => {
     let paddle1Direction = 0
@@ -74,17 +75,18 @@ export default function ThreeScene({ onScoreUpdate, player1, player2, setPage}) 
 
   return (
     <div className="h-full aspect-[1/0.5]">
-      <Canvas camera={{ position: [0, 10, 2], fov: 60 }}>
+      <Canvas camera={{ position: [0, 10, 20], fov: 60 }}>
         <OrbitControls />
         <ambientLight intensity={0.4} />
         <Plane />
-        <SuperBall player1={player1} player2={player2}
-          paddlePositions={[
-            { x: paddle1Pos[0], y: paddle1Pos[1], z: paddle1Pos[2] },
-            { x: paddle2Pos[0], y: paddle2Pos[1], z: paddle2Pos[2] }
-          ]} setPage={setPage}
-          onScoreUpdate={onScoreUpdate}
-        />
+        <Sphere ref={ballRef} args={[0.2, 32, 32]} position={[0, 0.2, 0]}>
+          <meshPhysicalMaterial
+            color="white"
+            roughness={0.1}
+            clearcoat={1}
+            clearcoatRoughness={0.1}
+          />
+        </Sphere>
         <Paddle position={paddle1Pos as [number, number, number]} />
         <Paddle position={paddle2Pos as [number, number, number]} />
       </Canvas>
