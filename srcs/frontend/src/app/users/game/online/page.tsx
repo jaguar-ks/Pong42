@@ -7,25 +7,19 @@ import { UserContext } from "@/context/UserContext"
 import { useGameSocket } from "@/context/GameSocketContext"
 import GameComponent from "./gameComponent"
 
-interface Player {
-  id: number;
-  username: string;
-  avatar_url: string;
-}
-
 const players = [
-  { id: 1, username: "Alex", avatar_url: "/placeholder.svg?height=100&width=100" },
-  { id: 2, username: "Sam", avatar_url: "/placeholder.svg?height=100&width=100" },
-  { id: 3, username: "Jamie", avatar_url: "/placeholder.svg?height=100&width=100" },
-  { id: 4, username: "Taylor", avatar_url: "/placeholder.svg?height=100&width=100" },
-  { id: 5, username: "Jordan", avatar_url: "/placeholder.svg?height=100&width=100" },
+  { id: 1, name: "Alex", image: "/placeholder.svg?height=100&width=100" },
+  { id: 2, name: "Sam", image: "/placeholder.svg?height=100&width=100" },
+  { id: 3, name: "Jamie", image: "/placeholder.svg?height=100&width=100" },
+  { id: 4, name: "Taylor", image: "/placeholder.svg?height=100&width=100" },
+  { id: 5, name: "Jordan", image: "/placeholder.svg?height=100&width=100" },
 ]
 
 export default function PingPongMatchup() {
   const {stageReady, setGameStarted, myPaddel, oppPaddel, ball } = useGameSocket()
   const { userData } = useContext(UserContext)
-  const [player1, setPlayer1] = useState<Player>({ id: 0, username: userData.username, avatar_url: userData.avatar_url || "/placeholder.svg" })
-  const [player2, setPlayer2] = useState<Player>(players[1])
+  const player1 = userData.username
+  const [player2, setPlayer2] = useState(players[1])
   const [isMatching, setIsMatching] = useState(false)
   const [matchFound, setMatchFound] = useState(false)
   const [noPlayerFound, setNoPlayerFound] = useState(false)
@@ -71,7 +65,7 @@ export default function PingPongMatchup() {
       <h1 className="text-4xl font-bold mb-8 text-white drop-shadow-lg">Ping Pong Matchup</h1>
 
       <div className="flex justify-between items-center w-full max-w-2xl mb-8 z-10">
-        <PlayerCard player={userData} color="blue" />
+        <PlayerCard player={player1} color="blue" />
         <div className="text-5xl font-bold text-white drop-shadow-lg">VS</div>
         <PlayerCard player={player2} color="red" />
       </div>
@@ -101,15 +95,20 @@ export default function PingPongMatchup() {
   ))
 }
 
+interface Player {
+  id: number;
+  name: string;
+  image: string;
+}
 
 function PlayerCard({ player, color }: { player: Player, color: string }) {
   return (
     <div className="text-center bg-white p-4 rounded-lg shadow-lg animate-fade-in">
-      <h2 className="text-xl font-semibold mb-2">{player.username}</h2>
+      <h2 className="text-xl font-semibold mb-2">{player.name}</h2>
       <div className={`w-32 h-32 rounded-full border-4 border-${color}-500 overflow-hidden`}>
         <img
-          src={player.avatar_url || "/placeholder.svg"}
-          alt={player.username}
+          src={player.image || "/placeholder.svg"}
+          alt={player.name}
           className="w-full h-full object-cover animate-pulse"
         />
       </div>

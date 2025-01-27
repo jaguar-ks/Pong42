@@ -2,8 +2,8 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 interface GameSocketContextType {
-  move: (direction: string, playerId: number) => void;
-  close: () => void;
+  move: (direction: string)=>void;
+
   isConnected: boolean;
   myPaddel: Paddel;
   oppPaddel: Paddel;
@@ -75,13 +75,12 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
       ws.current.onerror = (error) => {
         console.error('WebSocket error:', error);
       };
-
     }
   }, [gameStarted]);
 
   const move = (direction: string, playerId: number) => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({ action: 'move', player_id: playerId, direction }));
+      ws.current.send(JSON.stringify({ action: 'move', direction }));
     }
   };
 
@@ -92,7 +91,7 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <GameSocketContext.Provider value={{ stageReady, setStage ,gameStarted, setGameStarted, myPaddel, oppPaddel, move, close, ball }}>
+    <GameSocketContext.Provider value={{ stageReady, setStage ,gameStarted, setGameStarted, myPaddel, oppPaddel, move, ball }}>
       {children}
     </GameSocketContext.Provider>
   );
