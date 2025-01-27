@@ -124,10 +124,6 @@ class UserDetailSerializer(UserSerializer):
         fields = UserSerializer.Meta.fields + (
             "first_name",
             "last_name",
-            "wins",
-            "loses",
-            "rating",
-            "rank",
             "connection",
         )
 
