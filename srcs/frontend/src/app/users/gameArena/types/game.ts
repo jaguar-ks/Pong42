@@ -9,7 +9,6 @@ export interface PlayerInfoProps {
   source: string
   playerName: string
   playerScore: number
-  playerGlobalScore: number
   direction: 'left' | 'right'
   rank?: string
   isActive?: boolean

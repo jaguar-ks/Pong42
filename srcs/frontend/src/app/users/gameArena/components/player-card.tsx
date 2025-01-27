@@ -5,16 +5,15 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { MicOff, Trophy } from 'lucide-react'
-import type { PlayerInfoProps } from "../types/game.ts"
+import type { PlayerInfoProps } from "./types/game"
 
 export function PlayerCard({
   source,
   playerName,
   playerScore,
-  playerGlobalScore,
   direction,
-  rank = "Rookie",
   isActive = false,
+  isMuted = false
 }: PlayerInfoProps) {
   return (
     <Card className={cn(
@@ -32,20 +31,21 @@ export function PlayerCard({
           className="rounded-full object-cover"
           priority
         />
-
+        {isMuted && (
+          <div className="absolute -bottom-1 -right-1 rounded-full bg-destructive p-1">
+            <MicOff className="h-3 w-3 text-destructive-foreground" />
+          </div>
+        )}
       </div>
 
       <div className={cn(
-        "flex flex-col gap-4 px8",
+        "flex flex-col",
         direction === 'right' ? "items-start" : "items-end"
       )}>
         <span className="text-lg font-semibold">{playerName}</span>
         <div className="flex items-center gap-2">
           <Badge variant="secondary" className="font-mono">
-            {playerGlobalScore}
-          </Badge>
-          <Badge variant="outline" className="text-xs">
-            {rank}
+            {playerScore}
           </Badge>
         </div>
       </div>
@@ -58,4 +58,3 @@ export function PlayerCard({
     </Card>
   )
 }
-

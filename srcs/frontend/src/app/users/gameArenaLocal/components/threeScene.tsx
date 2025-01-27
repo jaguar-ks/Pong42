@@ -10,7 +10,8 @@ import Paddle from './paddle'
 const planeH = 15
 const planeW = 10
 
-export default function ThreeScene({ onScoreUpdate, player1, player2, setPage}) {
+export default function ThreeScene() {
+  const [score, setScore] = useState({ player1: 0, player2: 0 })
   const [paddle1Pos, setPaddle1Pos] = useState([0, 0, (planeH / 2) - 0.1])
   const [paddle2Pos, setPaddle2Pos] = useState([0, 0, -(planeH / 2) + 0.1])
 
@@ -18,7 +19,7 @@ export default function ThreeScene({ onScoreUpdate, player1, player2, setPage}) 
     let paddle1Direction = 0
     let paddle2Direction = 0
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
         case 'ArrowLeft':
           paddle1Direction = -1
@@ -35,7 +36,7 @@ export default function ThreeScene({ onScoreUpdate, player1, player2, setPage}) 
       }
     }
 
-    const handleKeyUp = (event) => {
+    const handleKeyUp = (event: KeyboardEvent) => {
       switch (event.key) {
         case 'ArrowLeft':
         case 'ArrowRight':
@@ -72,18 +73,22 @@ export default function ThreeScene({ onScoreUpdate, player1, player2, setPage}) 
     }
   }, [])
 
+  const handleScoreUpdate = (newScore: { player1: number; player2: number }) => {
+    setScore(newScore)
+  }
+
   return (
-    <div className="h-full aspect-[1/0.5]">
-      <Canvas camera={{ position: [0, 10, 2], fov: 60 }}>
+    <div className="w-full h-full aspect-[2/0.98]">
+      <Canvas camera={{ position: [0, 19, 2], fov: 60 }}>
         <OrbitControls />
         <ambientLight intensity={0.4} />
         <Plane />
-        <SuperBall player1={player1} player2={player2}
+        <SuperBall
           paddlePositions={[
             { x: paddle1Pos[0], y: paddle1Pos[1], z: paddle1Pos[2] },
             { x: paddle2Pos[0], y: paddle2Pos[1], z: paddle2Pos[2] }
-          ]} setPage={setPage}
-          onScoreUpdate={onScoreUpdate}
+          ]}
+          onScoreUpdate={handleScoreUpdate}
         />
         <Paddle position={paddle1Pos as [number, number, number]} />
         <Paddle position={paddle2Pos as [number, number, number]} />
@@ -91,3 +96,4 @@ export default function ThreeScene({ onScoreUpdate, player1, player2, setPage}) 
     </div>
   )
 }
+

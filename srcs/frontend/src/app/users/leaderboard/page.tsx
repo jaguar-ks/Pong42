@@ -6,6 +6,7 @@ import axios from 'axios';
 import classes from './page.module.css';
 import { useUserContext } from '@/context/UserContext';
 import { useRouter } from 'next/navigation';
+import playerImage from '../../../../assets/player.png'
 
 interface Player {
   id: number;
@@ -30,6 +31,17 @@ const Leaderboard: React.FC = () => {
 
   useEffect(() => {
     updateCurrentPage("leaderboard");
+    const checkToken = async () => {
+      try {
+        // Use the test_auth endpoint to verify authentication
+        await axios.get("http://localhost:8000/api/auth/test_auth/",{withCredentials: true})
+      } catch (err) {
+        console.log("Token validation error:", err);
+        router.push("/auth/signin");
+      } finally{
+      }
+    }
+    checkToken();
     fetchLeaderboard();
   }, [currentPage]);
 
@@ -70,17 +82,15 @@ const Leaderboard: React.FC = () => {
         <>
           <div className={classes.leaderboardContainer}>
             <div className={classes.leaderboardHeader}>
-              <span className={classes.rank}>Rank</span>
               <span className={classes.player}>Player</span>
               <span className={classes.wl}>W/L</span>
               <span className={classes.rating}>Rating</span>
             </div>
             {leaderboardData?.results.map((player, index) => (
               <div key={player.id} className={classes.playerRow} onClick={() => handleClickOnPlayer(player.id)}>
-                <span className={classes.rank}>{(currentPage - 1) * 30 + index + 1}</span>
                 <div className={classes.player}>
                   <div className={classes.avatarContainer}>
-                    <Image src={player.avatar_url ? player.avatar_url : "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} alt={player.username} width={40} height={40} className={classes.avatar} />
+                    <Image src={ player.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} alt={player.username} width={40} height={40} className={classes.avatar} />
                     {player.is_online && <div className={classes.onlineIndicator}></div>}
                   </div>
                   <span className={classes.username}>{player.username}</span>
@@ -116,4 +126,3 @@ const Leaderboard: React.FC = () => {
 };
 
 export default Leaderboard;
-

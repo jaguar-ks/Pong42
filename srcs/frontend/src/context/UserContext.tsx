@@ -195,7 +195,6 @@ export const useUserContext = () => {
                     wins: res.data.wins,
                     loses: res.data.loses,
                     rating: res.data.rating,
-                    rank: res.data.rank,
                 })
             } catch (err: any) {
                 console.log("Error in fetching user data", err);

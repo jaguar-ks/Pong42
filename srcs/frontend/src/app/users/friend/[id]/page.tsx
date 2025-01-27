@@ -11,12 +11,13 @@ import { useRouter } from 'next/navigation'
 import { UserContext, useUserContext } from '@/context/UserContext'
 import axios from 'axios'
 import PlayerInfosFr from '@/components/FriendPage/PlayerInfos/PlayerInfosFr'
-// import WeeklyAttendanceFr from '@/components/FriendPage/WeeklyAttendance/WeeklyAttendanceFr'
+import WeeklyAttendanceFr from '@/components/FriendPage/WeeklyAttendance/WeeklyAttendanceFr'
 import RateFr from '@/components/FriendPage/Rate/RateFr'
 import ProgressBarFr from '@/components/FriendPage/ProgressBar/ProgressBarFr'
 import FriendsFr from '@/components/FriendPage/Friends/FriendsFr'
 import { AchievementsFr } from '@/components/FriendPage/Achievements/AchievementsFr'
 import FriendActions from '@/components/FriendPage/FriendActions/FriendActions'
+import { MatchHistoryFr } from '@/components/MatchHistory/MatchHistory'
 // import loadMyData from '@/Components/LoadMyData'
 const FriendPage = ({ params }) => {
   const { id } = params;
@@ -25,6 +26,17 @@ const FriendPage = ({ params }) => {
   const router = useRouter();
   useEffect(() => {
     updateCurrentPage("Friend");
+    const checkToken = async () => {
+      try {
+        // Use the test_auth endpoint to verify authentication
+        await axios.get("http://localhost:8000/api/auth/test_auth/",{withCredentials: true})
+      } catch (err) {
+        console.log("Token validation error:", err);
+        router.push("/auth/signin");
+      } finally{
+      }
+    }
+    checkToken();
     const fetchData = async () => {
       try {
         const res = await axios.get(`http://localhost:8000/api/users/${id}/`);
@@ -36,7 +48,6 @@ const FriendPage = ({ params }) => {
           is_online: res.data.is_online,
           last_name: res.data.last_name,
           loses: res.data.loses,
-          rank: res.data.rank,
           rating: res.data.rating,
           username: res.data.username,
           wins: res.data.wins,
@@ -54,12 +65,12 @@ const FriendPage = ({ params }) => {
     <div className={classes.home}>
       <div className={classes.container}>
         <div className={classes.box1}><PlayerInfosFr/></div>
-        {/* <div className={classes.box2}><WeeklyAttendanceFr/></div> */}
+        <div className={classes.box2}><WeeklyAttendanceFr/></div>
         <div className={classes.box3}><RateFr/></div>
         <div className={classes.line}><ProgressBarFr/></div>
         <div className={classes.box4}><FriendActions/></div>
         <div className={classes.box5}><AchievementsFr/></div>
-        <div className={classes.box6}>lin6</div>
+        <div className={classes.box6}>testttt</div>
       </div>
     </div>)
 }

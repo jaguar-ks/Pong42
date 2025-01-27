@@ -14,6 +14,9 @@ import classes from "./page.module.css";
 import FriendsFR from "@/components/FriendsFR/FriendsFR";
 import Image from "next/image";
 import userNotFoundImage from '../../../../../assets/userNotFound.svg'
+import { MatchHistoryFr } from "@/components/MatchHistoryFr/MatchHistoryFr";
+import ProgressBarFr from "@/components/ProgressBarFr/ProgressBarFr";
+import { AchievementsFr } from "@/components/AchievementsFr/AchievementsFr";
 
 const SearchProfile = () => {
   const { updateSearchedUserData, updateCurrentPage, searchedUserData, updateUserDataSearch } = useUserContext();
@@ -66,15 +69,17 @@ const SearchProfile = () => {
             <Rate user="search" />
           </div>
           <div className={classes.line}>
-            <ProgressBar user="search" />
+            <ProgressBarFr ratingFr={searchedUserData.rating} />
           </div>
           <div className={classes.box4}>
             <FriendsFR id={id} />
           </div>
           <div className={classes.box5}>
-            <Achievements user="search" />
+            <AchievementsFr wins={searchedUserData.wins} loses={searchedUserData.loses} rating={searchedUserData.rating} rank={searchedUserData.rank} />
           </div>
-          <div className={classes.box6}>Line 6</div>
+          <div className={classes.box6}>
+            <MatchHistoryFr id={id}></MatchHistoryFr>
+          </div>
         </div>
       ) : (
         <div className={classes.notFoundContainer}>
