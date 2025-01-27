@@ -39,12 +39,13 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   const [notifications, setNotifications] = useState<Notifications[]>([])
   useEffect(() => {
       const wsUrl = `ws://localhost:8000/ws/chat/`;
-      
-      if (!ws.current)
+      if(!ws.current)
         ws.current = new WebSocket(wsUrl);
+
 
       ws.current.onopen = () => {
         console.log('Connected to chat');
+        userData.is_online = true;
         setIsConnected(true);
       };
 
@@ -93,15 +94,11 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         console.error('WebSocket error:', error);
         setIsConnected(false);
       };
-    if (!userData.id) {
-      return;
-    }
-
-    return () => {
-      if (ws.current) {
-        ws.current.close();
-      }
-    };
+    // return () => {
+    //   if (ws.current) {
+    //     ws.current.close();
+    //   }
+    // };
   }, []);
 
   const close = () => {

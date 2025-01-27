@@ -56,7 +56,7 @@ const SearchResultComponent: React.FC<{
                     aria-label={`View profile of ${result.username}`}
                 >
                     <Image
-                        src={result.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"}
+                        src={result.avatar_url || "/default-avatar.png"}
                         alt={`${result.username}'s avatar`}
                         width={24}
                         height={24}
