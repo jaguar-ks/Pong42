@@ -89,7 +89,7 @@ const HorizontalNavbar = () => {
                                 alt="Notifications Icon"
                             />
                         </button>
-                        {activeIcon === "notifications" && <Notifications />}
+                        {activeIcon === "notifications" && <Notifications  />}
                         {notification && (
                             <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
                         )}
@@ -108,7 +108,7 @@ const HorizontalNavbar = () => {
                                 alt="Player Avatar"
                             />
                         </button>
-                        {activeIcon === "profile" && <Profile setActiveIcon={setActiveIcon} username={userData.username} />}
+                        {activeIcon === "profile" && <Profile  handleIconToggle={handleIconToggle} username={userData.username} />}
                     </div>
                     <div className={styles.dropdownMenuWrapper}>
                         <button

@@ -25,7 +25,7 @@ const Leaderboard: React.FC = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const { updateCurrentPage } = useUserContext();
+  const { updateCurrentPage, userData } = useUserContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -86,7 +86,7 @@ const Leaderboard: React.FC = () => {
                   <span className={classes.username}>{player.username}</span>
                 </div>
                 <span className={classes.wl}>{player.wins}/{player.loses}</span>
-                <span className={classes.rating}>500</span>
+                <span className={classes.rating}>{userData.rating}</span>
               </div>
             ))}
           </div>

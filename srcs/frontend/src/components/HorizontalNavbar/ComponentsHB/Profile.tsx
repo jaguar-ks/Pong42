@@ -11,20 +11,24 @@ interface ProfileProps {
   username: string;
 }
 
-const Profile: React.FC<ProfileProps> = ({ username, setSelectedIcon }) => {
+const Profile: React.FC<ProfileProps> = ({ username, handleIconToggle }) => {
   const {userData, updateCurrentPage,updateSearchedUserData } = useUserContext();
   const router = useRouter();
 
   const handleGosettings = () =>{
     updateCurrentPage("");
+    handleIconToggle("");
     router.push('/users/settings');
+
   }
   const handlelLogout = () =>{
     updateCurrentPage("");
+    handleIconToggle("");
     router.push('/users/logout');
   }
   const handleViewProfile = () =>{
     updateCurrentPage("");
+    handleIconToggle("");
     router.push('/users/home');
   }
 
