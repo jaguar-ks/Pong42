@@ -48,7 +48,6 @@ const FriendPage = ({ params }) => {
           is_online: res.data.is_online,
           last_name: res.data.last_name,
           loses: res.data.loses,
-          rank: res.data.rank,
           rating: res.data.rating,
           username: res.data.username,
           wins: res.data.wins,

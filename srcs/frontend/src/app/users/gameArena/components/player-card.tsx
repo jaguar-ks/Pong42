@@ -12,7 +12,6 @@ export function PlayerCard({
   playerName,
   playerScore,
   direction,
-  rank = "Rookie",
   isActive = false,
   isMuted = false
 }: PlayerInfoProps) {
@@ -48,9 +47,6 @@ export function PlayerCard({
           <Badge variant="secondary" className="font-mono">
             {playerScore}
           </Badge>
-          <Badge variant="outline" className="text-xs">
-            {rank}
-          </Badge>
         </div>
       </div>
 
@@ -62,4 +58,3 @@ export function PlayerCard({
     </Card>
   )
 }
-

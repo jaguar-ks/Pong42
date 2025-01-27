@@ -88,7 +88,7 @@ export const AchievementsFr = ({wins, loses,rating, rank}) => {
       title: 'Top 1000',
       desc: 'Reach top 1000 in rankings',
       imgUrl: achieImage,
-      isUnlocked: rank <= 1000
+      isUnlocked: true
     },
     {
       title: 'Champion',
@@ -156,4 +156,3 @@ export const AchievementsFr = ({wins, loses,rating, rank}) => {
     </div>
   );
 };
-

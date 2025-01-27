@@ -82,14 +82,12 @@ const Leaderboard: React.FC = () => {
         <>
           <div className={classes.leaderboardContainer}>
             <div className={classes.leaderboardHeader}>
-              <span className={classes.rank}>Rank</span>
               <span className={classes.player}>Player</span>
               <span className={classes.wl}>W/L</span>
               <span className={classes.rating}>Rating</span>
             </div>
             {leaderboardData?.results.map((player, index) => (
               <div key={player.id} className={classes.playerRow} onClick={() => handleClickOnPlayer(player.id)}>
-                <span className={classes.rank}>{(currentPage - 1) * 30 + index + 1}</span>
                 <div className={classes.player}>
                   <div className={classes.avatarContainer}>
                     <Image src={ player.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} alt={player.username} width={40} height={40} className={classes.avatar} />
@@ -128,4 +126,3 @@ const Leaderboard: React.FC = () => {
 };
 
 export default Leaderboard;
-

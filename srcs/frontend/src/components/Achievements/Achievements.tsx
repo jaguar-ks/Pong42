@@ -89,7 +89,7 @@ export const Achievements = () => {
       title: 'Top 1000',
       desc: 'Reach top 1000 in rankings',
       imgUrl: achieImage,
-      isUnlocked: userData.rank <= 1000
+      isUnlocked: false
     },
     {
       title: 'Champion',
@@ -157,4 +157,3 @@ export const Achievements = () => {
     </div>
   );
 };
-
