@@ -5,8 +5,6 @@ import * as THREE from 'three'
 import { useFrame } from '@react-three/fiber'
 import { Sphere, Html } from '@react-three/drei'
 import type { PaddlePosition } from '../types/game'
-import { useUserContext } from '@/context/UserContext'
-import  WinningBoard  from "./WinningBoard"
 
 interface SuperBallProps {
   paddlePositions: PaddlePosition[]
@@ -14,24 +12,21 @@ interface SuperBallProps {
 }
 
 const planeH = 15
+const planeW = 10
 
-export default function SuperBall({ player1, player2, paddlePositions, setPage,onScoreUpdate }: SuperBallProps) {
-
-    const { localTournementNames, setLocalTournementNames } = useUserContext();
-
+export default function SuperBall({ paddlePositions, onScoreUpdate }: SuperBallProps) {
   const ballRef = useRef<THREE.Mesh>(null)
   const velocity = useRef(new THREE.Vector3(0, 0, 0))
   const radius = 0.2
   const maxX = 5 - radius
   const maxZ = (planeH / 2) - radius
   const winScore = 3
-  const [countdown, setCountdown] = useState(3)
+  const [countdown, setCountdown] = useState(10)
   const [gameStarted, setGameStarted] = useState(false)
   const lastCollisionTime = useRef(0)
   const COLLISION_COOLDOWN = 0.1
   const [score, setScore] = useState({ player1: 0, player2: 0 })
   const [winner, setWinner] = useState<string | null>(null)
-
 
   const getRandomStartAngle = () => {
     const randomQuadrant = Math.random() < 0.5 ? 0 : Math.PI
@@ -52,7 +47,7 @@ export default function SuperBall({ player1, player2, paddlePositions, setPage,o
   }
 
   useEffect(() => {
-    if (countdown > 0 && !winner) {
+    if (countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
       return () => clearTimeout(timer)
     } else if (countdown === 0 && !gameStarted) {
@@ -115,18 +110,13 @@ export default function SuperBall({ player1, player2, paddlePositions, setPage,o
           newScore = { ...score, player2: score.player2 + 1 }
         }
         setScore(newScore)
-        onScoreUpdate(newScore) // Call the callback to update the scores in the Game component
 
         if (newScore.player1 >= winScore) {
-          setWinner(player1)
-          setLocalTournementNames([...localTournementNames, player1])
-          setPage('map')
+          setWinner('Player 1')
           newX = 0
           newZ = 0
         } else if (newScore.player2 >= winScore) {
-          setWinner(player2)
-          setLocalTournementNames([...localTournementNames, player2])
-          setPage('map')
+          setWinner('Player 2')
           newX = 0
           newZ = 0
         } else {
@@ -154,7 +144,7 @@ export default function SuperBall({ player1, player2, paddlePositions, setPage,o
           clearcoatRoughness={0.1}
         />
       </Sphere>
-
+      
       {countdown > 0 && (
         <Html center>
           <div className="text-5xl font-bold text-white drop-shadow-lg">
@@ -162,6 +152,18 @@ export default function SuperBall({ player1, player2, paddlePositions, setPage,o
           </div>
         </Html>
       )}
+
+      {winner && (
+        <Html center>
+          <div className="relative w-[500px] h-[500px] bg-black/90 p-10 rounded-lg text-white text-5xl font-bold text-center flex flex-col items-center justify-center gap-4">
+            <div>{winner} wins!</div>
+            <div className="text-3xl">
+              Score: {score.player1} : {score.player2}
+            </div>
+          </div>
+        </Html>
+      )}
     </>
   )
 }
+

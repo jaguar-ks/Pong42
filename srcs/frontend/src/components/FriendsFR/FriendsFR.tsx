@@ -8,14 +8,11 @@ import addFriendIcon from '../../../assets/add-friendBlack.svg'
 import challengeIcon from '../../../assets/challengeBlack.svg'
 import blockFriendIcon from '../../../assets/blockFriend.svg'
 import { useUserContext } from '@/context/UserContext'
-import { useRouter, useSearchParams } from 'next/navigation'
 
 const FriendsFR = ({id}) => {
   const { searchedUserData, updateSearchedUserData } = useUserContext();
   const [showPopup, setShowPopup] = useState(false);
 
-
-  const router = useRouter()
   const sendFriendRequest = async () => {
     try {
       const response = await axios.post(
@@ -82,8 +79,6 @@ const FriendsFR = ({id}) => {
         { withCredentials: true }
       );
       console.log("User blocked:", response.data);
-      router.push("/users/home")
-      
     } catch (error) {
       console.error("Error blocking user:", error);
     }

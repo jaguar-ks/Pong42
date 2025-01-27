@@ -3,10 +3,9 @@ import { useState } from "react";
 
 import EntreInfos from "@/components/tournement/localTournement/EntreInfos/EntreInfos";
 import { useUserContext } from "@/context/UserContext";
+
 import styles from './EntreInfos.module.css'
 import MapLocal from "@/components/tournement/localTournement/MapLocal/MapLocal";
-import GameComponent from "@/app/users/gameArenaLocal/page";
-
 
 
 const RoundOne = ({setPage}) =>{
@@ -60,7 +59,7 @@ const RoundTree = ({setPage}) =>{
         <div className={styles.containerwinnerFstRound}>
         <button className={styles.PlayBtn} onClick={() => handlePlayerWins(localTournementNames[4])}>winner : {localTournementNames[4]}</button>
         <button className={styles.PlayBtn} onClick={() => handlePlayerWins(localTournementNames[5])}>winner : {localTournementNames[5]}</button>
-        </div>
+    </div>
     )
 }
 
@@ -78,9 +77,11 @@ const Tournament = () => {
         <div className={styles.container}>
             {page === "chosePlayers" && <EntreInfos setPage={setPage} />}
             {page === "map" && <MapLocal setPage={setPage}></MapLocal>}
-            {(page === "startedGame" && localTournementNames.length === 4) && <GameComponent setPage={setPage} player1={localTournementNames[0]} player2={localTournementNames[1]}/>}
-            {(page === "startedGame" && localTournementNames.length === 5) && <GameComponent setPage={setPage} player1={localTournementNames[2]} player2={localTournementNames[3]}/>}
-            {(page === "startedGame" && localTournementNames.length === 6) && <GameComponent setPage={setPage} player1={localTournementNames[4]} player2={localTournementNames[5]}/>}
+            {(page === "startedGame" && localTournementNames.length === 4) && <RoundOne setPage={setPage}></RoundOne>}
+            {(page === "startedGame" && localTournementNames.length === 5) && <RoundTwo setPage={setPage}></RoundTwo>}
+            {(page === "startedGame" && localTournementNames.length === 6) && <RoundTree setPage={setPage}></RoundTree>}
+
+
         </div>
     );
 };

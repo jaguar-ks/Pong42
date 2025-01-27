@@ -6,6 +6,7 @@ import axios from 'axios';
 import classes from './page.module.css';
 import { useUserContext } from '@/context/UserContext';
 import { useRouter } from 'next/navigation';
+import playerImage from '../../../../assets/player.png'
 
 interface Player {
   id: number;
@@ -25,11 +26,22 @@ const Leaderboard: React.FC = () => {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const { updateCurrentPage, userData } = useUserContext();
+  const { updateCurrentPage } = useUserContext();
   const router = useRouter();
 
   useEffect(() => {
     updateCurrentPage("leaderboard");
+    const checkToken = async () => {
+      try {
+        // Use the test_auth endpoint to verify authentication
+        await axios.get("http://localhost:8000/api/auth/test_auth/",{withCredentials: true})
+      } catch (err) {
+        console.log("Token validation error:", err);
+        router.push("/auth/signin");
+      } finally{
+      }
+    }
+    checkToken();
     fetchLeaderboard();
   }, [currentPage]);
 
@@ -80,13 +92,13 @@ const Leaderboard: React.FC = () => {
                 <span className={classes.rank}>{(currentPage - 1) * 30 + index + 1}</span>
                 <div className={classes.player}>
                   <div className={classes.avatarContainer}>
-                    <Image src={player.avatar_url ? player.avatar_url : "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} alt={player.username} width={40} height={40} className={classes.avatar} />
+                    <Image src={ player.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} alt={player.username} width={40} height={40} className={classes.avatar} />
                     {player.is_online && <div className={classes.onlineIndicator}></div>}
                   </div>
                   <span className={classes.username}>{player.username}</span>
                 </div>
                 <span className={classes.wl}>{player.wins}/{player.loses}</span>
-                <span className={classes.rating}>{userData.rating}</span>
+                <span className={classes.rating}>500</span>
               </div>
             ))}
           </div>

@@ -1,7 +1,5 @@
 import { UserContextProvider } from "@/context/UserContext";
 import { WebSocketProvider } from '@/context/WebSocketContext';
-import { GameSocketProvider } from '@/context/GameSocketContext';
-
 import VerticalNavbar from "@/components/VerticalNavbar/VerticalNavbar";
 import HorizontalNavbar from "@/components/HorizontalNavbar/HorizontalNavbar";
 import NavBar from "@/components/NavBar/NavBar";
@@ -20,7 +18,7 @@ export default function UsersLayout({
   return (
     <UserContextProvider>
       <WebSocketProvider>
-        <GameSocketProvider>
+
       <div className="layout-container">
         <div className="verticalNavbarr">
           <VerticalNavbar />
@@ -37,7 +35,6 @@ export default function UsersLayout({
           </div>
         </div>
       </div>
-        </GameSocketProvider>
       </WebSocketProvider>
     </UserContextProvider>
   );
