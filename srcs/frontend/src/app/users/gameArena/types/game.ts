@@ -27,3 +27,14 @@ export interface PaddlePosition {
   z: number
 }
 
+export interface Ball {
+  x: number
+  y: number
+  z: number
+}
+
+export interface GameComponentProps {
+  player1: PlayerInfoProps
+  player2: PlayerInfoProps
+  ball: Ball
+}
