@@ -37,12 +37,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'data': {
                             'type': 'online',
                             'user_id': self.user.id,
-                            'is_online': self.user.is_online,
+                            'is_online': self.user.id in online_users,
                         }
                     }
                 )
 
-    async def satus_update(self, event):
+    async def status_update(self, event):
         await self.send(text_data=json.dumps(event['data']))
 
     async def disconnect(self, close_code):
