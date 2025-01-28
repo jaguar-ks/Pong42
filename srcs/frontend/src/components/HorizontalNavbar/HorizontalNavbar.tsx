@@ -60,7 +60,7 @@ const HorizontalNavbar: React.FC = () => {
                 <div className={styles.containerGroups}>
                     <div className={`${styles.dropdown} ${styles.dropdownSearch}`}>
                         {!isSearchActive && (
-                            <button className={styles.iconButton} onClick={() => setIsMenuOpen(true)}>
+                            <button className={styles.iconButton} onClick={() => handleMenuToggle(true)}>
                                 <Image className={styles.menuDotImage} src={hamburgerDotsBlack} alt="hamburger Icon" />
                             </button>
                         )}
