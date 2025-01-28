@@ -2,7 +2,6 @@ import React from 'react';
 import Image from 'next/image';
 import classes from './Profile.module.css';
 import { useUserContext } from '@/context/UserContext';
-import settingsIcon from '../../../../assets/settingsIcon.svg'
 import settingsIconBlack from '../../../../assets/SettingsBlack.svg'
 import logoutIcon from '../../../../assets/LogoutBlack.svg'
 import { useRouter } from 'next/navigation'
@@ -11,8 +10,8 @@ interface ProfileProps {
   username: string;
 }
 
-const Profile: React.FC<ProfileProps> = ({ username, setSelectedIcon }) => {
-  const {userData, updateCurrentPage,updateSearchedUserData } = useUserContext();
+const Profile: React.FC<ProfileProps> = ({ username }) => {
+  const {userData, updateCurrentPage } = useUserContext();
   const router = useRouter();
 
   const handleGosettings = () =>{

@@ -2,7 +2,6 @@ import { UserContextProvider } from "@/context/UserContext";
 import { WebSocketProvider } from '@/context/WebSocketContext';
 import VerticalNavbar from "@/components/VerticalNavbar/VerticalNavbar";
 import HorizontalNavbar from "@/components/HorizontalNavbar/HorizontalNavbar";
-import NavBar from "@/components/NavBar/NavBar";
 import "./layout.css";
 
 export const metadata = {
@@ -27,9 +26,6 @@ export default function UsersLayout({
           <div className="horizontalNavbarr">
             <HorizontalNavbar />
           </div>
-          {/* <div className="navBarContainer">
-            <NavBar />
-          </div> */}
           <div className="page-content">
             {children}
           </div>

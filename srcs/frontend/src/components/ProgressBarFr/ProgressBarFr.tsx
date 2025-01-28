@@ -1,7 +1,6 @@
 "use client"
 import React from 'react'
 import classes from './progressBarFr.module.css'
-import { useUserContext } from '@/context/UserContext';
 
 const calculateLevel = (rating: number): number => {
   return Math.floor(rating / 100) + 1;
@@ -12,7 +11,6 @@ const calculatePercentage = (rating: number): number => {
 }
 
 const ProgressBarFr = ({ratingFr}) => {
-  const { userData } = useUserContext();
   const rating = ratingFr || 0;
   const level = calculateLevel(rating);
   const percentage = calculatePercentage(rating);

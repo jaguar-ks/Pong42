@@ -1,10 +1,8 @@
 "use client"
-import { useState } from "react";
 import styles from './MapLocal.module.css'
 import { useUserContext } from "@/context/UserContext";
 import { useRouter } from 'next/navigation'
 import Image from "next/image";
-import playerImage from '../../../../../assets/player.png'
 import leftLine from '../../../../../assets/lines/leftLine.png'
 import middleLine from '../../../../../assets/lines/middleLine.png'
 import rightLine from '../../../../../assets/lines/rightLine.png'
@@ -13,7 +11,13 @@ import dogProfileImage from '../../../../../assets/animalsProfile/player4gif.gif
 import lionProfileImage from '../../../../../assets/animalsProfile/player1gif.gif'
 import dankyProfileImage from '../../../../../assets/animalsProfile/player2gif.gif'
 import questionMark from '../../../../../assets/animalsProfile/questionMarkGif.webp'
-const MapLocal = ({setPage}) =>{
+import React, { useEffect } from 'react';
+
+interface MapLocalProps {
+    setPage: React.Dispatch<React.SetStateAction<string>>;
+  }
+
+  const MapLocal: React.FC<MapLocalProps> = ({ setPage }) => {
 
     const router = useRouter();
     const {localTournementNames, setLocalTournementNames, localTournementCount, setLocalTournementCount} = useUserContext();
@@ -22,6 +26,9 @@ const MapLocal = ({setPage}) =>{
         router.push("/users/game/local");
     }
 
+    useEffect(() => {
+        // Logic for map local tournament
+    }, [localTournementNames, setLocalTournementNames, localTournementCount, setLocalTournementCount, router, setPage]);
 
     return(
         <div className={styles.containerGlobal}>

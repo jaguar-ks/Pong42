@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
 import { useUserContext } from '@/context/UserContext';
 import styles from './changeUsername.module.css';
 
@@ -15,7 +14,6 @@ type ErrorType = string[];
 const ChangeUsername: React.FC<ChangeUsernameProps> = ({ setCurrentPage }) => {
   const [newUsername, setNewUsername] = useState<string>("");
   const [error, setError] = useState<ErrorType>([]);
-  const router = useRouter();
   const newUsernameInputRef = useRef<HTMLInputElement>(null);
   const { userData, updateUserData } = useUserContext();
 
@@ -40,8 +38,12 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({ setCurrentPage }) => {
       console.log(res.data);
       updateUserData({ ...userData, username: newUsername });
       setCurrentPage("");
-    } catch (err: any) {
-      setError(err.response?.data?.username || []);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.username || []);
+      } else {
+        throw err;
+      }
     }
   };
 
@@ -82,4 +84,3 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({ setCurrentPage }) => {
 };
 
 export default ChangeUsername;
-

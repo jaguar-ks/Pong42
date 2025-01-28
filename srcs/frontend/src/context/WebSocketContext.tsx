@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { UserContext, UserContextProvider } from './UserContext';
+import { UserContext } from './UserContext';
 
 interface Message {
   message: string;
@@ -36,7 +36,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   const [isConnected, setIsConnected] = useState(false);
   const { userData } = useContext(UserContext);
   const [notification, setNotification] = useState(false)
-  const [notifications, setNotifications] = useState<Notifications[]>([])
+  const [setNotifications] = useState<Notifications[]>([])
   useEffect(() => {
       const wsUrl = `ws://localhost:8000/ws/chat/`;
       

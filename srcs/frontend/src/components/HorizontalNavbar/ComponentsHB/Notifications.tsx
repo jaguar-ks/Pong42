@@ -1,7 +1,6 @@
 'use client'
-import React from 'react';
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import React, { useEffect } from 'react';
+import { useState } from 'react';
 import classes from './Notifications.module.css';
 import axios from 'axios';
 import { useWebSocket } from '@/context/WebSocketContext';
@@ -23,15 +22,18 @@ function printTime(time: string){
 
 const Notifications: React.FC = () => {
   const [notifications, setNotifications] = useState<Notifications[]>([]);
-  const { sendMessage, messages: wsMessages, isConnected , notification, setNotification} = useWebSocket();
+  const { messages: wsMessages, notification} = useWebSocket();
+
   useEffect(() => {
-    
-        axios.get(`http://localhost:8000/api/users/me/notifications/`, {withCredentials: true})
-        .then((res) => {
-            setNotifications(res.data.results)
-            console.log(res.data.results)
-        })
-  },[notification])
+    if (wsMessages.length > 0) {
+      console.log('Received message from WebSocket:', wsMessages);
+    }
+    axios.get(`http://localhost:8000/api/users/me/notifications/`, {withCredentials: true})
+    .then((res) => {
+        setNotifications(res.data.results)
+        console.log(res.data.results)
+    })
+  },[notification, wsMessages])
   return (
     <div className={classes.dropdownContent}>
       <h3 className={classes.dropdownTitle}>Notifications</h3>
@@ -48,4 +50,3 @@ const Notifications: React.FC = () => {
 };
 
 export default Notifications;
-
