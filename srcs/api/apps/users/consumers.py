@@ -24,13 +24,33 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
         online_users.append(self.user.id)
         await self.change_online_status(self.user.id, True)
+        await self.notify_oline_users()
         print('IN =>', online_users, flush=True)
+
+    async def notify_oline_users(self):
+        for user_id in online_users:
+            if user_id != self.user.id:
+                await self.channel_layer.group_send(
+                    f"user_{user_id}",
+                    {
+                        'type': 'status_update',
+                        'data': {
+                            'type': 'online',
+                            'user_id': self.user.id,
+                            'is_online': self.user.is_online,
+                        }
+                    }
+                )
+
+    async def satus_update(self, event):
+        await self.send(text_data=json.dumps(event['data']))
 
     async def disconnect(self, close_code):
         online_users.remove(self.user.id)
         print('OUT =>', online_users, flush=True)
         if self.user.id not in online_users:
             await self.change_online_status(self.user.id, False)
+            await self.notify_oline_users()
         if hasattr(self, 'group_name'):
             await self.channel_layer.group_discard(
                 self.group_name,
