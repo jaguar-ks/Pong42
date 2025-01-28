@@ -22,13 +22,6 @@ interface MatchData {
   created_at: string
 }
 
-interface ApiResponse {
-  count: number
-  next: string | null
-  previous: string | null
-  results: MatchData[]
-}
-
 export const MatchHistory = () => {
   const { userData } = useUserContext()
   const [matches, setMatches] = useState<MatchData[]>([])

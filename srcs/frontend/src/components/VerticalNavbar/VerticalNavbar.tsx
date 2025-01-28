@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect } from "react";
+import React from "react";
 import classes from './VerticalNavbar.module.css';
 import Image from "next/image";
 import mainLogo from '../../../assets/Main-Logo.svg';
@@ -16,9 +16,8 @@ import SettingsWithe from '../../../assets/SettingsWithe.svg';
 import SettingsBlack from '../../../assets/SettingsBlack.svg';
 import LogoutWithe from '../../../assets/LogoutWithe.svg';
 import LogoutBlack from '../../../assets/LogoutBlack.svg';
-import { UserContext, useUserContext } from "../../context/UserContext";
+import { useUserContext } from "../../context/UserContext";
 import Link from "next/link";
-import axios from "axios";
 
 const VerticalNavbar = () => {
     const pages = [

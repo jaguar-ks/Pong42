@@ -3,13 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useUserContext } from "@/context/UserContext";
-import axios from "axios";
 import PlayerInfos from "@/components/PlayerInfos/PlayerInfos";
 import WeeklyAttendance from "@/components/weeklyAttendance/WeeklyAttendance";
 import Rate from "@/components/Rate/Rate";
-import ProgressBar from "@/components/ProgressBar/ProgressBar";
-import Friends from "@/components/Friends/Friends";
-import { Achievements } from "@/components/Achievements/Achievements";
 import classes from "./page.module.css";
 import FriendsFR from "@/components/FriendsFR/FriendsFR";
 import Image from "next/image";
@@ -17,6 +13,7 @@ import userNotFoundImage from '../../../../../assets/userNotFound.svg'
 import { MatchHistoryFr } from "@/components/MatchHistoryFr/MatchHistoryFr";
 import ProgressBarFr from "@/components/ProgressBarFr/ProgressBarFr";
 import { AchievementsFr } from "@/components/AchievementsFr/AchievementsFr";
+import axios from "axios";
 
 const SearchProfile = () => {
   const { updateSearchedUserData, updateCurrentPage, searchedUserData, updateUserDataSearch } = useUserContext();
@@ -38,13 +35,18 @@ const SearchProfile = () => {
         updateSearchedUserData(res.data);
         updateUserDataSearch(res.data);
       } catch (err) {
-        console.error("Error fetching user data:", err.response.data.detail);
-        if(err?.response?.data?.detail)
-          {
-            console.log(err?.response?.data?.detail);
-            
+        if (axios.isAxiosError(err)) {
+          // Now TypeScript knows `err` is an AxiosError
+          console.error("Error fetching user data:", err.response?.data?.detail);
+          if (err.response?.data?.detail) {
+            console.log(err.response.data.detail);
           }
           setUserExist(true);
+        } else {
+          // Some other type of error (e.g. network error, etc.)
+          console.error("Unknown error:", err);
+          setUserExist(true);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -66,7 +68,7 @@ const SearchProfile = () => {
             <WeeklyAttendance user="search" />
           </div>
           <div className={classes.box3}>
-            <Rate user="search" />
+            <Rate />
           </div>
           <div className={classes.line}>
             <ProgressBarFr ratingFr={searchedUserData.rating} />
@@ -75,7 +77,7 @@ const SearchProfile = () => {
             <FriendsFR id={id} />
           </div>
           <div className={classes.box5}>
-            <AchievementsFr wins={searchedUserData.wins} loses={searchedUserData.loses} rating={searchedUserData.rating} rank={searchedUserData.rank} />
+            <AchievementsFr wins={searchedUserData.wins} loses={searchedUserData.loses} rating={searchedUserData.rating} />
           </div>
           <div className={classes.box6}>
             <MatchHistoryFr id={id}></MatchHistoryFr>

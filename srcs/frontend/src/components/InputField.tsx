@@ -29,7 +29,7 @@ export function InputField({ label, type, id, name, value, onChange, error }: In
           className={ `${styles.input} ${error ? styles.inputError : ''}`}
         />
       </div>
-      {error ?  <p className={styles.errorText}>{error}</p> : <p className={styles.noErrorText}>"no error"</p>}
+      {error ?  <p className={styles.errorText}>{error}</p> : <p className={styles.noErrorText}>no error</p>}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import classes from './FriendActions.module.css';
 import challengeImage from '../../../../assets/challengeBlack.svg'
-import snedMessageImage from '../../../../assets/messageBlack.svg'
+import snedMessageImage from '../../../../assets/MessagesBlack.svg'
 import sendRequestImage from '../../../../assets/sendRequest.svg'
 import Image from 'next/image';
 
@@ -10,10 +10,9 @@ interface FriendActionsProps {
         name: string;
         isFriend: boolean;
     };
-    onClose: () => void;
 }
 
-const FriendActions: React.FC<FriendActionsProps> = ({ friend, onClose }) => {
+const FriendActions: React.FC<FriendActionsProps> = ({ friend }) => {
     const handleAction = (action: string) => {
         console.log(`${action} action for ${friend.name}`);
         // Implement the actual action logic here
@@ -49,13 +48,10 @@ const dummyFriend = {
     isFriend: true,
 };
 
-const dummyOnClose = () => {
-    console.log("Modal closed");
-};
 
 // Usage
 const App = () => (
-    <FriendActions friend={dummyFriend} onClose={dummyOnClose} />
+    <FriendActions friend={dummyFriend}  />
 );
 
 export default App;

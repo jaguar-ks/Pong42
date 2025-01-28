@@ -1,54 +1,52 @@
-"use client";
-import React, { useState } from 'react';
-import classes from './OtpForLogin.module.css';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import OtpInput from './OtpInput';
-import { Header } from '../Header';
+"use client"
+import type React from "react"
+import { useState } from "react"
+import classes from "./OtpForLogin.module.css"
+import axios from "axios"
+import { useRouter } from "next/navigation"
+import OtpInput from "./OtpInput"
 
 interface OtpForLoginProps {
-  setErrors: React.Dispatch<React.SetStateAction<any>>;
-  errors: any;
-  username: string;
-  password: string;
+  setErrors: React.Dispatch<React.SetStateAction<{ details: string; username: string; password: string; otp: string }>>
+  username: string
+  password: string
 }
 
 const OtpForLogin: React.FC<OtpForLoginProps> = ({ setErrors, username, password }) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>();
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string | undefined>()
+  const router = useRouter()
 
   const handleSignin = async (inputCode: string): Promise<void> => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
       await axios.post(
-        `http://localhost:8000/api/auth/sign-in/`, 
+        `http://localhost:8000/api/auth/sign-in/`,
         { username, password, otp_code: inputCode },
-        { withCredentials: true }
-      );
-      router.push("/users/home");
-    } catch (err: any) {
-      setError(err.response?.data?.otp_code?.[0] || "An error occurred.");
+        { withCredentials: true },
+      )
+      router.push("/users/home")
+    } catch (err: { response: { data: { otp_code: string[] } } }) {
+      setError(err.response?.data?.otp_code?.[0] || "An error occurred.")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleCancel = () => {
     setErrors({
-      details: '',
-      username: '',
-      password: '',
-      otp: '',
-    });
-  };
+      details: "",
+      username: "",
+      password: "",
+      otp: "",
+    })
+  }
 
   return (
     <div className={classes.NotifNotif}>
       <div className={classes.window} onClick={(e) => e.stopPropagation()}>
         <div className={classes.element}>
-          <h1>confermation code: </h1>
+          <h1>Confirmation code: </h1>
           <OtpInput
             isLoading={isLoading}
             setErrorBack={setError}
@@ -59,7 +57,7 @@ const OtpForLogin: React.FC<OtpForLoginProps> = ({ setErrors, username, password
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default OtpForLogin;
+export default OtpForLogin

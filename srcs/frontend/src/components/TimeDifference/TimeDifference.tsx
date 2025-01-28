@@ -1,6 +1,4 @@
 "use client"
-import { useUserContext } from '@/context/UserContext';
-import classes from './rate.module.css'
 import { useEffect, useState } from 'react'; 
  
  

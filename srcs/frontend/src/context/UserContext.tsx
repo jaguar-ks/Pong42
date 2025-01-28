@@ -42,7 +42,6 @@ interface UserDataType {
     wins: number;
     loses: number;
     rating: number;
-    rank: number;
 }
 
 // Define a type for the searched user data
@@ -53,11 +52,10 @@ interface SearchedUserDataType {
     is_online: boolean;
     last_name: string;
     loses: number;
-    rank: number;
     rating: number;
     username: string;
     wins: number;
-    connection: string;
+    // connection?: string;
 }
 
 // Define a type for user data search
@@ -71,7 +69,6 @@ interface UserDataSearchType {
     wins: number;
     loses: number;
     rating: number;
-    rank: number;
 }
 
 // Create the context with a default value of `undefined` for type safety
@@ -103,7 +100,6 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         wins: 0,
         loses: 0,
         rating: 0,
-        rank: 0,
     });
 
     const [searchedUserData, setSearchedUserData] = useState<SearchedUserDataType>({
@@ -113,7 +109,6 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         is_online: false,
         last_name: "",
         loses: 0,
-        rank: 0,
         rating: 0,
         username: "",
         wins: 0,
@@ -130,7 +125,6 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         wins: 0,
         loses: 0,
         rating: 0,
-        rank: 0,
     });
 
     const [localTournementCount, setLocalTournementCount] = useState<4 | 8>(4);
@@ -196,7 +190,7 @@ export const useUserContext = () => {
                     loses: res.data.loses,
                     rating: res.data.rating,
                 })
-            } catch (err: any) {
+            } catch (err) {
                 console.log("Error in fetching user data", err);
             }
         };

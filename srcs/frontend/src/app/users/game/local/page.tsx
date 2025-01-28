@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import Image from 'next/image'
 import styles from '../styles/Game.module.css'
 import twoPlayers from '../../../../../assets/4players_1.svg'
