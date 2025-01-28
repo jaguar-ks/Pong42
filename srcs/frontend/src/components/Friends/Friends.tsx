@@ -32,10 +32,10 @@ type BlockType = {
 
 const Friends = () => {
     const [requests, setRequests] = useState<RequestType[]>([]);
-    const [sentRequest, setSentRequest] = useState<RequestType[]>([]);
     const [blocked, setBlocked] = useState<BlockType[]>([]);
     const [friends, setFriends] = useState<BlockType[]>([]);
     const [nowBlocked, setNowBlocked] = useState<BlockType[]>([]);
+    const [sentRequest, setSentRequest] = useState<RequestType[]>([]);
     const [clicked, setClicked] = useState("Friends");
 
     useEffect(() => {
@@ -44,10 +44,10 @@ const Friends = () => {
                 const res = await axios.get(`http://localhost:8000/api/users/me/connections/`, {
                     withCredentials: true,
                 });
-                setRequests(res.data.results.filter((item: any) => item.status === "incoming_request"));
-                setSentRequest(res.data.results.filter((item: any) => item.status === "sent_request"));
-                setBlocked(res.data.results.filter((item: any) => item.status === "blocked"));
-                setFriends(res.data.results.filter((item: any) => item.status === "friends"));
+                setRequests(res.data.results.filter((item: RequestType) => item.status === "incoming_request"));
+                setSentRequest(res.data.results.filter((item: BlockType) => item.status === "sent_request"));
+                setBlocked(res.data.results.filter((item: BlockType) => item.status === "blocked"));
+                setFriends(res.data.results.filter((item: BlockType) => item.status === "friends"));
             } catch (err) {
                 console.error("Error in fetching user data", err);
             }
@@ -109,6 +109,7 @@ const Friends = () => {
             const response = await axios.get(`http://localhost:8000/api/users/me/connections/${id}/accept/`, {
                 withCredentials: true,
             });
+            console.log(response);
             const acceptedRequest = requests.find((item) => item.id === id);
             
             if (acceptedRequest) {
@@ -195,7 +196,8 @@ const Friends = () => {
                 });
                 setBlocked(blocked.filter((item) => item.id !== idd - 1));
                 setNowBlocked(nowBlocked.filter((item) => item.id !== idd - 1));
-                console.log("User unblocked successfully 2 ");
+                console.log("User unblocked successfully 2 ",errr);
+
             } catch (error) {
                 console.error("errrrr", error);
             }
@@ -267,4 +269,3 @@ const Friends = () => {
 };
 
 export default Friends;
-

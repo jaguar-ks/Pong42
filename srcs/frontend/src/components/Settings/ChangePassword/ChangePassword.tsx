@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, ChangeEvent } from 'react';
 import axios from 'axios';
-import { useUserContext } from '@/context/UserContext';
 import styles from './change.module.css';
 
 interface ChangePasswordProps {
@@ -14,7 +13,6 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ setCurrentPage }) => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [error, setError] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { userData, updateUserData } = useUserContext();
 
   useEffect(() => {
     if (inputRef.current) {
@@ -44,8 +42,12 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ setCurrentPage }) => {
       );
       console.log(res.data);
       setCurrentPage("");
-    } catch (err: any) {
-      setError(err.response?.data?.password || []);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.password || []);
+      } else {
+        setError(["An unknown error occurred"]);
+      }
     }
   };
 
@@ -93,4 +95,3 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ setCurrentPage }) => {
 };
 
 export default ChangePassword;
-

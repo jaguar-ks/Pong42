@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import chatLogoWithe from '../../../assets/chatLogoWithe.svg';
 import chatLogoBlack from '../../../assets/chatLogoBlack.svg';
 import gameLogoWithe from '../../../assets/chatLogoWithe.svg';
@@ -9,20 +9,13 @@ import homeLogoWithe from '../../../assets/homeLogoWithe.svg';
 import homeLogoBlack from '../../../assets/homeLogoBlack.svg';
 import leaderboardWithe from '../../../assets/leaderboardWithe.svg';
 import leaderboardBlack from '../../../assets/leaderboardBlack.svg';
-import SettingsWithe from '../../../assets/SettingsWithe.svg';
-import SettingsBlack from '../../../assets/SettingsBlack.svg';
-import LogoutWithe from '../../../assets/LogoutWithe.svg';
-import LogoutBlack from '../../../assets/LogoutBlack.svg';
 import hamburgerDotsBlack from '../../../assets/XBlack.svg'
 import { useUserContext } from "@/context/UserContext";
 import Image from "next/image";
-import Link from "next/link";
 import classes from './NavBar.module.css'
 import { useRouter } from 'next/navigation'
 
-interface NavBarProps {
-    onClose: () => void;
-  }
+
 
 const NavBar = ({onClose}) => {
     const router = useRouter();
@@ -33,7 +26,6 @@ const NavBar = ({onClose}) => {
         { name: "leaderboard", logoBlack: leaderboardBlack, logoWhite: leaderboardWithe },
     ];
     const { currentPage, updateCurrentPage } = useUserContext();
-    const [isMenuOpen, setIsMenuOpen] = useState(true);
 
     const handlePageChange = (item: string) => {
         router.push("/users/" + item.name)

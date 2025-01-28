@@ -12,25 +12,9 @@ const Line = dynamic(() => import("react-chartjs-2").then((mod) => mod.Line), {
   ssr: false,
 })
 
-interface Player {
-  id: number
-  username: string
-  rating: number
-}
 
-interface MatchData {
-  id: number
-  player1: Player
-  player2: Player
-  created_at: string
-}
 
-interface ApiResponse {
-  count: number
-  next: string | null
-  previous: string | null
-  results: MatchData[]
-}
+
 
 const Rate = () => {
   const { userData } = useUserContext()

@@ -1,34 +1,47 @@
-'use client'
-
+"use client"
+import { z } from 'zod'
+import axios, { AxiosError } from 'axios'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import axios from 'axios'
-import { z } from 'zod'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { InputField } from '@/components/InputField'
+
 import styles from './page.module.css'
 import imageee from '../../../../assets/syberPlayer.png'
 import googleIcon from '../../../../assets/googleSigninLogoBlack.svg'
 import githubIcon from '../../../../assets/githubSignInLogo.svg'
 import FTIcon from '../../../../assets/FTSignUnImage1.svg'
 
-const schema = z.object({
-  firstname: z.string().min(1, 'First name is required'),
-  lastname: z.string().min(1, 'Last name is required'),
-  email: z.string().email('Invalid email address'),
-  username: z.string().min(3, 'Username must be at least 3 characters'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  confermPassword: z.string(),
-}).refine((data) => data.password === data.confermPassword, {
-  message: "Passwords don't match",
-  path: ["confermPassword"],
-})
+// Define your Zod schema
+const schema = z
+  .object({
+    firstname: z.string().min(1, 'First name is required'),
+    lastname: z.string().min(1, 'Last name is required'),
+    email: z.string().email('Invalid email address'),
+    username: z.string().min(3, 'Username must be at least 3 characters'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    confermPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confermPassword, {
+    message: "Passwords don't match",
+    path: ['confermPassword'],
+  })
 
 type FormData = z.infer<typeof schema>
 
+// If you want single-string errors for each field:
+type ServerErrorData = {
+  [K in keyof FormData]?: string
+} & {
+  non_field_errors?: string
+  detail?: string
+}
+
 export default function SignUpPage() {
+  const router = useRouter()
+
   const [formData, setFormData] = useState<FormData>({
     firstname: '',
     lastname: '',
@@ -37,29 +50,40 @@ export default function SignUpPage() {
     password: '',
     confermPassword: '',
   })
+
+  const [errors, setErrors] = useState<ServerErrorData>({})
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
-  const [errors, setErrors] = useState<Partial<FormData> & { non_field_errors?: string }>({})
 
-  const router = useRouter()
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setErrors({})
     setIsLoading(true)
 
+    // Validate
     const result = schema.safeParse(formData)
-    if(!result.success) {
-      setErrors(result.error.flatten().fieldErrors)
+    if (!result.success) {
+      // Flatten errors from Zod
+      const fieldErrors = result.error.flatten().fieldErrors
+      // Transform arrays of errors into a single string (e.g., first error only)
+      setErrors({
+        firstname: fieldErrors.firstname?.[0],
+        lastname: fieldErrors.lastname?.[0],
+        email: fieldErrors.email?.[0],
+        username: fieldErrors.username?.[0],
+        password: fieldErrors.password?.[0],
+        confermPassword: fieldErrors.confermPassword?.[0],
+      })
       setIsLoading(false)
       return
     }
 
+    // Submit to backend
     try {
       await axios.post('http://localhost:8000/api/auth/sign-up/', {
         username: formData.username,
@@ -69,27 +93,37 @@ export default function SignUpPage() {
         last_name: formData.lastname,
       })
       setIsSuccess(true)
-    } catch (err: any) {
-      console.error('Error:', err.response?.data)
-      setErrors(err.response?.data || { non_field_errors: 'An error occurred' })
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError<ServerErrorData>
+        if (axiosError.response?.data) {
+          setErrors(axiosError.response.data)
+        } else {
+          setErrors({ non_field_errors: 'An unknown error occurred' })
+        }
+      } else {
+        setErrors({ non_field_errors: 'An unknown error occurred' })
+      }
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleSignUp = async (index: number) => {
+    setIsLoading(true)
     try {
       const res = await axios.get('http://localhost:8000/api/auth/social/providers/')
-      console.log(`${res.data.providers[index].provider_name} sign-up clicked`)
-      router.push(res.data.providers[index].provider_url);
-    } catch (err: any) {
-      console.error('Error:', err.response )
-      
+      router.push(res.data.providers[index].provider_url)
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('Error:', error.response)
+      } else {
+        console.error('Error:', error)
+      }
     } finally {
       setIsLoading(false)
     }
   }
-
 
   return (
     <div className={styles.pageContainer}>
@@ -103,21 +137,65 @@ export default function SignUpPage() {
                   <h2 className={styles.subtitle}>Welcome to the Ping Pong World</h2>
                   <p className={styles.description}>Please create your account.</p>
                   <form onSubmit={handleSubmit} className={styles.form}>
-                    {Object.entries(formData).map(([key, value]) => (
-                      <InputField
-                        key={key}
-                        label={key.charAt(0).toUpperCase() + key.slice(1)}
-                        type={key.includes('password') ? 'password' : 'text'}
-                        id={key}
-                        name={key}
-                        value={value}
-                        onChange={handleChange}
-                        error={errors[key as keyof FormData]}
-                      />
-                    ))}
+                    <InputField
+                      label="Firstname"
+                      name="firstname"
+                      id="firstname"
+                      type="text"
+                      value={formData.firstname}
+                      onChange={handleChange}
+                      error={errors.firstname}
+                    />
+                    <InputField
+                      label="Lastname"
+                      name="lastname"
+                      id="lastname"
+                      type="text"
+                      value={formData.lastname}
+                      onChange={handleChange}
+                      error={errors.lastname}
+                    />
+                    <InputField
+                      label="Email"
+                      name="email"
+                      id="email"
+                      type="text"
+                      value={formData.email}
+                      onChange={handleChange}
+                      error={errors.email}
+                    />
+                    <InputField
+                      label="Username"
+                      name="username"
+                      id="username"
+                      type="text"
+                      value={formData.username}
+                      onChange={handleChange}
+                      error={errors.username}
+                    />
+                    <InputField
+                      label="Password"
+                      name="password"
+                      id="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      error={errors.password}
+                    />
+                    <InputField
+                      label="Confirm Password"
+                      name="confermPassword"
+                      id="confermPassword"
+                      type="password"
+                      value={formData.confermPassword}
+                      onChange={handleChange}
+                      error={errors.confermPassword}
+                    />
+
                     {errors.non_field_errors && (
                       <p className={styles.errorText}>{errors.non_field_errors}</p>
                     )}
+
                     <div className={styles.submitContainer}>
                       <div className={styles.submitButtonContainer}>
                         <button
@@ -152,7 +230,7 @@ export default function SignUpPage() {
                     <button onClick={() => handleSignUp(0)} className={styles.socialButton}>
                       <Image
                         src={FTIcon}
-                        alt="Sign up with GitHub"
+                        alt="Sign up with 42"
                         width={40}
                         height={40}
                         className={styles.socialButtonImage}
@@ -206,4 +284,3 @@ export default function SignUpPage() {
     </div>
   )
 }
-

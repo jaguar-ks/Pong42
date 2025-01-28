@@ -1,90 +1,67 @@
-"use client";
-import React, { useState, useRef, useEffect } from 'react';
-import classes from './OtpInput.module.css';
+import type React from "react"
+import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import styles from "./OtpInput.module.css"
 
 interface OtpInputProps {
-  onComplete: (code: string) => void;
-  onCancel: () => void;
+  onComplete: (code: string) => void
+  onCancel: () => void
+  isLoading: boolean
+  setErrorBack: (error: string) => void
+  errorback: string | undefined
 }
 
-const OtpInput: React.FC<OtpInputProps> = ({setErrorBack, errorback, onComplete, onCancel, isLoading }) => {
-  const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
-  const [error, setError] = useState<string>('');
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+const OtpInput: React.FC<OtpInputProps> = ({ onComplete, onCancel, isLoading, setErrorBack, errorback }) => {
+  const [otp, setOtp] = useState<string>("")
+  const [error, setError] = useState<string>("")
 
-  useEffect(() => {
-    inputRefs.current[0]?.focus();
-  }, []);
-
-  const handleChange = (index: number, value: string) => {
-      setErrorBack("");
-    if (isNaN(Number(value))){
-        return;
-    }
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    if (value !== '' && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-
-    if (newOtp.every(digit => digit !== '')) {
-      setError('');
-    }
-  };
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && otp[index] === '' && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, "").slice(0, 6)
+    setOtp(value)
+    setError("")
+    setErrorBack("")
+  }
 
   const handleSubmit = () => {
-    if (otp.some(digit => digit === '')) {
-      setError('Please fill in all digits');
+    if (otp.length !== 6) {
+      setError("Please enter all 6 digits")
       setErrorBack("")
-      return;
+      return
     }
-    onComplete(otp.join(''));
-  };
+    onComplete(otp)
+  }
 
   return (
-    <div>
-      <div className={classes.otpContainer}>
-        {otp.map((digit, index) => (
-          <input
-            key={index}
-            ref={el => inputRefs.current[index] = el}
-            className={classes.otpInput}
-            type="text"
-            maxLength={1}
-            value={digit}
-            onChange={e => handleChange(index, e.target.value)}
-            onKeyDown={e => handleKeyDown(index, e)}
-            placeholder="•"
-            onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
-          />
-        ))}
+    <div className={styles.container}>
+      <div className={styles.inputContainer}>
+        <Label htmlFor="otp-input">Enter 6-digit OTP</Label>
+        <Input
+          id="otp-input"
+          type="text"
+          inputMode="numeric"
+          pattern="\d{6}"
+          maxLength={6}
+          value={otp}
+          onChange={handleChange}
+          placeholder="Enter 6-digit code"
+          className={styles.input}
+        />
       </div>
-      {error && <p className={classes.error}>{error}</p>}
-      {errorback && <p className={classes.error}>{errorback}</p>}
-      <div className={classes.buttonContainer}>
-        <div>
-          <button disabled={isLoading} className={`${classes.button} ${classes.submitButton}`} onClick={handleSubmit}>
-            {!isLoading ? "Submit" : "loading"}
-          </button>
-        </div>
-        <div className={classes.cancleBtnContainer}>
-          <button className={`${classes.button} ${classes.cancelButton}`} onClick={onCancel}>
-            Cancel
-          </button>
-        </div>
+      {error && <p className={styles.errorText}>{error}</p>}
+      {errorback && <p className={styles.errorText}>{errorback}</p>}
+      <div className={styles.buttonContainer}>
+        <Button variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button onClick={handleSubmit} disabled={isLoading}>
+          {isLoading ? "Loading..." : "Submit"}
+        </Button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default OtpInput;
+export default OtpInput
 

@@ -1,17 +1,17 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Image from 'next/image'
-import axios from 'axios'
-import { InputField } from '@/components/InputField'
-import styles from './page.module.css'
-import OtpForLogin from '../../../components/OtpForLogin/OtpForLogin'
-import { Header } from '@/components/Header'
-import imageee from '../../../../assets/syberPlayer.png'
-import googleIcon from '../../../../assets/googleSigninLogoBlack.svg'
-import githubIcon from '../../../../assets/githubSignInLogo.svg'
-import FTIcon from '../../../../assets/FTSignUnImage1.svg'
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import Image from "next/image"
+import axios, { type AxiosError } from "axios"
+import { InputField } from "@/components/InputField"
+import styles from "./page.module.css"
+import OtpForLogin from "@/components/OtpForLogin/OtpForLogin"
+import { Header } from "@/components/Header"
+import imageee from "../../../../assets/syberPlayer.png"
+import googleIcon from "../../../../assets/googleSigninLogoBlack.svg"
+import githubIcon from "../../../../assets/githubSignInLogo.svg"
+import FTIcon from "../../../../assets/FTSignUnImage1.svg"
 
 interface Errors {
   details: string
@@ -20,69 +20,68 @@ interface Errors {
   otp: string
 }
 
+interface ErrorResponse {
+  detail?: string
+  username?: string[]
+  password?: string[]
+  otp_code?: string[]
+  
+}
+
 const SignInPage: React.FC = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [errors, setErrors] = useState<Errors>({
-    details: '',
-    username: '',
-    password: '',
-    otp: '',
+    details: "",
+    username: "",
+    password: "",
+    otp: "",
   })
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const social_error: string = searchParams.get('error')
-  const otp_required = searchParams.get('otp_required') === 'true'
-  console.log('component mounted')
-  // Listen for changes in the query params
-  useEffect(() => {
-    console.log('otp_required:', otp_required)
-    if (otp_required) {
-      setErrors({
-        details: '',
-        username: '',
-        password: '',
-        otp: 'OTP is required',
-      })
-    }
-  }, [otp_required]) // Runs when query params change
+  const social_error = searchParams.get("error")
+  const otp_required = searchParams.get("otp_required") === "true"
 
   useEffect(() => {
-    console.log('social_error:', social_error)
-    if (social_error) {
-      setErrors({
-        details: social_error,
-        username: '',
-        password: '',
-        otp: '',
-      })
+    if (otp_required) {
+      setErrors((prev) => ({ ...prev, otp: "OTP is required" }))
     }
-  }, [social_error]) // Runs when query params change
+  }, [otp_required])
+
+  useEffect(() => {
+    if (social_error) {
+      setErrors((prev) => ({ ...prev, details: social_error }))
+    }
+  }, [social_error])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
     setErrors({
-      details: '',
-      username: '',
-      password: '',
-      otp: '',
+      details: "",
+      username: "",
+      password: "",
+      otp: "",
     })
     setIsLoading(true)
-    
+
     try {
-      await axios.post("http://localhost:8000/api/auth/sign-in/", {username, password}, {withCredentials: true})
-      console.log("Success")
+      await axios.post("http://localhost:8000/api/auth/sign-in/", { username, password }, { withCredentials: true })
       router.push("/users/home")
-    } catch (err: any) {
-      console.error("Error:", err.response)
-      setErrors({
-        details: err.response?.data?.detail || "",
-        username: err.response?.data?.username?.[0] || "",
-        password: err.response?.data?.password?.[0] || "",
-        otp: err.response?.data?.otp_code?.[0] || "",
-      })
+    } catch (err) {
+      console.error("Error:", err)
+      if (axios.isAxiosError(err)) {
+        const axiosError = err as AxiosError<ErrorResponse>
+        setErrors({
+          details: axiosError.response?.data?.detail || "",
+          username: axiosError.response?.data?.username?.[0] || "",
+          password: axiosError.response?.data?.password?.[0] || "",
+          otp: axiosError.response?.data?.otp_code?.[0] || "",
+        })
+      } else {
+        setErrors((prev) => ({ ...prev, details: "An unexpected error occurred" }))
+      }
     } finally {
       setIsLoading(false)
     }
@@ -90,12 +89,19 @@ const SignInPage: React.FC = () => {
 
   const handleSignUp = async (index: number) => {
     try {
-      const res = await axios.get('http://localhost:8000/api/auth/social/providers/')
-      console.log(`${res.data.providers[index].provider_name} sign-up clicked`)
-      router.push(res.data.providers[index].provider_url);
-    } catch (err: any) {
-      console.error('Error:', err.response )
-      
+      const res = await axios.get("http://localhost:8000/api/auth/social/providers/")
+      router.push(res.data.providers[index].provider_url)
+    } catch (err) {
+      console.error("Error:", err)
+      if (axios.isAxiosError(err)) {
+        const axiosError = err as AxiosError<ErrorResponse>
+        setErrors((prev) => ({
+          ...prev,
+          details: axiosError.response?.data?.detail || "An error occurred during sign up",
+        }))
+      } else {
+        setErrors((prev) => ({ ...prev, details: "An unexpected error occurred during sign up" }))
+      }
     } finally {
       setIsLoading(false)
     }
@@ -103,7 +109,7 @@ const SignInPage: React.FC = () => {
 
   return (
     <div className={styles.pageContainer}>
-      <Header forWhat="Sign In"/>
+      <Header forWhat="Sign In" />
       <main className={styles.main}>
         <div className={styles.formContainer}>
           <div className={styles.formContent}>
@@ -132,12 +138,8 @@ const SignInPage: React.FC = () => {
                 {errors.details && <p className={styles.error}>{errors.details}</p>}
                 <div className={styles.submitContainer}>
                   <div className={styles.submitButtonContainer}>
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className={styles.submitButton}
-                    >
-                      {isLoading ? 'Loading...' : 'Sign In'}
+                    <button type="submit" disabled={isLoading} className={styles.submitButton}>
+                      {isLoading ? "Loading..." : "Sign In"}
                     </button>
                   </div>
                 </div>
@@ -145,41 +147,35 @@ const SignInPage: React.FC = () => {
               <div className={styles.socialButtonsContainer}>
                 <button onClick={() => handleSignUp(1)} className={styles.socialButton}>
                   <Image
-                    src={googleIcon}
+                    src={googleIcon || "/placeholder.svg"}
                     alt="Sign in with Google"
                     width={40}
                     height={40}
                     className={styles.socialButtonImage}
-                    error={errors.details}
                   />
                 </button>
                 <button onClick={() => handleSignUp(2)} className={styles.socialButton}>
                   <Image
-                    src={githubIcon}
+                    src={githubIcon || "/placeholder.svg"}
                     alt="Sign in with GitHub"
                     width={40}
                     height={40}
                     className={styles.socialButtonImage}
-                    error={errors.details}
-                    />
+                  />
                 </button>
                 <button onClick={() => handleSignUp(0)} className={styles.socialButton}>
                   <Image
-                    src={FTIcon}
-                    alt="Sign in with GitHub"
+                    src={FTIcon || "/placeholder.svg"}
+                    alt="Sign in with FT"
                     width={40}
                     height={40}
                     className={styles.socialButtonImage}
-                    error={errors.details}
                   />
                 </button>
               </div>
               <p className={styles.signUpText}>
-                Don't have an account?{' '}
-                <button
-                  onClick={() => router.push('/auth/signup')}
-                  className={styles.signUpLink}
-                >
+                Dont have an account
+                <button onClick={() => router.push("/auth/signup")} className={styles.signUpLink}>
                   Sign Up
                 </button>
               </p>
@@ -188,7 +184,7 @@ const SignInPage: React.FC = () => {
               <div className={styles.containerImage}>
                 <div className={styles.ImageContainer}>
                   <Image
-                    src={imageee}
+                    src={imageee || "/placeholder.svg"}
                     alt="Login Player"
                     width={500}
                     height={500}

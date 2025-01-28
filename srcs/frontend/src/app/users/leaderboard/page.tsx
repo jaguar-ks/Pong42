@@ -6,13 +6,14 @@ import axios from 'axios';
 import classes from './page.module.css';
 import { useUserContext } from '@/context/UserContext';
 import { useRouter } from 'next/navigation';
-import playerImage from '../../../../assets/player.png'
 
 interface Player {
   id: number;
   username: string;
   avatar_url: string;
   is_online: boolean;
+  wins: number;
+  loses: number;
 }
 
 interface LeaderboardResponse {
@@ -86,7 +87,7 @@ const Leaderboard: React.FC = () => {
               <span className={classes.wl}>W/L</span>
               <span className={classes.rating}>Rating</span>
             </div>
-            {leaderboardData?.results.map((player, index) => (
+            {leaderboardData?.results.map((player) => (
               <div key={player.id} className={classes.playerRow} onClick={() => handleClickOnPlayer(player.id)}>
                 <div className={classes.player}>
                   <div className={classes.avatarContainer}>
