@@ -18,6 +18,10 @@ import axios from "axios";
 const SearchProfile = () => {
   const { updateSearchedUserData, updateCurrentPage, searchedUserData, updateUserDataSearch } = useUserContext();
   const { id } = useParams();
+
+  // Convert id to number safely
+  const numericId = typeof id === "string" ? parseInt(id, 10) : Array.isArray(id) ? parseInt(id[0], 10) : NaN;
+
   const [isLoading, setIsLoading] = useState(true);
   const [userExist, setUserExist] = useState(false);
 
@@ -27,23 +31,19 @@ const SearchProfile = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get(`http://localhost:8000/api/users/${id}/`, {
+        const res = await axios.get(`http://localhost:8000/api/users/${numericId}/`, {
           withCredentials: true,
         });
         console.log("Fetched Data:", res.data);
 
         updateSearchedUserData(res.data);
         updateUserDataSearch(res.data);
+        setUserExist(false); // User exists
       } catch (err) {
         if (axios.isAxiosError(err)) {
-          // Now TypeScript knows `err` is an AxiosError
           console.error("Error fetching user data:", err.response?.data?.detail);
-          if (err.response?.data?.detail) {
-            console.log(err.response.data.detail);
-          }
-          setUserExist(true);
+          setUserExist(true); // User doesn't exist
         } else {
-          // Some other type of error (e.g. network error, etc.)
           console.error("Unknown error:", err);
           setUserExist(true);
         }
@@ -52,8 +52,14 @@ const SearchProfile = () => {
       }
     };
 
-    fetchData();
-  }, []);
+    if (!isNaN(numericId)) {
+      fetchData();
+    } else {
+      console.error("Invalid user ID");
+      setUserExist(true);
+      setIsLoading(false);
+    }
+  }, [numericId, updateCurrentPage, updateSearchedUserData, updateUserDataSearch]);
 
   return (
     <div className={classes.home}>
@@ -74,20 +80,33 @@ const SearchProfile = () => {
             <ProgressBarFr ratingFr={searchedUserData.rating} />
           </div>
           <div className={classes.box4}>
-            <FriendsFR id={id} />
+            <FriendsFR id={numericId} />
           </div>
           <div className={classes.box5}>
-            <AchievementsFr wins={searchedUserData.wins} loses={searchedUserData.loses} rating={searchedUserData.rating} />
+            <AchievementsFr
+              wins={searchedUserData.wins}
+              loses={searchedUserData.loses}
+              rating={searchedUserData.rating}
+            />
           </div>
           <div className={classes.box6}>
-            <MatchHistoryFr id={id}></MatchHistoryFr>
+            <MatchHistoryFr id={numericId} />
           </div>
         </div>
       ) : (
         <div className={classes.notFoundContainer}>
-          <Image width={100} height={100} src={userNotFoundImage} alt="user not found" className={classes.userNotFoundImage}/>
+          <Image
+            width={100}
+            height={100}
+            src={userNotFoundImage}
+            alt="user not found"
+            className={classes.userNotFoundImage}
+          />
           <p className={classes.notFoundMessage}>This user does not exist.</p>
-          <button className={classes.homeButton} onClick={() => window.location.href = '/users/home'}>
+          <button
+            className={classes.homeButton}
+            onClick={() => (window.location.href = "/users/home")}
+          >
             Go to Home
           </button>
         </div>
@@ -97,4 +116,3 @@ const SearchProfile = () => {
 };
 
 export default SearchProfile;
-
