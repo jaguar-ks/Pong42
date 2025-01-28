@@ -26,8 +26,13 @@ const OtpForLogin: React.FC<OtpForLoginProps> = ({ setErrors, username, password
         { withCredentials: true },
       )
       router.push("/users/home")
-    } catch (err: { response: { data: { otp_code: string[] } } }) {
-      setError(err.response?.data?.otp_code?.[0] || "An error occurred.")
+    } catch (err: unknown) {
+      // Use a type guard to safely access properties on the error object
+      if (axios.isAxiosError(err) && err.response?.data?.otp_code) {
+        setError(err.response.data.otp_code[0])
+      } else {
+        setError("An error occurred.")
+      }
     } finally {
       setIsLoading(false)
     }

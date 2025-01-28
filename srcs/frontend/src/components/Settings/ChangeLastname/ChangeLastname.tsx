@@ -36,8 +36,12 @@ const ChangeLastname: React.FC<ChangeLastnameProps> = ({ setCurrentPage }) => {
       console.log(res.data);
       updateUserData({ ...userData, last_name: newLastName });
       setCurrentPage("");
-    } catch (err: { response: { data: { last_name: string[] } } }) {
-      setError(err.response?.data?.last_name || []);
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data?.last_name) {
+        setError(err.response.data.last_name);
+      } else {
+        setError(["An unexpected error occurred."]);
+      }
     }
   };
 

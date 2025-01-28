@@ -55,7 +55,10 @@ interface SearchedUserDataType {
     rating: number;
     username: string;
     wins: number;
-    // connection?: string;
+    connection?: {
+        id: number;
+        status: string;
+    }; // Update this to an object
 }
 
 // Define a type for user data search

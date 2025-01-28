@@ -22,8 +22,11 @@ interface MatchData {
   created_at: string
 }
 
+interface MatchHistoryFrProps {
+  id: number // Explicitly define the type of id
+}
 
-export const MatchHistoryFr = ({id}) => {
+export const MatchHistoryFr: React.FC<MatchHistoryFrProps> = ({ id }) => {
   const { userData } = useUserContext()
   const [matches, setMatches] = useState<MatchData[]>([])
   const [loading, setLoading] = useState(true)
@@ -49,7 +52,7 @@ export const MatchHistoryFr = ({id}) => {
     if (typeof userData.id === "number") {
       fetchData()
     }
-  }, [userData.id])
+  }, [userData.id, id])
 
   const getMatchResult = (match: MatchData) => {
     if (match.player1.id === userData.id) {

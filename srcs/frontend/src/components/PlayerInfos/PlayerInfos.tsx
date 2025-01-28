@@ -31,6 +31,10 @@ const PlayerInfos: React.FC<{ user: string }> = ({ user }) => {
 
   const defaultAvatarUrl = "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png";
 
+  // Type guard to check if the data is of type UserDataType
+  const isUserDataType = (data: typeof userData | typeof userDataSearch): data is typeof userData =>
+    "last_login" in data;
+
   return (
     <div className={styles.playerinfos}>
       {/* User Image and Name Section */}
@@ -50,7 +54,8 @@ const PlayerInfos: React.FC<{ user: string }> = ({ user }) => {
         <div className={styles.nameUnderImage}>
           {truncateText(`${data.first_name} ${data.last_name}`, 20)}
         </div>
-        {!data.is_online && data.last_login && (
+        {/* Only show last login if data is of UserDataType */}
+        {!data.is_online && isUserDataType(data) && data.last_login && (
           <div className={styles.lastSeen}>
             Last seen: <TimeDifference timestamp={data.last_login} />
           </div>
@@ -61,11 +66,10 @@ const PlayerInfos: React.FC<{ user: string }> = ({ user }) => {
       <div className={styles.infosContainer}>
         <InfoItem title="Username" value={data.username} />
         <InfoItem title="ID" value={data.id?.toString()} />
-        {user !== "search" && <InfoItem title="Email" value={data.email} />}
+        {user !== "search" && "email" in data && <InfoItem title="Email" value={data.email} />}
       </div>
     </div>
   );
 };
 
 export default PlayerInfos;
-
