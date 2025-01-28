@@ -1,10 +1,10 @@
 'use client'
 
-export default function Paddle({ position }: { position: [number, number, number] }) {
+export default function Paddle({ position, color }: { position: [number, number, number] , color: string }) {
   return (
     <mesh position={position}>
-      <boxGeometry args={[2.25, 0.2, 0.2]} />
-      <meshPhongMaterial color="red" />
+      <boxGeometry args={[1.875,0.375, 0.375]} />
+      <meshPhongMaterial color={color} />
     </mesh>
   )
 }

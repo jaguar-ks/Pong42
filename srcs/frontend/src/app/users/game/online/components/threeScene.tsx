@@ -11,10 +11,13 @@ import { useUserContext } from '@/context/UserContext'
 
 const planeH = 15
 const planeW = 11.25
+const paddleWidth = 1.875
+const paddleHeight = 0.375
 
 export default function ThreeScene({ onScoreUpdate, player1, player2 }) {
-  const { myPaddel, oppPaddel, ball, move } = useGameSocket()
+  const { myPaddel, oppPaddel, ball, move, myId, oppId } = useGameSocket()
   const ballRef = useRef()
+  const me = myPaddel.y == 0 ? -1 : 1
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -36,19 +39,18 @@ export default function ThreeScene({ onScoreUpdate, player1, player2 }) {
   }, [move])
 
   useEffect(() => {
-    console.log(ball.current)
     if (ballRef.current) {
       ballRef.current.position.set(
-        -5.625 + ((ball.current.x * planeW) / 600),
+        me * (-5.625 + ((ball.x * planeW) / 600)),
         0.2,
-        -7.5 + ((ball.current.y * planeH) / 800)
+        -7.5 + ((ball.y * planeH) / 800)
       )
     }
   }, [ball])
 
   return (
     <div className="h-full aspect-[1/0.5]">
-      <Canvas camera={{ position: [0, 10, 20], fov: 60 }}>
+      <Canvas camera={{ position: [0, 20, 0], fov: me * 60 }}>
         <OrbitControls />
         <ambientLight intensity={0.4} />
         <Plane />
@@ -60,8 +62,9 @@ export default function ThreeScene({ onScoreUpdate, player1, player2 }) {
             clearcoatRoughness={0.1}
           />
         </Sphere>
-        <Paddle position={[myPaddel.current.x, myPaddel.current.y, (planeH / 2) - 0.1]} />
-        <Paddle position={[oppPaddel.current.x, oppPaddel.current.y, -(planeH / 2) + 0.01]} />
+        <Paddle position={[me * (-5.625 + myPaddel.x *planeW /600 + paddleWidth /2) ,0, me * ((planeH / 2) -0.1)]} color="red"/>
+        <Paddle position={[-5.625 + (oppPaddel.x * planeW)/600 + paddleWidth /2 , 0, me * (-(planeH / 2) + 0.1)]} color="blue"/>
+
       </Canvas>
     </div>
   )
