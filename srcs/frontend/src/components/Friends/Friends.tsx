@@ -35,7 +35,6 @@ const Friends = () => {
     const [blocked, setBlocked] = useState<BlockType[]>([]);
     const [friends, setFriends] = useState<BlockType[]>([]);
     const [nowBlocked, setNowBlocked] = useState<BlockType[]>([]);
-    const [sentRequest, setSentRequest] = useState<RequestType[]>([]);
     const [clicked, setClicked] = useState("Friends");
 
     useEffect(() => {
@@ -45,7 +44,6 @@ const Friends = () => {
                     withCredentials: true,
                 });
                 setRequests(res.data.results.filter((item: RequestType) => item.status === "incoming_request"));
-                setSentRequest(res.data.results.filter((item: BlockType) => item.status === "sent_request"));
                 setBlocked(res.data.results.filter((item: BlockType) => item.status === "blocked"));
                 setFriends(res.data.results.filter((item: BlockType) => item.status === "friends"));
             } catch (err) {

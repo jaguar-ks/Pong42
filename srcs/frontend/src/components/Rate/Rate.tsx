@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
-import "chart.js/auto"
+import type { ChartOptions } from "chart.js"
 import ChartDataLabels from "chartjs-plugin-datalabels"
 import classes from "./rate.module.css"
 import axios from "axios"
@@ -12,9 +12,18 @@ const Line = dynamic(() => import("react-chartjs-2").then((mod) => mod.Line), {
   ssr: false,
 })
 
-
-
-
+// Define the type for match data
+interface Match {
+  created_at: string
+  player1: {
+    id: number
+    rating: number
+  }
+  player2: {
+    id: number
+    rating: number
+  }
+}
 
 const Rate = () => {
   const { userData } = useUserContext()
@@ -27,16 +36,18 @@ const Rate = () => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const res = await axios.get(`http://localhost:8000/api/pongue/${userData.id}/matches`,{withCredentials: true})
-        const matches = res.data.results
+        const res = await axios.get(`http://localhost:8000/api/pongue/${userData.id}/matches`, {
+          withCredentials: true,
+        })
+        const matches: Match[] = res.data.results
 
         // Sort matches by date
-        matches.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+        matches.sort((a: Match, b: Match) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
 
         // Extract ratings and dates
         const ratings: number[] = []
         const dates: string[] = []
-        matches.forEach((match) => {
+        matches.forEach((match: Match) => {
           const player = match.player1.id === userData.id ? match.player1 : match.player2
           ratings.push(player.rating)
           dates.push(new Date(match.created_at).toLocaleDateString())
@@ -51,8 +62,7 @@ const Rate = () => {
         setLoading(false)
       }
     }
-    if (typeof userData.id === "number")
-      fetchData()
+    if (typeof userData.id === "number") fetchData()
   }, [userData.id])
 
   if (loading) {
@@ -81,7 +91,7 @@ const Rate = () => {
     ],
   }
 
-  const options = {
+  const options: ChartOptions<"line"> = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
@@ -110,7 +120,7 @@ const Rate = () => {
           return value.toFixed(0)
         },
         anchor: "end",
-        align: "top",
+        align: "top" as const,
       },
     },
   }
