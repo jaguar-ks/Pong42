@@ -81,6 +81,10 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
           });
           setNotification(true)
         }
+        if (message.type === 'online') {
+          const { id, is_online } = message;
+          console.log(id, is_online);
+        }
       };
 
       ws.current.onclose = () => {
