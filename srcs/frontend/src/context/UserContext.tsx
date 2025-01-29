@@ -42,6 +42,7 @@ interface UserDataType {
     wins: number;
     loses: number;
     rating: number;
+    has_notif: boolean;
 }
 
 // Define a type for the searched user data
@@ -103,6 +104,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         wins: 0,
         loses: 0,
         rating: 0,
+        has_notif: false,
     });
 
     const [searchedUserData, setSearchedUserData] = useState<SearchedUserDataType>({
@@ -192,6 +194,7 @@ export const useUserContext = () => {
                     wins: res.data.wins,
                     loses: res.data.loses,
                     rating: res.data.rating,
+                    has_notif: res.data.has_notif,
                 })
             } catch (err) {
                 console.log("Error in fetching user data", err);

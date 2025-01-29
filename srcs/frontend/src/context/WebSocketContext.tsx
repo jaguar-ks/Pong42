@@ -35,8 +35,10 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const { userData } = useContext(UserContext);
-  const [notification, setNotification] = useState(false)
+  const [notification, setNotification] = useState(false);
   const [notifications, setNotifications] = useState<Notifications[]>([])
+  const [onlineUser, setOnlineUser] = useState<{user_id:number, is_online:boolean}>({user_id:0, is_online:false});
+
   useEffect(() => {
       const wsUrl = `ws://localhost:8000/ws/chat/`;
       
@@ -82,8 +84,9 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
           setNotification(true)
         }
         if (message.type === 'online') {
-          const { id, is_online } = message;
-          console.log(id, is_online);
+          const { user_id, is_online } = message;
+          setOnlineUser({user_id: user_id, is_online: is_online});
+          console.log(message);
         }
       };
 
@@ -128,7 +131,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   };
 
   return (
-    <WebSocketContext.Provider value={{close, sendMessage, messages, isConnected, clearMessages, notification ,setNotification}}>
+    <WebSocketContext.Provider value={{close, sendMessage, messages, isConnected, clearMessages, notification ,setNotification, onlineUser }}>
       {children}
     </WebSocketContext.Provider>
   );

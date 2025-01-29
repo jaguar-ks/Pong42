@@ -203,7 +203,7 @@ export default function BoxedChatInterface() {
           {messages.map((msg, i, msgs) => {
             const newDay = i > 0 && msg.timestamp.split('T')[0] > msgs[i - 1].timestamp.split('T')[0];
             return (
-              <>
+              <React.Fragment key={msg.id}>
                 {newDay && (
                     <p className="flex-1 text-center text-gray-500 dark:text-gray-400 text-sm mb-3">
                       {msg.timestamp.split('T')[0]}
@@ -216,7 +216,7 @@ export default function BoxedChatInterface() {
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{printTime(msg.timestamp)}</p>
                   </div>
                 </div>
-              </>
+              </React.Fragment>
             );
             })
           }

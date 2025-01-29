@@ -7,9 +7,13 @@ from ..utils import send_real_time_notif
 
 class AuthUserSerializer(serializers.ModelSerializer):
     otp_uri = serializers.SerializerMethodField(
-        method_name="get_otp_uri", read_only=True
+        method_name="get_otp_uri", read_only=True,
     )
 
+    has_notif = serializers.SerializerMethodField(
+        method_name="get_has_notif", read_only=True,
+    )
+    
     class Meta:
         model = User
         exclude = ("password",)
@@ -18,6 +22,9 @@ class AuthUserSerializer(serializers.ModelSerializer):
         if user.two_fa_enabled:
             return ""
         return user.otp_uri
+    
+    def get_has_notif(self, user) -> bool:
+        return Notification.objects.filter(user=user, read=False).exists()
 
 
 class UserSerializer(serializers.ModelSerializer):
