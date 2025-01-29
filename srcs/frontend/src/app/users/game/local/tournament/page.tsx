@@ -16,12 +16,27 @@ const RoundOne = ({setPage}) =>{
     } = useUserContext();
 
     const handlePlayerWins = (winnerName: string) => {
+    const handlePlayerWins = (winnerName: string) => {
         setLocalTournementNames([...localTournementNames, winnerName]);
         setPage("map");
     };
+    };
 
     return (
+    return (
         <div className={styles.containerwinnerFstRound}>
+            <button
+                className={styles.PlayBtn}
+                onClick={() => handlePlayerWins(localTournementNames[0])}
+            >
+                winner : {localTournementNames[0]}
+            </button>
+            <button
+                className={styles.PlayBtn}
+                onClick={() => handlePlayerWins(localTournementNames[1])}
+            >
+                winner : {localTournementNames[1]}
+            </button>
             <button
                 className={styles.PlayBtn}
                 onClick={() => handlePlayerWins(localTournementNames[0])}
@@ -40,14 +55,34 @@ const RoundOne = ({setPage}) =>{
 
 const RoundTwo: React.FC<RoundProps> = ({ setPage }) => {
     const { localTournementNames, setLocalTournementNames } = useUserContext();
+    );
+};
 
+const RoundTwo: React.FC<RoundProps> = ({ setPage }) => {
+    const { localTournementNames, setLocalTournementNames } = useUserContext();
+
+    const handlePlayerWins = (winnerName: string) => {
     const handlePlayerWins = (winnerName: string) => {
         setLocalTournementNames([...localTournementNames, winnerName]);
         setPage("map");
     };
+    };
 
     return (
+    return (
         <div className={styles.containerwinnerFstRound}>
+            <button
+                className={styles.PlayBtn}
+                onClick={() => handlePlayerWins(localTournementNames[2])}
+            >
+                winner : {localTournementNames[2]}
+            </button>
+            <button
+                className={styles.PlayBtn}
+                onClick={() => handlePlayerWins(localTournementNames[3])}
+            >
+                winner : {localTournementNames[3]}
+            </button>
             <button
                 className={styles.PlayBtn}
                 onClick={() => handlePlayerWins(localTournementNames[2])}
@@ -66,12 +101,20 @@ const RoundTwo: React.FC<RoundProps> = ({ setPage }) => {
 
 const RoundTree: React.FC<RoundProps> = ({ setPage }) => {
     const { localTournementNames, setLocalTournementNames } = useUserContext();
+    );
+};
 
+const RoundTree: React.FC<RoundProps> = ({ setPage }) => {
+    const { localTournementNames, setLocalTournementNames } = useUserContext();
+
+    const handlePlayerWins = (winnerName: string) => {
     const handlePlayerWins = (winnerName: string) => {
         setLocalTournementNames([...localTournementNames, winnerName]);
         setPage("map");
     };
+    };
 
+    return (
     return (
         <div className={styles.containerwinnerFstRound}>
         <button className={styles.PlayBtn} onClick={() => handlePlayerWins(localTournementNames[4])}>winner : {localTournementNames[4]}</button>
@@ -82,6 +125,7 @@ const RoundTree: React.FC<RoundProps> = ({ setPage }) => {
 
 
 const Tournament = () => {
+    const { localTournementNames } = useUserContext();
     const { localTournementNames } = useUserContext();
     const [page, setPage] = useState<string>("chosePlayers");
 
