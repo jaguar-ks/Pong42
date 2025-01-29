@@ -93,7 +93,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
       ws.current.onclose = () => {
         console.log('Disconnected from chat');
         setIsConnected(false);
-        // setTimeout(connect, 3000);
       };
 
       ws.current.onerror = (error) => {
