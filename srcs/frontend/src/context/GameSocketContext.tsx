@@ -2,8 +2,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 interface GameSocketContextType {
-  move: (direction: string, playerId: number) => void;
-  close: () => void;
+  move: (direction: string)=>void;
   isConnected: boolean;
   myPaddel: Paddel;
   oppPaddel: Paddel;
@@ -29,9 +28,9 @@ const GameSocketContext = createContext<GameSocketContextType | null>(null);
 
 export const GameSocketProvider = ({ children }: { children: React.ReactNode }) => {
   const ws = useRef<WebSocket | null>(null);
-  const myPaddel = useRef<Paddel>({ x: 0, y: 0, score: 0 });
-  const oppPaddel = useRef<Paddel>({ x: 0, y: 0, score: 0 });
-  const ball = useRef<Ball>({ x: 0, y: 0 });
+  const [myPaddel, setMyPaddel] = useState<Paddel>({ x: 0, y: 0, score: 0 });
+  const [oppPaddel, setOppPaddel] = useState<Paddel>({ x: 0, y: 0, score: 0 });
+  const [ball, setBall] = useState<Ball>({ x: 0, y: 0 });
   const [gameStarted, setGameStarted] = useState(false);
   const myId = useRef<number>(0);
   const oppId = useRef<number>(0);
@@ -46,26 +45,21 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
 
       ws.current.onopen = () => {
         console.log('Game state started');
-
       };
 
       ws.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === 'game.start') {
-          // console.log(data);
           myId.current = data.data.my_id;
           oppId.current = data.data.opp_id;
         }
 
         if (data.type === 'game.update') {
           setStage(true);
-            myPaddel.current = {x:data.data[myId.current].x, y:data.data[myId.current].y, score: data.data[myId.current].score};
-            oppPaddel.current = {x:data.data[oppId.current].x, y:data.data[oppId.current].y, score: data.data[oppId.current].score};
-            ball.current = {x:data.data.ball.x, y:data.data.ball.y};
-            
-            // console.log(myPaddel.current, oppPaddel.current, ball.current);
+          setMyPaddel({x:data.data[myId.current].x, y:data.data[myId.current].y, score: data.data[myId.current].score});
+          setOppPaddel({x:data.data[oppId.current].x, y:data.data[oppId.current].y, score: data.data[oppId.current].score});
+          setBall({x:data.data.ball.x, y:data.data.ball.y});
         }
-
       };
 
       ws.current.onclose = () => {
@@ -75,13 +69,12 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
       ws.current.onerror = (error) => {
         console.error('WebSocket error:', error);
       };
-
     }
   }, [gameStarted]);
 
   const move = (direction: string, playerId: number) => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({ action: 'move', player_id: playerId, direction }));
+      ws.current.send(JSON.stringify({ action: 'move', direction }));
     }
   };
 
@@ -92,7 +85,7 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <GameSocketContext.Provider value={{ stageReady, setStage ,gameStarted, setGameStarted, myPaddel, oppPaddel, move, close, ball }}>
+    <GameSocketContext.Provider value={{ stageReady, setStage ,gameStarted, setGameStarted, myPaddel, oppPaddel,myId, oppId, move, ball }}>
       {children}
     </GameSocketContext.Provider>
   );
