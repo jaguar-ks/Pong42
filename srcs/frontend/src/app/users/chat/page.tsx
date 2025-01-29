@@ -1,12 +1,11 @@
 'use client'
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Send, Smile, MoreVertical, Phone, Video } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useWebSocket } from '@/context/WebSocketContext';
-import { useUserContext } from '@/context/UserContext'
 import axios from 'axios';
 
 type Message = {
@@ -34,7 +33,7 @@ function printTime(time: string) {
 }
 
 export default function BoxedChatInterface() {
-  const { sendMessage, messages: wsMessages, isConnected } = useWebSocket();
+  const { sendessage, messages: wsMessages, isConnected } = useWebSocket();
   const [user, setUser] = useState<User>({
     conv_id: 0,
     id: '',
@@ -50,7 +49,6 @@ export default function BoxedChatInterface() {
   const [users, setUsers] = useState<User[]>([]);
   const [activeUser, setActiveUser] = useState<User | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(()=>{
     axios.get('http://localhost:8000/api/users/me/', { withCredentials: true })
@@ -150,22 +148,26 @@ export default function BoxedChatInterface() {
       setMessage('');
     }
   };
-
+  const handleSearchfriends = (target: string) => {
+    const filteredUsers = users.filter((user) => user.username.toLowerCase().includes(target.toLowerCase()));
+    setUsers(filteredUsers);
+  }
   const handleUserClick = (user: User) => {
     setActiveUser(user);
   };
 
   return (
-    <div className="w-full h-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex">
-      <div className="w-1/3 border-r border-gray-200 dark:border-gray-700">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex">
+      <div className="h-full w-1/3 border-r border-gray-200 dark:border-gray-700">
         <div className="p-4">
           <Input
             type="search"
             placeholder="Search"
             className="w-full"
+            onChange={(e) => handleSearchfriends(e.target.value)}
           />
         </div>
-        <ScrollArea className="h-[calc(100vh-4rem)]">
+        <ScrollArea className="h-[calc(92vh-4rem)]">
           {users.map((user, index) => (
             <div
               key={`${user.id}-${index}`}
@@ -197,7 +199,7 @@ export default function BoxedChatInterface() {
             </div>
           </div>
         </div>
-        <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+        <ScrollArea className="h-[calc(85vh-4rem)]">
           {messages.map((msg, i, msgs) => {
             const newDay = i > 0 && msg.timestamp.split('T')[0] > msgs[i - 1].timestamp.split('T')[0];
             return (
@@ -208,8 +210,8 @@ export default function BoxedChatInterface() {
                     </p>
                   )
                 }
-                <div key={msg.id} className={`flex ${msg.user == user?.id ? 'justify-end' : 'justify-start'} mb-3`}>
-                  <div className={`max-w-[70%] ${msg.user == user?.id ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-4`}>
+                <div key={msg.id} className={`flex ${msg.user == user?.id ? 'justify-end' : 'justify-start'} p-1 m-3 mb-3`}>
+                  <div className={`max-w-[50vw] ${msg.user == user?.id ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-4`}>
                     <p className="break-words whitespace-pre-wrap">{msg.content}</p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{printTime(msg.timestamp)}</p>
                   </div>
@@ -222,10 +224,6 @@ export default function BoxedChatInterface() {
         </ScrollArea>
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex space-x-2">
-            <Button variant="ghost" size="icon">
-              <Smile className="h-5 w-5" />
-              <span className="sr-only">Add emoji</span>
-            </Button>
             <Input
               type="text"
               placeholder="Type a message..."

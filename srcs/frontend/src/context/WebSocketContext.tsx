@@ -36,7 +36,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   const [isConnected, setIsConnected] = useState(false);
   const { userData } = useContext(UserContext);
   const [notification, setNotification] = useState(false)
-  const [setNotifications] = useState<Notifications[]>([])
+  const [notifications, setNotifications] = useState<Notifications[]>([])
   useEffect(() => {
       const wsUrl = `ws://localhost:8000/ws/chat/`;
       
@@ -90,7 +90,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
       ws.current.onclose = () => {
         console.log('Disconnected from chat');
         setIsConnected(false);
-        // setTimeout(connect, 3000);
       };
 
       ws.current.onerror = (error) => {
