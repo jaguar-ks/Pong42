@@ -33,7 +33,7 @@ function printTime(time: string) {
 }
 
 export default function BoxedChatInterface() {
-  const { sendessage, messages: wsMessages, isConnected } = useWebSocket();
+  const { sendMessage, messages: wsMessages, isConnected } = useWebSocket();
   const [user, setUser] = useState<User>({
     conv_id: 0,
     id: '',
