@@ -1,35 +1,17 @@
 "use client"
-import { z } from 'zod'
-import axios, { AxiosError } from 'axios'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
-import { InputField } from '@/components/InputField'
+import axios, { type AxiosError } from "axios"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
+import { Header } from "@/components/Header"
+import { Footer } from "@/components/Footer"
+import { InputField } from "@/components/InputField"
 
-import styles from './page.module.css'
-import imageee from '../../../../assets/syberPlayer.png'
-import googleIcon from '../../../../assets/googleSigninLogoBlack.svg'
-import githubIcon from '../../../../assets/githubSignInLogo.svg'
-import FTIcon from '../../../../assets/FTSignUnImage1.svg'
-
-// Define your Zod schema
-const schema = z
-  .object({
-    firstname: z.string().min(1, 'First name is required'),
-    lastname: z.string().min(1, 'Last name is required'),
-    email: z.string().email('Invalid email address'),
-    username: z.string().min(3, 'Username must be at least 3 characters'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    confermPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confermPassword, {
-    message: "Passwords don't match",
-    path: ['confermPassword'],
-  })
-
-type FormData = z.infer<typeof schema>
+import styles from "./page.module.css"
+import imageee from "../../../../assets/syberPlayer.png"
+import googleIcon from "../../../../assets/googleSigninLogoBlack.svg"
+import githubIcon from "../../../../assets/githubSignInLogo.svg"
+import FTIcon from "../../../../assets/FTSignUnImage1.svg"
 
 // If you want single-string errors for each field:
 type ServerErrorData = {
@@ -39,16 +21,23 @@ type ServerErrorData = {
   detail?: string
 }
 
+type FormData = {
+  firstname: string
+  lastname: string
+  email: string
+  username: string
+  password: string
+}
+
 export default function SignUpPage() {
   const router = useRouter()
 
   const [formData, setFormData] = useState<FormData>({
-    firstname: '',
-    lastname: '',
-    email: '',
-    username: '',
-    password: '',
-    confermPassword: '',
+    firstname: "",
+    lastname: "",
+    email: "",
+    username: "",
+    password: "",
   })
 
   const [errors, setErrors] = useState<ServerErrorData>({})
@@ -65,27 +54,15 @@ export default function SignUpPage() {
     setErrors({})
     setIsLoading(true)
 
-    // Validate
-    const result = schema.safeParse(formData)
-    if (!result.success) {
-      // Flatten errors from Zod
-      const fieldErrors = result.error.flatten().fieldErrors
-      // Transform arrays of errors into a single string (e.g., first error only)
-      setErrors({
-        firstname: fieldErrors.firstname?.[0],
-        lastname: fieldErrors.lastname?.[0],
-        email: fieldErrors.email?.[0],
-        username: fieldErrors.username?.[0],
-        password: fieldErrors.password?.[0],
-        confermPassword: fieldErrors.confermPassword?.[0],
-      })
+    if (formData.firstname.trim() === "" || formData.lastname.trim() === "") {
+      setErrors({ non_field_errors: "First name and last name cannot be blank" })
       setIsLoading(false)
       return
     }
 
     // Submit to backend
     try {
-      await axios.post('http://localhost:8000/api/auth/sign-up/', {
+      await axios.post("http://localhost:8000/api/auth/sign-up/", {
         username: formData.username,
         password: formData.password,
         email: formData.email,
@@ -99,10 +76,10 @@ export default function SignUpPage() {
         if (axiosError.response?.data) {
           setErrors(axiosError.response.data)
         } else {
-          setErrors({ non_field_errors: 'An unknown error occurred' })
+          setErrors({ non_field_errors: "An unknown error occurred" })
         }
       } else {
-        setErrors({ non_field_errors: 'An unknown error occurred' })
+        setErrors({ non_field_errors: "An unknown error occurred" })
       }
     } finally {
       setIsLoading(false)
@@ -112,13 +89,13 @@ export default function SignUpPage() {
   const handleSignUp = async (index: number) => {
     setIsLoading(true)
     try {
-      const res = await axios.get('http://localhost:8000/api/auth/social/providers/')
+      const res = await axios.get("http://localhost:8000/api/auth/social/providers/")
       router.push(res.data.providers[index].provider_url)
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error('Error:', error.response)
+        console.error("Error:", error.response)
       } else {
-        console.error('Error:', error)
+        console.error("Error:", error)
       }
     } finally {
       setIsLoading(false)
@@ -127,7 +104,7 @@ export default function SignUpPage() {
 
   return (
     <div className={styles.pageContainer}>
-      <Header forWhat="Sign Up"/>
+      <Header forWhat="Sign Up" />
       <main className={styles.main}>
         <div className={styles.formContainer}>
           <div className={styles.formContent}>
@@ -182,28 +159,13 @@ export default function SignUpPage() {
                       onChange={handleChange}
                       error={errors.password}
                     />
-                    <InputField
-                      label="Confirm Password"
-                      name="confermPassword"
-                      id="confermPassword"
-                      type="password"
-                      value={formData.confermPassword}
-                      onChange={handleChange}
-                      error={errors.confermPassword}
-                    />
 
-                    {errors.non_field_errors && (
-                      <p className={styles.errorText}>{errors.non_field_errors}</p>
-                    )}
+                    {errors.non_field_errors && <p className={styles.errorText}>{errors.non_field_errors}</p>}
 
                     <div className={styles.submitContainer}>
                       <div className={styles.submitButtonContainer}>
-                        <button
-                          type="submit"
-                          disabled={isLoading}
-                          className={styles.submitButton}
-                        >
-                          {isLoading ? 'Loading...' : 'Sign Up'}
+                        <button type="submit" disabled={isLoading} className={styles.submitButton}>
+                          {isLoading ? "Loading..." : "Sign Up"}
                         </button>
                       </div>
                     </div>
@@ -211,7 +173,7 @@ export default function SignUpPage() {
                   <div className={styles.socialButtonsContainer}>
                     <button onClick={() => handleSignUp(1)} className={styles.socialButton}>
                       <Image
-                        src={googleIcon}
+                        src={googleIcon || "/placeholder.svg"}
                         alt="Sign up with Google"
                         width={40}
                         height={40}
@@ -220,7 +182,7 @@ export default function SignUpPage() {
                     </button>
                     <button onClick={() => handleSignUp(2)} className={styles.socialButton}>
                       <Image
-                        src={githubIcon}
+                        src={githubIcon || "/placeholder.svg"}
                         alt="Sign up with GitHub"
                         width={40}
                         height={40}
@@ -229,7 +191,7 @@ export default function SignUpPage() {
                     </button>
                     <button onClick={() => handleSignUp(0)} className={styles.socialButton}>
                       <Image
-                        src={FTIcon}
+                        src={FTIcon || "/placeholder.svg"}
                         alt="Sign up with 42"
                         width={40}
                         height={40}
@@ -238,11 +200,8 @@ export default function SignUpPage() {
                     </button>
                   </div>
                   <p className={styles.signInText}>
-                    Already have an account?{' '}
-                    <button
-                      onClick={() => router.push('/auth/signin')}
-                      className={styles.signInLink}
-                    >
+                    Already have an account?{" "}
+                    <button onClick={() => router.push("/auth/signin")} className={styles.signInLink}>
                       Sign In
                     </button>
                   </p>
@@ -252,10 +211,7 @@ export default function SignUpPage() {
                   <h2 className={styles.subtitle}>Sign Up Successful!</h2>
                   <p className={styles.description}>Please check your email to validate registration.</p>
                   <div className={styles.submitButtonContainer}>
-                    <button
-                      onClick={() => router.push('/auth/signin')}
-                      className={styles.submitButton}
-                    >
+                    <button onClick={() => router.push("/auth/signin")} className={styles.submitButton}>
                       Go to Login
                     </button>
                   </div>
@@ -267,7 +223,7 @@ export default function SignUpPage() {
                 <div className={styles.containerImage}>
                   <div className={styles.ImageContainer}>
                     <Image
-                      src={imageee}
+                      src={imageee || "/placeholder.svg"}
                       alt="Login Player"
                       width={500}
                       height={500}
@@ -284,3 +240,4 @@ export default function SignUpPage() {
     </div>
   )
 }
+
