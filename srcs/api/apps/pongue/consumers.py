@@ -9,7 +9,7 @@ from .elo import save_game
 from apps.pongue.managers import GameRoom, RoomsManager, GameException, Participant
 
 
-NUMBER_OF_ROUNDS = 2
+NUMBER_OF_ROUNDS = 4
 FRAMES = 1 / 60
 
 class GameConsumer(AsyncJsonWebsocketConsumer):
