@@ -16,13 +16,10 @@ const RoundOne = ({setPage}) =>{
     } = useUserContext();
 
     const handlePlayerWins = (winnerName: string) => {
-    const handlePlayerWins = (winnerName: string) => {
         setLocalTournementNames([...localTournementNames, winnerName]);
         setPage("map");
     };
-    };
 
-    return (
     return (
         <div className={styles.containerwinnerFstRound}>
             <button
@@ -55,20 +52,12 @@ const RoundOne = ({setPage}) =>{
 
 const RoundTwo: React.FC<RoundProps> = ({ setPage }) => {
     const { localTournementNames, setLocalTournementNames } = useUserContext();
-    );
-};
 
-const RoundTwo: React.FC<RoundProps> = ({ setPage }) => {
-    const { localTournementNames, setLocalTournementNames } = useUserContext();
-
-    const handlePlayerWins = (winnerName: string) => {
     const handlePlayerWins = (winnerName: string) => {
         setLocalTournementNames([...localTournementNames, winnerName]);
         setPage("map");
     };
-    };
 
-    return (
     return (
         <div className={styles.containerwinnerFstRound}>
             <button
@@ -99,22 +88,15 @@ const RoundTwo: React.FC<RoundProps> = ({ setPage }) => {
     );
 };
 
-const RoundTree: React.FC<RoundProps> = ({ setPage }) => {
-    const { localTournementNames, setLocalTournementNames } = useUserContext();
-    );
-};
 
 const RoundTree: React.FC<RoundProps> = ({ setPage }) => {
     const { localTournementNames, setLocalTournementNames } = useUserContext();
 
-    const handlePlayerWins = (winnerName: string) => {
     const handlePlayerWins = (winnerName: string) => {
         setLocalTournementNames([...localTournementNames, winnerName]);
         setPage("map");
     };
-    };
 
-    return (
     return (
         <div className={styles.containerwinnerFstRound}>
         <button className={styles.PlayBtn} onClick={() => handlePlayerWins(localTournementNames[4])}>winner : {localTournementNames[4]}</button>
@@ -125,7 +107,6 @@ const RoundTree: React.FC<RoundProps> = ({ setPage }) => {
 
 
 const Tournament = () => {
-    const { localTournementNames } = useUserContext();
     const { localTournementNames } = useUserContext();
     const [page, setPage] = useState<string>("chosePlayers");
 
