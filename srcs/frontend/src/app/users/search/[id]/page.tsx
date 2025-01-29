@@ -3,13 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useUserContext } from "@/context/UserContext";
-import axios from "axios";
 import PlayerInfos from "@/components/PlayerInfos/PlayerInfos";
 import WeeklyAttendance from "@/components/weeklyAttendance/WeeklyAttendance";
 import Rate from "@/components/Rate/Rate";
-import ProgressBar from "@/components/ProgressBar/ProgressBar";
-import Friends from "@/components/Friends/Friends";
-import { Achievements } from "@/components/Achievements/Achievements";
 import classes from "./page.module.css";
 import FriendsFR from "@/components/FriendsFR/FriendsFR";
 import Image from "next/image";
@@ -17,10 +13,15 @@ import userNotFoundImage from '../../../../../assets/userNotFound.svg'
 import { MatchHistoryFr } from "@/components/MatchHistoryFr/MatchHistoryFr";
 import ProgressBarFr from "@/components/ProgressBarFr/ProgressBarFr";
 import { AchievementsFr } from "@/components/AchievementsFr/AchievementsFr";
+import axios from "axios";
 
 const SearchProfile = () => {
   const { updateSearchedUserData, updateCurrentPage, searchedUserData, updateUserDataSearch } = useUserContext();
   const { id } = useParams();
+
+  // Convert id to number safely
+  const numericId = typeof id === "string" ? parseInt(id, 10) : Array.isArray(id) ? parseInt(id[0], 10) : NaN;
+
   const [isLoading, setIsLoading] = useState(true);
   const [userExist, setUserExist] = useState(false);
 
@@ -30,28 +31,35 @@ const SearchProfile = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get(`http://localhost:8000/api/users/${id}/`, {
+        const res = await axios.get(`http://localhost:8000/api/users/${numericId}/`, {
           withCredentials: true,
         });
         console.log("Fetched Data:", res.data);
 
         updateSearchedUserData(res.data);
         updateUserDataSearch(res.data);
+        setUserExist(false); // User exists
       } catch (err) {
-        console.error("Error fetching user data:", err.response.data.detail);
-        if(err?.response?.data?.detail)
-          {
-            console.log(err?.response?.data?.detail);
-            
-          }
+        if (axios.isAxiosError(err)) {
+          console.error("Error fetching user data:", err.response?.data?.detail);
+          setUserExist(true); // User doesn't exist
+        } else {
+          console.error("Unknown error:", err);
           setUserExist(true);
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchData();
-  }, []);
+    if (!isNaN(numericId)) {
+      fetchData();
+    } else {
+      console.error("Invalid user ID");
+      setUserExist(true);
+      setIsLoading(false);
+    }
+  }, [numericId, updateCurrentPage, updateSearchedUserData, updateUserDataSearch]);
 
   return (
     <div className={classes.home}>
@@ -66,26 +74,39 @@ const SearchProfile = () => {
             <WeeklyAttendance user="search" />
           </div>
           <div className={classes.box3}>
-            <Rate user="search" />
+            <Rate />
           </div>
           <div className={classes.line}>
             <ProgressBarFr ratingFr={searchedUserData.rating} />
           </div>
           <div className={classes.box4}>
-            <FriendsFR id={id} />
+            <FriendsFR id={numericId} />
           </div>
           <div className={classes.box5}>
-            <AchievementsFr wins={searchedUserData.wins} loses={searchedUserData.loses} rating={searchedUserData.rating} rank={searchedUserData.rank} />
+            <AchievementsFr
+              wins={searchedUserData.wins}
+              loses={searchedUserData.loses}
+              rating={searchedUserData.rating}
+            />
           </div>
           <div className={classes.box6}>
-            <MatchHistoryFr id={id}></MatchHistoryFr>
+            <MatchHistoryFr id={numericId} />
           </div>
         </div>
       ) : (
         <div className={classes.notFoundContainer}>
-          <Image width={100} height={100} src={userNotFoundImage} alt="user not found" className={classes.userNotFoundImage}/>
+          <Image
+            width={100}
+            height={100}
+            src={userNotFoundImage}
+            alt="user not found"
+            className={classes.userNotFoundImage}
+          />
           <p className={classes.notFoundMessage}>This user does not exist.</p>
-          <button className={classes.homeButton} onClick={() => window.location.href = '/users/home'}>
+          <button
+            className={classes.homeButton}
+            onClick={() => (window.location.href = "/users/home")}
+          >
             Go to Home
           </button>
         </div>
@@ -95,4 +116,3 @@ const SearchProfile = () => {
 };
 
 export default SearchProfile;
-

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, ChangeEvent } from 'react';
+import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
 import axios from 'axios';
 import { useUserContext } from '@/context/UserContext';
 import styles from './change.module.css';
@@ -25,7 +25,7 @@ const ChangeFirstname: React.FC<ChangeFirstnameProps> = ({ setCurrentPage }) => 
     setNewFirstName(e.target.value);
   };
 
-  const handleChangeFirstName = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleChangeFirstName = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
       const res = await axios.patch(
@@ -36,12 +36,14 @@ const ChangeFirstname: React.FC<ChangeFirstnameProps> = ({ setCurrentPage }) => 
       console.log(res.data);
       updateUserData({ ...userData, first_name: newFirstName });
       setCurrentPage("");
-    } catch (err: any) {
-      setError(err.response?.data?.first_name || []);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.first_name || []);
+      }
     }
   };
 
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleOverlayClick = (e: MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       setCurrentPage("");
     }
@@ -78,4 +80,3 @@ const ChangeFirstname: React.FC<ChangeFirstnameProps> = ({ setCurrentPage }) => 
 };
 
 export default ChangeFirstname;
-

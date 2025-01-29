@@ -53,9 +53,8 @@ const Settings: React.FC = () => {
           wins: res.data.wins,
           loses: res.data.loses,
           rating: res.data.rating,
-          rank: res.data.rank,
         });
-      } catch (err: any) {
+      } catch (err) {
         console.log("Error in fetching user data", err);
       }
     };

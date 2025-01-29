@@ -1,44 +1,54 @@
-'use client'
+// src/components/1v1/local1v1/EntreInfosOneVsOne.tsx
+"use client";
 
-import { useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { useUserContext } from '@/context/UserContext'
-import styles from './EntreInfosOneVsOne.module.css'
+import React, { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { useUserContext } from "@/context/UserContext";
+import styles from "./EntreInfosOneVsOne.module.css";
 
-export default function UserGameInfoPage({setPage}) {
-  const [user1, setUser1] = useState('')
-  const [user2, setUser2] = useState('')
-  const [user1Image, setUser1Image] = useState('/placeholder.svg?height=100&width=100')
-  const [user2Image, setUser2Image] = useState('/placeholder.svg?height=100&width=100')
+// 1. Declare the prop interface
+
+
+export default function EntreInfosOneVsOne() {
+  const [user1, setUser1] = useState("");
+  const [user2, setUser2] = useState("");
+  const [user1Image, setUser1Image] = useState(
+    "/placeholder.svg?height=100&width=100"
+  );
+  const [user2Image, setUser2Image] = useState(
+    "/placeholder.svg?height=100&width=100"
+  );
   const { setLocalOneVsOneNames } = useUserContext();
-  const [isFormValid, setIsFormValid] = useState(false)
-  const router = useRouter()
-  const fileInputRef1 = useRef<HTMLInputElement>(null)
-  const fileInputRef2 = useRef<HTMLInputElement>(null)
+  const [isFormValid, setIsFormValid] = useState(false);
+  const router = useRouter();
+  const fileInputRef1 = useRef<HTMLInputElement>(null);
+  const fileInputRef2 = useRef<HTMLInputElement>(null);
 
   const validateForm = () => {
-    setIsFormValid(user1.trim() !== '' && user2.trim() !== '')
-  }
+    setIsFormValid(user1.trim() !== "" && user2.trim() !== "");
+  };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, setImage: (value: string) => void) => {
-    const file = event.target.files?.[0]
+  const handleImageUpload = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setImage: (value: string) => void
+  ) => {
+    const file = event.target.files?.[0];
     if (file) {
-      const objectUrl = URL.createObjectURL(file)
-      setImage(objectUrl)
+      const objectUrl = URL.createObjectURL(file);
+      setImage(objectUrl);
     }
-  }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (isFormValid) {
-      setLocalOneVsOneNames([
-        `${user1}|${user1Image}`,
-        `${user2}|${user2Image}`
-      ])
-      router.push(`/users/gameArenaLocal`)
+      setLocalOneVsOneNames([`${user1}|${user1Image}`, `${user2}|${user2Image}`]);
+      // Optionally update page state if needed
+      // setPage("somethingElse");
+      router.push(`/users/gameArenaLocal`);
     }
-  }
+  };
 
   return (
     <div className={styles.container}>
@@ -53,8 +63,8 @@ export default function UserGameInfoPage({setPage}) {
             type="text"
             value={user1}
             onChange={(e) => {
-              setUser1(e.target.value)
-              validateForm()
+              setUser1(e.target.value);
+              validateForm();
             }}
             placeholder="Enter Player 1 Nickname"
             className={styles.input}
@@ -93,8 +103,8 @@ export default function UserGameInfoPage({setPage}) {
             type="text"
             value={user2}
             onChange={(e) => {
-              setUser2(e.target.value)
-              validateForm()
+              setUser2(e.target.value);
+              validateForm();
             }}
             placeholder="Enter Player 2 Nickname"
             className={styles.input}
@@ -125,16 +135,11 @@ export default function UserGameInfoPage({setPage}) {
           </div>
         </div>
         <div className={styles.startButtonContainer}>
-          <button
-            type="submit"
-            className={styles.startButton}
-            disabled={!isFormValid}
-          >
+          <button type="submit" className={styles.startButton} disabled={!isFormValid}>
             Start Game
           </button>
         </div>
       </form>
     </div>
-  )
+  );
 }
-

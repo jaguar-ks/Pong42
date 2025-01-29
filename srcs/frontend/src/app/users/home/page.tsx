@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import classes from "./page.module.css"
 import PlayerInfos from "../../../components/PlayerInfos/PlayerInfos"
@@ -16,13 +16,11 @@ import { MatchHistory } from "@/components/MatchHistory/MatchHistory"
 
 
 const Home = () => {
-  const { updateUserData, updateCurrentPage } = useUserContext();
-  const [isLoading, setIsloading] = useState<boolean>(false);
+  const {updateCurrentPage } = useUserContext();
   const router = useRouter()
 
   useEffect(() => {
     updateCurrentPage("home")
-    setIsloading(true);
     const checkToken = async () => {
       try {
         // Use the test_auth endpoint to verify authentication
@@ -31,7 +29,6 @@ const Home = () => {
         console.log("Token validation error:", err);
         router.push("/auth/signin");
       } finally{
-        setIsloading(false);
       }
     }
     checkToken();

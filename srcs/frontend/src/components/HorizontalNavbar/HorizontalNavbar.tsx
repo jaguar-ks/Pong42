@@ -3,32 +3,30 @@
 import React, { useState, useRef, useEffect } from "react";
 import styles from './HorizontalNavbar.module.css';
 import SearchBar from "./SearchBar/SearchBar";
-import MessagesWhite from '../../../assets/MessagesWhite.svg';
-import MessagesBlack from '../../../assets/MessagesBlack.svg';
 import NotificationsWhite from '../../../assets/NotificationsWhite.svg';
 import NotificationsBlack from '../../../assets/NotificationsBlack.svg';
-import playerExample from '../../../assets/playerExcemple.jpeg';
 import searchIcon from '../../../assets/SearchBlack.svg';
 import closeIcon from '../../../assets/XBlack.svg';
 import Image from "next/image";
 import { useUserContext } from "@/context/UserContext";
 import Notifications from "./ComponentsHB/Notifications";
-import Messages from "./ComponentsHB/Messages";
 import Profile from "./ComponentsHB/Profile";
 import hamburgerDotsBlack from '../../../assets/hamburgerDotsBlack.svg';
 import NavBar from "../NavBar/NavBar";
 import { useWebSocket } from '@/context/WebSocketContext';
 
 
-const HorizontalNavbar = () => {
+const HorizontalNavbar: React.FC = () => {
     const [activeIcon, setActiveIcon] = useState("");
     const [isSearchActive, setIsSearchActive] = useState(false);
     const { userData } = useUserContext();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navbarRef = useRef<HTMLDivElement>(null);
-    const { sendMessage, messages: wsMessages, isConnected , notification, setNotification} = useWebSocket();
+    const { messages: wsMessages, notification, setNotification} = useWebSocket();
 
-
+    useEffect(() => {
+        console.log('Received messages from WebSocket:', wsMessages);
+    }, [wsMessages]);
 
     const handleIconToggle = (icon: string) => {
         setActiveIcon(prevIcon => prevIcon === icon ? "" : icon);
@@ -62,7 +60,7 @@ const HorizontalNavbar = () => {
                 <div className={styles.containerGroups}>
                     <div className={`${styles.dropdown} ${styles.dropdownSearch}`}>
                         {!isSearchActive && (
-                            <button className={styles.iconButton} onClick={() => setIsMenuOpen(true)}>
+                            <button className={styles.iconButton} onClick={() => handleMenuToggle(true)}>
                                 <Image className={styles.menuDotImage} src={hamburgerDotsBlack} alt="hamburger Icon" />
                             </button>
                         )}
@@ -139,4 +137,3 @@ const HorizontalNavbar = () => {
 };
 
 export default HorizontalNavbar;
-

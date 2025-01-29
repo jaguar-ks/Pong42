@@ -1,54 +1,63 @@
-"use client";
-import dynamic from 'next/dynamic';
-import 'chart.js/auto';
-import ChartDataLabels from 'chartjs-plugin-datalabels'; // Import the plugin
-import classes from './WeeklyAttendanceFr.module.css';
+"use client"
 
-const Pie = dynamic(() => import('react-chartjs-2').then((mod) => mod.Pie), {
-  ssr: false,
-});
+import { useState, useEffect } from "react"
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, type ChartOptions } from "chart.js"
+import { Pie } from "react-chartjs-2"
+import ChartDataLabels from "chartjs-plugin-datalabels"
+
+ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels)
 
 // Sample data for wins and losses
-const matches = { win: 15, lose: 10 }; // Example match data
+const matches = { win: 15, lose: 10 } // Example match data
+
 const data = {
-  labels: ['Wins', 'Losses'], // Use descriptive labels
+  labels: ["Wins", "Losses"],
   datasets: [
     {
-      label: 'Game Results',
-      data: [matches.win, matches.lose], // Use the actual match data
+      label: "Game Results",
+      data: [matches.win, matches.lose],
       backgroundColor: [
-        'rgba(0, 0, 0, 0.6)', // Color for Wins
-        'rgba(255, 255, 255, 0.6)', // Color for Losses
+        "rgba(0, 0, 0, 0.6)", // Color for Wins
+        "rgba(255, 255, 255, 0.6)", // Color for Losses
       ],
-      borderColor: 'rgba(0, 0, 0, 0.6)', // Border color for each segment
+      borderColor: "rgba(0, 0, 0, 0.6)",
       borderWidth: 2,
     },
   ],
-};
-
-// Chart options
-const options = {
-  plugins: {
-    legend: {
-      display: true, // Show legend
-    },
-    datalabels: {
-      color: 'black', // Text color for the labels
-      formatter: (value) => {
-        return value; // Return the actual value to display in the chart
-      },
-      anchor: 'center', // Center the label inside the segment
-      align: 'center',  // Align the label to the center
-    },
-  },
-};
-
-const WeeklyAttendanceFr = () => {
-  return (
-    <div className={classes.container}>
-      <Pie data={data} options={options} plugins={[ChartDataLabels]} /> {/* Pass the plugin to the Pie chart */}
-    </div>
-  );
 }
 
-export default WeeklyAttendanceFr;
+const options: ChartOptions<"pie"> = {
+  responsive: true,
+  plugins: {
+    legend: {
+      display: true,
+    },
+    datalabels: {
+      color: "black",
+      formatter: (value: number) => {
+        return value.toString()
+      },
+      anchor: "center",
+      align: "center",
+    },
+  },
+}
+
+const WeeklyAttendanceFr = () => {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (!isClient) return null
+
+  return (
+    <div className="w-full h-[400px] flex items-center justify-center bg-gray-100 border border-gray-200 rounded-lg p-4">
+      <Pie data={data} options={options} />
+    </div>
+  )
+}
+
+export default WeeklyAttendanceFr
+

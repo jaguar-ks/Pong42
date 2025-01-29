@@ -21,8 +21,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
       try {
         const res = await axios.get("http://localhost:8000/api/users/me/");
         setNewImage(res.data.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png");
-      } catch (err: any) {
-        console.log("Error in fetching user data", err);
+      } catch (error: unknown) {
+        console.log("Error in fetching user data", error);
       }
     };
 
@@ -30,8 +30,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
   }, []);
 
   const validateImage = (file: File) => {
-    const validTypes = ["image/jpeg", "image/png", "image/gif"];
-    const maxSize = 2 * 1024 * 1024;
+    const validTypes: string[] = ["image/jpeg", "image/png", "image/gif"];
+    const maxSize: number = 2 * 1024 * 1024;
 
     if (!validTypes.includes(file.type)) {
       setError("Invalid file type. Only JPG, PNG, and GIF are allowed.");
@@ -48,29 +48,29 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
   };
 
   const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+    const files: FileList | null = e.target.files;
     if (files && files.length > 0) {
-      const file = files[0];
+      const file: File = files[0];
 
       if (!validateImage(file)) return;
 
       setIsLoading(true);
-      const data = new FormData();
+      const data: FormData = new FormData();
       data.append("file", file);
       data.append("upload_preset", "estate");
 
       try {
-        const res = await fetch(
+        const res: Response = await fetch(
           `https://api.cloudinary.com/v1_1/doufu6atn/image/upload`,
           {
             method: "POST",
             body: data,
           }
         );
-        const fileData = await res.json();
+        const fileData: { secure_url: string } = await res.json();
         setNewImage(fileData.secure_url);
-      } catch (err) {
-        console.error("Error uploading image:", err);
+      } catch (error: unknown) {
+        console.error("Error uploading image:", error);
         setError("Failed to upload image. Please try again.");
       } finally {
         setIsLoading(false);
@@ -86,7 +86,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
 
     setIsLoading(true);
     try {
-      const res = await axios.patch(
+      const res: { data: { avatar_url: string } } = await axios.patch(
         "http://localhost:8000/api/users/me/",
         {
           avatar_url: newImage,
@@ -96,8 +96,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
       console.log(res.data);
       updateUserData({...userData, avatar_url: newImage});
       setCurrentPage("");
-    } catch (err) {
-      console.error("Error updating user data:", err);
+    } catch (error: unknown) {
+      console.error("Error updating user data:", error);
       setError("Failed to update avatar. Please try again.");
     } finally {
       setIsLoading(false);
@@ -155,4 +155,3 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
 };
 
 export default ImageUpload;
-

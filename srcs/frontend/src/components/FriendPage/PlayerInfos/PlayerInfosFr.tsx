@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
+
 import classes from "./PlayerInfosFr.module.css";
-import { useUserContext } from '../../../context/UserContext'; // Import the custom hook
-import TimeDifference from '../../TimeDifference/TimeDifference';
+import { useUserContext } from '../../../context/UserContext';
 import CopyToClipboard from '../../CopyToClipboard/CopyToClipboard';
 import Image from 'next/image';
 
@@ -32,7 +31,7 @@ const PlayerInfosFr = () => {
                         <h2 className={classes.title}>
                             {searchedUserData?.id ? searchedUserData?.id.toString().length > 10 ? `${searchedUserData.id.toString().slice(0, 10)}...` : searchedUserData.id : "loading"}
                         </h2>
-                        <CopyToClipboard textToCopy={searchedUserData?.id} width={18} height={18} />
+                        <CopyToClipboard textToCopy={String(searchedUserData?.id)} width={18} height={18} />
                     </div>
                 </div>
                 <div className={classes.info}>
