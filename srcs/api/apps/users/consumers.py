@@ -1,24 +1,28 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.db import database_sync_to_async, sync_to_async
-from .models import Message, Notification, Connection
+from channels.db import database_sync_to_async
+from .models import Message, Connection
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from django.forms.models import model_to_dict
-from .serializers import NotificationSerializer
-from ..utils import send_real_time_notif
 
 User = get_user_model()
 
 online_users = []
 
+online_group = 'online_users'
+
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        global online_group, online_users
         self.user = self.scope["user"]
         self.group_name = f"user_{self.user.id}"
 
         await self.channel_layer.group_add(
             self.group_name,
+            self.channel_name,
+        )
+        await self.channel_layer.group_add(
+            online_group,
             self.channel_name,
         )
         await self.accept()
@@ -28,19 +32,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print('IN =>', online_users, flush=True)
 
     async def notify_oline_users(self):
-        for user_id in online_users:
-            if user_id != self.user.id:
-                await self.channel_layer.group_send(
-                    f"user_{user_id}",
-                    {
-                        'type': 'status_update',
-                        'data': {
-                            'type': 'online',
-                            'user_id': self.user.id,
-                            'is_online': self.user.id in online_users,
-                        }
-                    }
-                )
+       await self.channel_layer.group_send(
+            online_group,
+            {
+                'type': 'status_update',
+                'data': {
+                    'type': 'online',
+                    'user_id': self.user.id,
+                    'is_online': self.user.id in online_users,
+                }
+            }
+        )
 
     async def status_update(self, event):
         await self.send(text_data=json.dumps(event['data']))
@@ -54,6 +56,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if hasattr(self, 'group_name'):
             await self.channel_layer.group_discard(
                 self.group_name,
+                self.channel_name
+            )
+            await self.channel_layer.group_discard(
+                online_group,
                 self.channel_name
             )
 

@@ -16,7 +16,7 @@ import { AchievementsFr } from "@/components/AchievementsFr/AchievementsFr";
 import axios from "axios";
 
 const SearchProfile = () => {
-  const { updateSearchedUserData, updateCurrentPage, searchedUserData, updateUserDataSearch } = useUserContext();
+  const { updateSearchedUserData, updateCurrentPage, searchedUserData, updateUserDataSearch, userDataSearch } = useUserContext();
   const { id } = useParams();
 
   // Convert id to number safely
@@ -59,7 +59,7 @@ const SearchProfile = () => {
       setUserExist(true);
       setIsLoading(false);
     }
-  }, [numericId, updateCurrentPage, updateSearchedUserData, updateUserDataSearch]);
+  }, [numericId, updateCurrentPage, updateSearchedUserData, updateUserDataSearch, userDataSearch.is_online, searchedUserData.is_online]);
 
   return (
     <div className={classes.home}>

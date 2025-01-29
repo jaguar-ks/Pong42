@@ -34,7 +34,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   const ws = useRef<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-  const { userData } = useContext(UserContext);
+  const { userData, updateUserData, searchedUserData, updateSearchedUserData, userDataSearch, updateUserDataSearch } = useContext(UserContext);
   const [notification, setNotification] = useState(false)
   const [setNotifications] = useState<Notifications[]>([])
   useEffect(() => {
@@ -82,8 +82,17 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
           setNotification(true)
         }
         if (message.type === 'online') {
-          const { id, is_online } = message;
-          console.log(id, is_online);
+          const { user_id, is_online } = message;
+          if (user_id == searchedUserData.id) {
+            updateSearchedUserData({ ...searchedUserData, is_online: is_online });
+          }
+          if (user_id == userDataSearch.id) {
+            updateUserDataSearch({ ...userDataSearch, is_online: is_online });
+          }
+          if (user_id == userData.id) {
+            updateUserData({ ...userData, is_online: is_online });
+          }
+          console.log(userDataSearch);
         }
       };
 
