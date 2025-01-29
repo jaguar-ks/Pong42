@@ -6,6 +6,7 @@ import styles from "./playerInfos.module.css";
 import TimeDifference from "../TimeDifference/TimeDifference";
 import CopyToClipboard from "../CopyToClipboard/CopyToClipboard";
 import { useUserContext } from "@/context/UserContext";
+import { useWebSocket } from "@/context/WebSocketContext";
 
 // Helper function to truncate text
 const truncateText = (text: string | undefined, maxLength: number) => {
@@ -27,7 +28,11 @@ const InfoItem: React.FC<{ title: string; value: string | undefined }> = ({ titl
 // Main PlayerInfos component
 const PlayerInfos: React.FC<{ user: string }> = ({ user }) => {
   const { userData, userDataSearch } = useUserContext();
-  const data = user === "search" ? userDataSearch : userData;
+  const dt = user === "search" ? userDataSearch : userData;
+  const { onlineUser } = useWebSocket();
+  const data = dt.id === onlineUser.user_id ? {...dt, is_online: onlineUser.is_online} : dt;
+  console.log("onlineUser", onlineUser);
+
 
   const defaultAvatarUrl = "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png";
 
