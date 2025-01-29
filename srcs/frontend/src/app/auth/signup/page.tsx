@@ -15,10 +15,11 @@ import FTIcon from "../../../../assets/FTSignUnImage1.svg"
 
 // If you want single-string errors for each field:
 type ServerErrorData = {
-  [K in keyof FormData]?: string
-} & {
-  non_field_errors?: string
-  detail?: string
+  firstname?: string
+  lastname?: string
+  email?: string
+  username?: string
+  password?: string
 }
 
 type FormData = {
