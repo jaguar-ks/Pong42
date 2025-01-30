@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react'
 import { PlayerCard } from './components/player-card'
 import { ScoreDisplay } from './components/score-display'
 import ThreeScene from './components/threeScene'
-import { useUserContext } from '@/context/UserContext'
+import { useGameSocket } from '@/context/GameSocketContext'
 import { Vector3 } from './types/game'
 
 export default function GameComponent({ player1, player2 }) {
+  const { me, opp } = useGameSocket();
   const [gameState, setGameState] = useState({
     player1Score: 0,
     player2Score: 0,
@@ -27,8 +28,6 @@ export default function GameComponent({ player1, player2 }) {
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-10">
         <PlayerCard
-          playerName={player1.name}
-          playerScore={gameState.player1Score}
           direction="left"
         />
         <ScoreDisplay
@@ -36,8 +35,6 @@ export default function GameComponent({ player1, player2 }) {
           player2Score={gameState.player2Score}
         />
         <PlayerCard
-          playerName={player2.name}
-          playerScore={gameState.player2Score}
           direction="right"
         />
       </div>

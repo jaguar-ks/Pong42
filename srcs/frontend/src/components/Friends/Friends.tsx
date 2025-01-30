@@ -92,7 +92,6 @@ const Friends = () => {
                         <p className={styles.message}>Friends</p>
                         <div className={styles.actionButtons}>
                             <button className={`${styles.actionButton} ${styles.challengeButton}`}>Challenge</button>
-                            <button className={`${styles.actionButton} ${styles.messageButton}`}>Message</button>
                             <button className={`${styles.actionButton} ${styles.blockButton}`} onClick={() => handleBlock(friend.user.id)}>Block</button>
                         </div>
                     </div>

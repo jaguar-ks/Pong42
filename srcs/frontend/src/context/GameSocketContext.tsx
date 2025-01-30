@@ -1,5 +1,7 @@
 'use client';
+import { Avatar } from '@/components/ui/avatar';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { useUserContext } from './UserContext';
 
 interface GameSocketContextType {
   move: (direction: string)=>void;
@@ -24,6 +26,12 @@ interface Ball {
   y: number;
 }
 
+interface PlayerData {
+  id: number;
+  username: string;
+  avatar: string;
+}
+
 const GameSocketContext = createContext<GameSocketContextType | null>(null);
 
 export const GameSocketProvider = ({ children }: { children: React.ReactNode }) => {
@@ -32,9 +40,12 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
   const [oppPaddel, setOppPaddel] = useState<Paddel>({ x: 0, y: 0, score: 0 });
   const [ball, setBall] = useState<Ball>({ x: 0, y: 0 });
   const [gameStarted, setGameStarted] = useState(false);
-  const myId = useRef<number>(0);
-  const oppId = useRef<number>(0);
+  // const me = useRef<number>(0);
+  // const opp = useRef<number>(0);
   const [stageReady, setStage] = useState(false);
+  const me = useRef<PlayerData>({ id: 0, username: '', avatar: '' });
+  const opp = useRef<PlayerData>({ id: 0, username: '', avatar: '' });
+  const { userData } = useUserContext();
 
   useEffect(() => {
     if (gameStarted) {
@@ -49,15 +60,29 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
 
       ws.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
+        if (data.type === 'room.waiting') {
+          console.log(data);
+          me.current.id = data.data.participants[0].id;
+          me.current.username = data.data.participants[0].username;
+          me.current.avatar = data.data.participants[0].avatar_url;
+        }
         if (data.type === 'game.start') {
-          myId.current = data.data.my_id;
-          oppId.current = data.data.opp_id;
+          console.log(data);
+          const op = data.data.participants.find((p: any) => p.id !== userData.id);
+          opp.current.id = op.id;
+          opp.current.username = op.username;
+          opp.current.avatar = op.avatar_url;
+          me.current.id = userData.id;
+          me.current.username = userData.username;
+          me.current.avatar = userData.avatar_url;
+          // me.current = data.data.my_id;
+          // opp.current = data.data.opp_id;
         }
 
         if (data.type === 'game.update') {
           setStage(true);
-          setMyPaddel({x:data.data[myId.current].x, y:data.data[myId.current].y, score: data.data[myId.current].score});
-          setOppPaddel({x:data.data[oppId.current].x, y:data.data[oppId.current].y, score: data.data[oppId.current].score});
+          setMyPaddel({x:data.data[me.current.id].x, y:data.data[me.current.id].y, score: data.data[me.current.id].score});
+          setOppPaddel({x:data.data[opp.current.id].x, y:data.data[opp.current.id].y, score: data.data[opp.current.id].score});
           setBall({x:data.data.ball.x, y:data.data.ball.y});
         }
       };
@@ -85,7 +110,7 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <GameSocketContext.Provider value={{ stageReady, setStage ,gameStarted, setGameStarted, myPaddel, oppPaddel,myId, oppId, move, ball }}>
+    <GameSocketContext.Provider value={{ stageReady, setStage ,gameStarted, setGameStarted, myPaddel, oppPaddel,me, opp, move, ball }}>
       {children}
     </GameSocketContext.Provider>
   );
