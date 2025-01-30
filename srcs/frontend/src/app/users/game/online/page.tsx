@@ -16,23 +16,29 @@ const players = [
 ]
 
 export default function PingPongMatchup() {
-  const {stageReady, setGameStarted, myPaddel, oppPaddel, ball } = useGameSocket()
+  const {stageReady, setGameStarted, myPaddel, oppPaddel, ball, me, opp} = useGameSocket()
   const { userData } = useContext(UserContext)
-  const player1 = userData.username
+  const [player1, setPlayer1] = useState<Player>({
+    id: 0,
+    name: "You",
+    image: '/placeholder.svg?height=100&width=100',
+  })
   const [player2, setPlayer2] = useState(players[1])
   const [isMatching, setIsMatching] = useState(false)
   const [matchFound, setMatchFound] = useState(false)
   const [noPlayerFound, setNoPlayerFound] = useState(false)
-
+  
+  
   useEffect(() => {
+    setPlayer1({ id: userData.id, name: userData.username, image: userData.avatar_url })
     let interval: NodeJS.Timeout
     let timeout: NodeJS.Timeout
-
+    
     if (isMatching && !matchFound) {
       interval = setInterval(() => {
         setPlayer2(players[Math.floor(Math.random() * players.length)])
       }, 100)
-
+      
       timeout = setTimeout(() => {
         clearInterval(interval)
         setIsMatching(false)
@@ -40,13 +46,13 @@ export default function PingPongMatchup() {
         setNoPlayerFound(true)
       }, 2000)
     }
-
+    
     return () => {
       clearInterval(interval)
       clearTimeout(timeout)
     }
-  }, [isMatching, matchFound])
-
+  }, [isMatching, matchFound, userData])
+  
   const startMatching = () => {
     setIsMatching(true)
     setMatchFound(false)
