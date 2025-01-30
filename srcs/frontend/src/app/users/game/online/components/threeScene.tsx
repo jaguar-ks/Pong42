@@ -23,10 +23,10 @@ export default function ThreeScene({ onScoreUpdate, player1, player2 }) {
     const handleKeyDown = (event) => {
       switch (event.key) {
         case 'ArrowLeft':
-          move('left')
+          move(me == 1 ? 'left' : 'right')
           break
         case 'ArrowRight':
-          move('right')
+          move(me == 1 ? 'right' : 'left')
           break
       }
     }
@@ -48,9 +48,15 @@ export default function ThreeScene({ onScoreUpdate, player1, player2 }) {
     }
   }, [ball])
 
+  useEffect(() => {
+    if (onScoreUpdate) {
+      onScoreUpdate({ player1: player1.score, player2: player2.score, winner: player1.score > player2.score ? player1 : player2 })
+    }
+  }, [player1, player2])
+
   return (
     <div className="h-full aspect-[1/0.5]">
-      <Canvas camera={{ position: [0, 20, 0], fov: me * 60 }}>
+      <Canvas camera={{ position: [0, 20, 0], fov: 60 }}>
         <OrbitControls />
         <ambientLight intensity={0.4} />
         <Plane />
@@ -63,7 +69,7 @@ export default function ThreeScene({ onScoreUpdate, player1, player2 }) {
           />
         </Sphere>
         <Paddle position={[me * (-5.625 + myPaddel.x *planeW /600 + paddleWidth /2) ,0, me * ((planeH / 2) -0.1)]} color="red"/>
-        <Paddle position={[-5.625 + (oppPaddel.x * planeW)/600 + paddleWidth /2 , 0, me * (-(planeH / 2) + 0.1)]} color="blue"/>
+        <Paddle position={[me * (-5.625 + (oppPaddel.x * planeW)/600 + paddleWidth /2) , 0, me * (-(planeH / 2) + 0.1)]} color="blue"/>
 
       </Canvas>
     </div>
