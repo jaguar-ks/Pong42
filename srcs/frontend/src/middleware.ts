@@ -11,7 +11,7 @@ export async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
     // If there is a token and user is trying to access signup or signin, redirect to /users/home
-    if (accessToken && (pathname.startsWith('/signup') || pathname.startsWith('/auth/signin'))) {
+    if (accessToken && (pathname.startsWith('/auth/signup') || pathname.startsWith('/auth/signin'))) {
         return NextResponse.redirect(new URL('/users/home', req.url));
     }
 
