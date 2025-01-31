@@ -108,7 +108,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
         ws.current.close();
       }
     };
-  }, []);
+  }, [notifications, userData.id]);
 
   const close = () => {
     if (ws.current) {
