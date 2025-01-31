@@ -1,21 +1,19 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Sphere } from '@react-three/drei'
 import { OrbitControls } from '@react-three/drei'
 import Plane from '../components/plane'
 import Paddle from '../components/paddle'
 import { useGameSocket } from '@/context/GameSocketContext'
-import { useUserContext } from '@/context/UserContext'
 
 const planeH = 15
 const planeW = 11.25
 const paddleWidth = 1.875
-const paddleHeight = 0.375
 
 export default function ThreeScene({ onScoreUpdate, player1, player2 }) {
-  const { myPaddel, oppPaddel, ball, move, myId, oppId } = useGameSocket()
+  const { myPaddel, oppPaddel, ball, move } = useGameSocket()
   const ballRef = useRef()
   const me = myPaddel.y == 0 ? -1 : 1
 
@@ -36,7 +34,7 @@ export default function ThreeScene({ onScoreUpdate, player1, player2 }) {
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [move])
+  }, [move, me])
 
   useEffect(() => {
     if (ballRef.current) {
@@ -46,13 +44,13 @@ export default function ThreeScene({ onScoreUpdate, player1, player2 }) {
         -7.5 + ((ball.y * planeH) / 800)
       )
     }
-  }, [ball])
+  }, [ball, me])
 
   useEffect(() => {
     if (onScoreUpdate) {
       onScoreUpdate({ player1: player1.score, player2: player2.score, winner: player1.score > player2.score ? player1 : player2 })
     }
-  }, [player1, player2])
+  }, [onScoreUpdate, player1, player2])
 
   return (
     <div className="h-full aspect-[1/0.5]">

@@ -6,6 +6,7 @@ import { TableIcon as TableTennis } from "lucide-react"
 import { UserContext } from "@/context/UserContext"
 import { useGameSocket } from "@/context/GameSocketContext"
 import GameComponent from "./gameComponent"
+import Image from "next/image"
 
 const players = [
   { id: 1, name: "Alex", image: "/placeholder.svg?height=100&width=100" },
@@ -16,7 +17,7 @@ const players = [
 ]
 
 export default function PingPongMatchup() {
-  const {stageReady, setGameStarted, myPaddel, oppPaddel, ball, me, opp} = useGameSocket()
+  const {stageReady, setGameStarted, myPaddel, oppPaddel, ball} = useGameSocket()
   const { userData } = useContext(UserContext)
   const [player1, setPlayer1] = useState<Player>({
     id: 0,
@@ -112,10 +113,12 @@ function PlayerCard({ player, color }: { player: Player, color: string }) {
     <div className="text-center bg-white p-4 rounded-lg shadow-lg animate-fade-in">
       <h2 className="text-xl font-semibold mb-2">{player.name}</h2>
       <div className={`w-32 h-32 rounded-full border-4 border-${color}-500 overflow-hidden`}>
-        <img
+        <Image
           src={player.image || "/placeholder.svg"}
           alt={player.name}
           className="w-full h-full object-cover animate-pulse"
+          width={32}
+          height={32}
         />
       </div>
     </div>

@@ -1,6 +1,3 @@
-"use client"
-
-import { motion } from "framer-motion"
 import { Card } from "@/components/ui/card"
 
 export function ScoreDisplay({ player1Score, player2Score }) {

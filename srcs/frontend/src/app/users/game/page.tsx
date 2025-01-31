@@ -15,7 +15,7 @@ const GamePage = () => {
 
   useEffect(() =>{
     updateCurrentPage("game");
-  }, []);
+  }, [updateCurrentPage]);
 
   const setGameMode = (mode: string) =>{
     if(mode === "local")
