@@ -1,17 +1,11 @@
 'use client'
 
 import * as THREE from 'three'
-import { useTexture } from '@react-three/drei'
-import arenaImg from '@/../assets/arena.jpg'
-import blackImg from '@/../assets/black.jpeg'
 
 const planeH = 15
 const planeW = 11.25
 
 export default function Plane() {
-  const textures = useTexture({
-    inside: arenaImg.src,
-  })
 
   const materials = [
     new THREE.MeshStandardMaterial({ color: 0x000000, side: THREE.BackSide }), // right

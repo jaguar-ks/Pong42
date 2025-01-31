@@ -12,7 +12,6 @@ interface SuperBallProps {
 }
 
 const planeH = 15
-const planeW = 10
 
 export default function SuperBall({ paddlePositions, onScoreUpdate }: SuperBallProps) {
   const ballRef = useRef<THREE.Mesh>(null)

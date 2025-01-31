@@ -33,7 +33,7 @@ function printTime(time: string) {
 }
 
 export default function BoxedChatInterface() {
-  const { sendMessage, messages: wsMessages, isConnected } = useWebSocket();
+  const { sendMessage, messages: wsMessages } = useWebSocket();
   const [user, setUser] = useState<User>({
     conv_id: 0,
     id: '',
@@ -61,8 +61,8 @@ export default function BoxedChatInterface() {
     axios.get('http://localhost:8000/api/users/me/connections/', { withCredentials: true })
       .then((response) => {
         const fetchedUsers: User[] = response.data.results
-          .filter((userData: any) => userData.status === "friends")
-          .map((userData: any) => ({
+          .filter((userData) => userData.status === "friends")
+          .map((userData) => ({
             conv_id: userData.id,
             id: userData.user.id,
             username: userData.user.username,
@@ -105,12 +105,11 @@ export default function BoxedChatInterface() {
     }
   }, [wsMessages]);
 
-  const fetchMessages = useCallback((page: number) => {
+  const fetchMessages = useCallback(() => {
     if (activeUser) {
       axios.get(`http://localhost:8000/api/users/me/connections/${activeUser.conv_id}/messages/`, { withCredentials: true })
         .then((response) => {
-          const logs = response.data;
-          const fetchedMessages: Message[] = response.data.results.map((msgData: any) => ({
+          const fetchedMessages: Message[] = response.data.results.map((msgData) => ({
             id: msgData.id,
             user: msgData.sender_id,
             content: msgData.content,

@@ -1,5 +1,4 @@
 'use client';
-import { Avatar } from '@/components/ui/avatar';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useUserContext } from './UserContext';
 
@@ -40,8 +39,6 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
   const [oppPaddel, setOppPaddel] = useState<Paddel>({ x: 0, y: 0, score: 0 });
   const [ball, setBall] = useState<Ball>({ x: 0, y: 0 });
   const [gameStarted, setGameStarted] = useState(false);
-  // const me = useRef<number>(0);
-  // const opp = useRef<number>(0);
   const [stageReady, setStage] = useState(false);
   const me = useRef<PlayerData>({ id: 0, username: '', avatar: '' });
   const opp = useRef<PlayerData>({ id: 0, username: '', avatar: '' });
@@ -68,15 +65,13 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
         }
         if (data.type === 'game.start') {
           console.log(data);
-          const op = data.data.participants.find((p: any) => p.id !== userData.id);
+          const op = data.data.participants.find((p) => p.id !== userData.id);
           opp.current.id = op.id;
           opp.current.username = op.username;
           opp.current.avatar = op.avatar_url;
-          me.current.id = userData.id;
+          me.current.id = userData.id | 0;
           me.current.username = userData.username;
           me.current.avatar = userData.avatar_url;
-          // me.current = data.data.my_id;
-          // opp.current = data.data.opp_id;
         }
 
         if (data.type === 'game.update') {
@@ -97,15 +92,9 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
     }
   }, [gameStarted]);
 
-  const move = (direction: string, playerId: number) => {
+  const move = (direction: string) => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify({ action: 'move', direction }));
-    }
-  };
-
-  const close = () => {
-    if (ws.current) {
-      ws.current.close();
     }
   };
 

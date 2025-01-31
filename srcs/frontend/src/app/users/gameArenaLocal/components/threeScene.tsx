@@ -8,7 +8,6 @@ import SuperBall from './superBall'
 import Paddle from './paddle'
 
 const planeH = 15
-const planeW = 10
 
 export default function ThreeScene() {
   const [score, setScore] = useState({ player1: 0, player2: 0 })

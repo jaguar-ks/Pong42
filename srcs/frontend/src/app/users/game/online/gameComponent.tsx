@@ -1,14 +1,9 @@
-'use client'
-
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { PlayerCard } from './components/player-card'
 import { ScoreDisplay } from './components/score-display'
 import ThreeScene from './components/threeScene'
-import { useGameSocket } from '@/context/GameSocketContext'
-import { Vector3 } from './types/game'
 
 export default function GameComponent({ player1, player2 }) {
-  const { me, opp } = useGameSocket();
   const [gameState, setGameState] = useState({
     player1Score: 0,
     player2Score: 0,
