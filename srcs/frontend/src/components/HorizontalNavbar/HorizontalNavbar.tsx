@@ -28,7 +28,7 @@ const HorizontalNavbar: React.FC = () => {
         if (userData.has_notif) {
             setNotification(true);
         }
-    }, [userData.has_notif]);
+    }, [userData.has_notif, setNotification]);
     
     useEffect(() => {
         console.log('Received messages from WebSocket:', wsMessages);

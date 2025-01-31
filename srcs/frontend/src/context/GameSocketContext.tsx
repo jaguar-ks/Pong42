@@ -64,12 +64,11 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
           me.current.avatar = data.data.participants[0].avatar_url;
         }
         if (data.type === 'game.start') {
-          console.log(data);
           const op = data.data.participants.find((p) => p.id !== userData.id);
           opp.current.id = op.id;
           opp.current.username = op.username;
           opp.current.avatar = op.avatar_url;
-          me.current.id = userData.id | 0;
+          me.current.id = userData.id;
           me.current.username = userData.username;
           me.current.avatar = userData.avatar_url;
         }
@@ -90,7 +89,7 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
         console.error('WebSocket error:', error);
       };
     }
-  }, [gameStarted]);
+  }, [gameStarted, userData.id, userData.username, userData.avatar_url]);
 
   const move = (direction: string) => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {

@@ -52,7 +52,7 @@ export default function PingPongMatchup() {
       clearInterval(interval)
       clearTimeout(timeout)
     }
-  }, [isMatching, matchFound, userData])
+  }, [isMatching, matchFound, userData, setGameStarted])
   
   const startMatching = () => {
     setIsMatching(true)
