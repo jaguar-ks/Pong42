@@ -43,19 +43,21 @@ export default function BoxedChatInterface() {
     wins: 0,
     losses: 0,
     rating: 0,
-  })
+  });
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [activeUser, setActiveUser] = useState<User | null>(null);
+  const [page, setPage] = useState(1); 
+  const [hasMore, setHasMore] = useState(true); 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     axios.get('http://localhost:8000/api/users/me/', { withCredentials: true })
-    .then((response)=>{
-      setUser(response.data)
-    })
-  },[])
+      .then((response) => {
+        setUser(response.data);
+      });
+  }, []);
 
   useEffect(() => {
     axios.get('http://localhost:8000/api/users/me/connections/', { withCredentials: true })
@@ -84,9 +86,8 @@ export default function BoxedChatInterface() {
 
   useEffect(() => {
     if (wsMessages.length > 0) {
-      setMessages(prevMessages => {
+      setMessages((prevMessages) => {
         const lastMessage = wsMessages[wsMessages.length - 1];
-        console.log("lastmessage: ",lastMessage)
         const newMessage = {
           id: `${lastMessage.sender_id}-${lastMessage.timestamp}-${Math.random().toString(36).substr(2, 9)}`,
           user: lastMessage.sender_id,
@@ -94,50 +95,59 @@ export default function BoxedChatInterface() {
           timestamp: lastMessage.timestamp,
         };
 
-          const isDuplicate = prevMessages.some(
-            msg => msg.content === newMessage.content &&
-              msg.timestamp === newMessage.timestamp &&
-              msg.user === newMessage.user
-          );
+        const isDuplicate = prevMessages.some(
+          (msg) => msg.content === newMessage.content &&
+            msg.timestamp === newMessage.timestamp &&
+            msg.user === newMessage.user
+        );
 
         return isDuplicate ? prevMessages : [...prevMessages, newMessage];
       });
     }
   }, [wsMessages]);
 
-  const fetchMessages = useCallback(() => {
+  const fetchMessages = useCallback(async (page: number) => {
     if (activeUser) {
-      axios.get(`http://localhost:8000/api/users/me/connections/${activeUser.conv_id}/messages/`, { withCredentials: true })
-        .then((response) => {
-          const fetchedMessages: Message[] = response.data.results.map((msgData) => ({
-            id: msgData.id,
-            user: msgData.sender_id,
-            content: msgData.content,
-            timestamp: msgData.timestamp,
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/users/me/connections/${activeUser.conv_id}/messages/`,
+          {
+            params: { page },
+            withCredentials: true,
           }
-        ));
+        );
 
-          setMessages(prevMessages => {
-            const uniqueMessages = [...new Set([...prevMessages, ...fetchedMessages].map(msg => msg.id))].map(id => {
-              return [...prevMessages, ...fetchedMessages].find(msg => msg.id === id);
-            });
-            return uniqueMessages;
+        const fetchedMessages: Message[] = response.data.results.map((msgData) => ({
+          id: msgData.id,
+          user: msgData.sender_id,
+          content: msgData.content,
+          timestamp: msgData.timestamp,
+        }));
+
+        setMessages((prevMessages) => {
+          const uniqueMessages = [...new Set([...prevMessages, ...fetchedMessages].map((msg) => msg.id))].map((id) => {
+            return [...prevMessages, ...fetchedMessages].find((msg) => msg.id === id);
           });
-        })
-        .catch((error) => {
-          console.error('Error fetching messages:', error);
+          return uniqueMessages as Message[];
         });
+        setHasMore(response.data.next !== null);
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      }
     }
   }, [activeUser]);
+
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
   useEffect(() => {
     if (activeUser) {
-      setMessages([]);
+      setMessages([]); 
       fetchMessages(1);
+      setPage(1);
     }
   }, [activeUser, fetchMessages]);
 
@@ -147,12 +157,22 @@ export default function BoxedChatInterface() {
       setMessage('');
     }
   };
+
   const handleSearchfriends = (target: string) => {
     const filteredUsers = users.filter((user) => user.username.toLowerCase().includes(target.toLowerCase()));
     setUsers(filteredUsers);
-  }
+  };
+
   const handleUserClick = (user: User) => {
     setActiveUser(user);
+  };
+
+  const handleLoadMore = () => {
+    if (hasMore) {
+      const nextPage = page + 1;
+      fetchMessages(nextPage);
+      setPage(nextPage);
+    }
   };
 
   return (
@@ -199,29 +219,43 @@ export default function BoxedChatInterface() {
           </div>
         </div>
         <ScrollArea className="h-[calc(85vh-4rem)]">
+          {hasMore && (
+            <div className="flex justify-center p-4">
+              <Button variant="ghost" onClick={handleLoadMore}>
+                Load More
+              </Button>
+            </div>
+          )}
           {messages.map((msg, i, msgs) => {
             const newDay = i > 0 && msg.timestamp.split('T')[0] > msgs[i - 1].timestamp.split('T')[0];
             return (
               <React.Fragment key={msg.id}>
                 {newDay && (
-                    <p className="flex-1 text-center text-gray-500 dark:text-gray-400 text-sm mb-3">
-                      {msg.timestamp.split('T')[0]}
-                    </p>
-                  )
-                }
-                <div key={msg.id} className={`flex ${msg.user == user?.id ? 'justify-end' : 'justify-start'} p-1 m-3 mb-3`}>
-                  <div className={`max-w-[50vw] ${msg.user == user?.id ? 'bg-blue-500 text-white':'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'} rounded-lg p-4`}>
+                  <p className="flex-1 text-center text-gray-500 dark:text-gray-400 text-sm mb-3">
+                    {msg.timestamp.split('T')[0]}
+                  </p>
+                )}
+                <div
+                  key={msg.id}
+                  className={`flex ${msg.user == user?.id ? 'justify-end' : 'justify-start'} p-1 m-3 mb-3`}
+                >
+                  <div
+                    className={`max-w-[50vw] ${
+                      msg.user == user?.id
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
+                    } rounded-lg p-4`}
+                  >
                     <p className="break-words whitespace-pre-wrap">{msg.content}</p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{printTime(msg.timestamp)}</p>
                   </div>
                 </div>
               </React.Fragment>
             );
-            })
-          }
+          })}
           <div ref={messagesEndRef} />
         </ScrollArea>
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        {activeUser&&<div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex space-x-2">
             <Input
               type="text"
@@ -236,7 +270,7 @@ export default function BoxedChatInterface() {
               Send
             </Button>
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );
