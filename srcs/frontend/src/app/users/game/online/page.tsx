@@ -1,12 +1,11 @@
 "use client"
 
-import React, { useState, useEffect, useContext } from "react"
+import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Hand, TableIcon as TableTennis } from "lucide-react"
+import { TableIcon as TableTennis } from "lucide-react"
 import { useGameSocket } from "@/context/GameSocketContext"
 import GameComponent from "./gameComponent"
 import Image from "next/image"
-import { set } from "zod"
 
 const players = [
   { id: 1, name: "Sam", avatar: "/animalsProfile/dankyprofile.png" },
@@ -16,19 +15,18 @@ const players = [
 ]
 
 export default function PingPongMatchup() {
-  const { stageReady, setGameStarted, me, opp, disconnectSocket } = useGameSocket()
-  const [player1, setPlayer1] = useState<Player>({
-    id: 0,
-    name: "You",
-    avatar: '/placeholder.svg?height=100&width=100',
-  })
+  const { stageReady, setGameStarted, me, disconnectSocket } = useGameSocket()
+  const player1 = {
+    id: me.id,
+    name: me.username,
+    avatar: me.avatar,
+  }
   const [player2, setPlayer2] = useState(players[0])
   const [isMatching, setIsMatching] = useState(false)
   const [matchFound, setMatchFound] = useState(false)
   const [countdown, setCountdown] = useState(5)
 
   useEffect(() => {
-    setPlayer1({ id: me.id, name: me.username, avatar: me.avatar })
 
     let interval: NodeJS.Timeout
 
@@ -39,10 +37,9 @@ export default function PingPongMatchup() {
     }
 
     return () => {
-      stageReady && setPlayer2({ id: opp.id, name: opp.username, avatar: opp.avatar })
       clearInterval(interval)
     }
-  }, [stageReady, isMatching])
+  }, [stageReady, isMatching, me])
 
   useEffect(() => {
     if (stageReady) {

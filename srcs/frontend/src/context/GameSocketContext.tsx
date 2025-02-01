@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useEffect, useRef, useState, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useUserContext } from './UserContext';
 
 interface GameSocketContextType {
@@ -43,12 +43,9 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
   const [ball, setBall] = useState<Ball>({ x: 0, y: 0 });
   const [gameStarted, setGameStarted] = useState(false);
   const [stageReady, setStage] = useState(false);
-  const me = useRef<PlayerData>({ id: 0, username: '', avatar: '' });
   const opp = useRef<PlayerData>({ id: 0, username: '', avatar: '' });
   const { userData } = useUserContext();
-
-  // Memoize userData to avoid unnecessary changes
-  const memoizedUserData = useMemo(() => userData, [userData.id, userData.username, userData.avatar_url]);
+  const me = { id: userData.id | 0, username: userData.username, avatar: userData.avatar_url | '' }
 
   useEffect(() => {
     if (gameStarted) {
@@ -60,32 +57,20 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
       const handleMessage = (event: MessageEvent) => {
         const data = JSON.parse(event.data);
         switch (data.type) {
-          case 'room.waiting':
-            me.current = {
-              id: data.data.participants[0].id,
-              username: data.data.participants[0].username,
-              avatar: data.data.participants[0].avatar_url,
-            };
-            break;
           case 'game.start':
-            const op = data.data.participants.find((p) => p.id !== memoizedUserData.id);
+            const op = data.data.participants.find((p) => p.id !== userData.id);
             opp.current = {
               id: op.id,
               username: op.username,
               avatar: op.avatar_url,
             };
-            me.current = {
-              id: memoizedUserData.id,
-              username: memoizedUserData.username,
-              avatar: memoizedUserData.avatar_url,
-            };
             break;
           case 'game.update':
             setStage(true);
             setMyPaddel({
-              x: data.data[me.current.id].x,
-              y: data.data[me.current.id].y,
-              score: data.data[me.current.id].score,
+              x: data.data[me.id].x,
+              y: data.data[me.id].y,
+              score: data.data[me.id].score,
             });
             setOppPaddel({
               x: data.data[opp.current.id].x,
@@ -113,14 +98,14 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
         console.error('WebSocket error:', error);
       };
 
-      // return () => {
-      //   if (ws.current) {
-      //     ws.current.close();
-      //     ws.current = null;
-      //   }
-      // };
+      return () => {
+        if (ws.current) {
+          ws.current.close();
+          ws.current = null;
+        }
+      };
     }
-  }, [gameStarted, memoizedUserData]);
+  }, [gameStarted, userData]);
 
   const disconnectSocket = () => {
     if (ws.current) {
@@ -144,7 +129,7 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
         setGameStarted,
         myPaddel,
         oppPaddel,
-        me: me.current,
+        me: me,
         opp: opp.current,
         move,
         ball,
