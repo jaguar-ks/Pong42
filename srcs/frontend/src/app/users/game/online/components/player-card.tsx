@@ -21,13 +21,13 @@ export function PlayerCard({direction}) {
       )}>
         <div className="flex items-center gap-2">
           <Image
-            src={playr.current.avatar || "/placeholder.svg"}
-            alt={playr.current.username}
+            src={playr.avatar || "/placeholder.svg"}
+            alt={playr.username}
             className="w-12 h-12 rounded-full object-cover"
             width={12}
             height={12}
           />
-          <span className="text-lg font-semibold">{playr.current.username}</span>
+          <span className="text-lg font-semibold">{playr.username}</span>
         </div>
       </div>
     </Card>

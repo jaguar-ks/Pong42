@@ -1,56 +1,70 @@
-'use client'
+'use client';
 
-import { useRef, useEffect } from 'react'
-import { Canvas } from '@react-three/fiber'
-import { Sphere } from '@react-three/drei'
-import { OrbitControls } from '@react-three/drei'
-import Plane from '../components/plane'
-import Paddle from '../components/paddle'
-import { useGameSocket } from '@/context/GameSocketContext'
+import { useRef, useEffect, useMemo, useCallback } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { Sphere } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
+import Plane from '../components/plane';
+import Paddle from '../components/paddle';
+import { useGameSocket } from '@/context/GameSocketContext';
 
-const planeH = 15
-const planeW = 11.25
-const paddleWidth = 1.875
+const planeH = 15;
+const planeW = 11.25;
+const paddleWidth = 1.875;
 
-export default function ThreeScene({ onScoreUpdate, player1, player2 }) {
-  const { myPaddel, oppPaddel, ball, move } = useGameSocket()
-  const ballRef = useRef()
-  const me = myPaddel.y == 0 ? -1 : 1
+export default function ThreeScene({ onScoreUpdate }) {
+  const { myPaddel, oppPaddel, ball, move } = useGameSocket();
+  const ballRef = useRef();
 
+  // Memoize `me` to prevent unnecessary re-renders
+  const me = useMemo(() => (myPaddel.y == 0 ? -1 : 1), [myPaddel.y]);
+
+  // Memoize `onScoreUpdate` callback to prevent unnecessary re-renders
+  const memoizedOnScoreUpdate = useCallback(() => {
+    if (onScoreUpdate) {
+      onScoreUpdate({
+        player1: myPaddel.score,
+        player2: oppPaddel.score,
+        winner: myPaddel.score > oppPaddel.score ? myPaddel : oppPaddel,
+      });
+    }
+  }, [onScoreUpdate, myPaddel, oppPaddel]);
+
+  // Add event listener for keydown
   useEffect(() => {
     const handleKeyDown = (event) => {
       switch (event.key) {
         case 'ArrowLeft':
-          move(me == 1 ? 'left' : 'right')
-          break
+          move(me == 1 ? 'left' : 'right');
+          break;
         case 'ArrowRight':
-          move(me == 1 ? 'right' : 'left')
-          break
+          move(me == 1 ? 'right' : 'left');
+          break;
       }
-    }
+    };
 
-    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [move, me])
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [move, me]);
 
+  // Update ball position
   useEffect(() => {
     if (ballRef.current) {
       ballRef.current.position.set(
         me * (-5.625 + ((ball.x * planeW) / 600)),
         0.2,
         -7.5 + ((ball.y * planeH) / 800)
-      )
+      );
     }
-  }, [ball, me])
+  }, [ball, me]);
 
+  // // Call `onScoreUpdate` when scores change
   useEffect(() => {
-    if (onScoreUpdate) {
-      onScoreUpdate({ player1: player1.score, player2: player2.score, winner: player1.score > player2.score ? player1 : player2 })
-    }
-  }, [onScoreUpdate, player1, player2])
+    memoizedOnScoreUpdate();
+  }, [memoizedOnScoreUpdate]);
 
   return (
     <div className="h-full aspect-[1/0.5]">
@@ -66,10 +80,23 @@ export default function ThreeScene({ onScoreUpdate, player1, player2 }) {
             clearcoatRoughness={0.1}
           />
         </Sphere>
-        <Paddle position={[me * (-5.625 + myPaddel.x *planeW /600 + paddleWidth /2) ,0, me * ((planeH / 2) -0.1)]} color="red"/>
-        <Paddle position={[me * (-5.625 + (oppPaddel.x * planeW)/600 + paddleWidth /2) , 0, me * (-(planeH / 2) + 0.1)]} color="blue"/>
-
+        <Paddle
+          position={[
+            me * (-5.625 + (myPaddel.x * planeW) / 600 + paddleWidth / 2),
+            0,
+            me * (planeH / 2 - 0.1),
+          ]}
+          color="red"
+        />
+        <Paddle
+          position={[
+            me * (-5.625 + (oppPaddel.x * planeW) / 600 + paddleWidth / 2),
+            0,
+            me * (-(planeH / 2) + 0.1),
+          ]}
+          color="blue"
+        />
       </Canvas>
     </div>
-  )
+  );
 }
