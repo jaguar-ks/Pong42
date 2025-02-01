@@ -3,7 +3,7 @@ import { PlayerCard } from './components/player-card'
 import { ScoreDisplay } from './components/score-display'
 import ThreeScene from './components/threeScene'
 
-export default function GameComponent({ player1, player2 }) {
+export default function GameComponent() {
   const [gameState, setGameState] = useState({
     player1Score: 0,
     player2Score: 0,
@@ -34,7 +34,7 @@ export default function GameComponent({ player1, player2 }) {
         />
       </div>
       <div className="h-full rounded-lg border bg-muted overflow-hidden">
-        <ThreeScene onScoreUpdate={handleScoreUpdate} player1={player1} player2={player2} />
+        <ThreeScene onScoreUpdate={handleScoreUpdate}/>
       </div>
     </div>
   )
