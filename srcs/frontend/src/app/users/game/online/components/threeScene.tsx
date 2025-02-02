@@ -7,50 +7,47 @@ import { OrbitControls } from '@react-three/drei';
 import Plane from '../components/plane';
 import Paddle from '../components/paddle';
 import { useGameSocket } from '@/context/GameSocketContext';
+import WinnerCared from './WinnerCared';
+import styles from '../styles/Game.module.css';
 
 const planeH = 15;
 const planeW = 11.25;
 const paddleWidth = 1.875;
 
 export default function ThreeScene({ onScoreUpdate }) {
-  const { myPaddel, oppPaddel, ball, move } = useGameSocket();
+  const { myPaddel, oppPaddel, ball, move, gameEnded, winner } = useGameSocket();
   const ballRef = useRef();
 
-  // Memoize `me` to prevent unnecessary re-renders
-  const me = useMemo(() => (myPaddel.y == 0 ? -1 : 1), [myPaddel.y]);
+  // Memoize player position calculation
+  const me = useMemo(() => (myPaddel.y === 0 ? -1 : 1), [myPaddel.y]);
 
-  // Memoize `onScoreUpdate` callback to prevent unnecessary re-renders
-  const memoizedOnScoreUpdate = useCallback(() => {
-    if (onScoreUpdate) {
-      onScoreUpdate({
-        player1: myPaddel.score,
-        player2: oppPaddel.score,
-        winner: myPaddel.score > oppPaddel.score ? myPaddel : oppPaddel,
-      });
-    }
-  }, [onScoreUpdate, myPaddel, oppPaddel]);
+  // Score update handler
+  const handleScoreUpdate = useCallback(() => {
+    onScoreUpdate?.({
+      player1: myPaddel.score,
+      player2: oppPaddel.score,
+      winner: myPaddel.score > oppPaddel.score ? myPaddel : oppPaddel,
+    });
+  }, [onScoreUpdate, myPaddel.score, oppPaddel.score]);
 
-  // Add event listener for keydown
+  // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (event) => {
       switch (event.key) {
         case 'ArrowLeft':
-          move(me == 1 ? 'left' : 'right');
+          move(me === 1 ? 'left' : 'right');
           break;
         case 'ArrowRight':
-          move(me == 1 ? 'right' : 'left');
+          move(me === 1 ? 'right' : 'left');
           break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [move, me]); // Added missing 'me' dependency
 
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [move, me]);
-
-  // Update ball position
+  // Ball position updates
   useEffect(() => {
     if (ballRef.current) {
       ballRef.current.position.set(
@@ -59,15 +56,17 @@ export default function ThreeScene({ onScoreUpdate }) {
         -7.5 + ((ball.y * planeH) / 800)
       );
     }
-  }, [ball, me]);
+  }, [ball.x, ball.y, me]); // Added missing 'me' dependency
 
-  // // Call `onScoreUpdate` when scores change
+  // Score updates
   useEffect(() => {
-    memoizedOnScoreUpdate();
-  }, [memoizedOnScoreUpdate]);
+    handleScoreUpdate();
+  }, [handleScoreUpdate]);
 
+  // Fixed JSX structure
   return (
     <div className="h-full aspect-[1/0.5]">
+      {gameEnded && <WinnerCared player={winner} />}
       <Canvas camera={{ position: [0, 20, 0], fov: 60 }}>
         <OrbitControls />
         <ambientLight intensity={0.4} />

@@ -2,6 +2,10 @@
   display: flex;
   width: 100vw;
   height: 100vh;
+  background-image: url('https://imgcdn.stablediffusionweb.com/2025/1/31/e80fa9dd-94f5-488b-8bdd-fa7ddbd0ea1c.jpg'); /* Add your image path here */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 .verticalNavbarr {
@@ -22,7 +26,8 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  background-color: #ffffff;
+  /* background-color: #ffffff; */
+  /* filter: blur(5px); */
 }
 
 .horizontalNavbarr {
@@ -30,6 +35,7 @@
   background-color: #FFFFFF;
   border-bottom: 1px solid #EEEEE0;
   width: 100%;
+  position: relative;
 }
 
 .navBarContainer {

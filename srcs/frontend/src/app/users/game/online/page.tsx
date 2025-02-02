@@ -6,12 +6,13 @@ import { TableIcon as TableTennis } from "lucide-react"
 import { useGameSocket } from "@/context/GameSocketContext"
 import GameComponent from "./gameComponent"
 import Image from "next/image"
+import styles from "../styles/Game.module.css"
 
 const players = [
-  { id: 1, name: "Sam", avatar: "/animalsProfile/dankyprofile.png" },
-  { id: 2, name: "Jamie", avatar: "/animalsProfile/dogprofile.png" },
-  { id: 3, name: "Taylor", avatar: "/animalsProfile/lionprofile.png" },
-  { id: 4, name: "Alex", avatar: "/animalsProfile/catprofile.png" },
+  { id: 1, name: "Sam", avatar: "/public/animalsProfile/dankyprofile.png" },
+  { id: 2, name: "Jamie", avatar: "/public/animalsProfile/dogprofile.png" },
+  { id: 3, name: "Taylor", avatar: "/public/animalsProfile/lionprofile.png" },
+  { id: 4, name: "Alex", avatar: "/public/animalsProfile/catprofile.png" },
 ]
 
 export default function PingPongMatchup() {
@@ -39,11 +40,12 @@ export default function PingPongMatchup() {
     return () => {
       clearInterval(interval)
     }
-  }, [stageReady, isMatching, me])
+  }, [isMatching])
 
   useEffect(() => {
     if (stageReady) {
       setMatchFound(true)
+      setIsMatching(false)
       const countdownInterval = setInterval(() => {
         setCountdown((prev) => prev - 1)
       }, 1000)
@@ -71,7 +73,8 @@ export default function PingPongMatchup() {
   }
 
   return (!stageReady ? (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-green-200 to-green-500 p-4 relative overflow-hidden">
+    // <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-green-200 to-green-500 p-4 relative overflow-hidden">
+    <div className={styles.container}>
       <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
       </div>
 
@@ -119,7 +122,7 @@ export default function PingPongMatchup() {
       </div>
     </div>
   ) : matchFound && countdown > 0 ? (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-green-200 to-green-500 p-4 relative overflow-hidden">
+    <div className={styles.container}>
       <div className="text-4xl font-bold mb-8 text-white drop-shadow-lg">Match Found!</div>
       <div className="text-2xl font-bold mb-8 text-white drop-shadow-lg">Starting in {countdown} seconds...</div>
     </div>

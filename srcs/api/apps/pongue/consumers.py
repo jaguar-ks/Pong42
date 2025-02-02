@@ -141,7 +141,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                 {
                     "type": "game.over",
                     "message": json.dumps(
-                        {"event": "game.over", "data": {"winner": winner.player_id}}
+                        {"type": "game.over", "data": {"winner": winner.player_id}}
                     ),
                 },
             )

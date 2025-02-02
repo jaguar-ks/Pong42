@@ -14,6 +14,9 @@ interface GameSocketContextType {
   ball: Ball;
   stageReady: boolean;
   setStage: React.Dispatch<React.SetStateAction<boolean>>;
+  gameEnded: boolean;
+  setGameEnded: React.Dispatch<React.SetStateAction<boolean>>;
+  winner: PlayerData;
   disconnectSocket: () => void;
 }
 
@@ -44,8 +47,10 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
   const [gameStarted, setGameStarted] = useState(false);
   const [stageReady, setStage] = useState(false);
   const opp = useRef<PlayerData>({ id: 0, username: '', avatar: '' });
+  const winner = useRef<PlayerData>({ id: 0, username: '', avatar: '' });
+  const [gameEnded, setGameEnded] = useState(false);
   const { userData } = useUserContext();
-  const me = { id: userData.id | 0, username: userData.username, avatar: userData.avatar_url | '' }
+  const me = { id: userData.id, username: userData.username, avatar: userData.avatar_url }
 
   useEffect(() => {
     if (gameStarted) {
@@ -78,6 +83,12 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
               score: data.data[opp.current.id].score,
             });
             setBall({ x: data.data.ball.x, y: data.data.ball.y });
+            break;
+          case 'game.over':
+            console.log('Game over');
+            setGameEnded(true);
+            winner.current = me.id === data.data.winner ? me : opp.current;
+            console.log(winner.current);
             break;
           default:
             console.warn('Unhandled message type:', data.type);
@@ -134,6 +145,9 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
         move,
         ball,
         disconnectSocket,
+        gameEnded,
+        setGameEnded,
+        winner: winner.current,
       }}
     >
       {children}
