@@ -5,7 +5,7 @@
   align-items: flex-start;
   justify-content: center;
   flex-direction: column;
-  background-color: #F5F5F5;
+  /* background-color: #F5F5F5; */
   color: #000000;
   padding: 2rem;
 }

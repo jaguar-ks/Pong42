@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useWebSocket } from '@/context/WebSocketContext';
 import axios from 'axios';
+import '../layout.css'
 
 type Message = {
   id: number;
@@ -176,6 +177,7 @@ export default function BoxedChatInterface() {
   };
 
   return (
+    <div className="main-content">
     <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex">
       <div className="h-full w-1/3 border-r border-gray-200 dark:border-gray-700">
         <div className="p-4">
@@ -184,7 +186,7 @@ export default function BoxedChatInterface() {
             placeholder="Search"
             className="w-full"
             onChange={(e) => handleSearchfriends(e.target.value)}
-          />
+            />
         </div>
         <ScrollArea className="h-[calc(92vh-4rem)]">
           {users.map((user, index) => (
@@ -192,7 +194,7 @@ export default function BoxedChatInterface() {
               key={`${user.id}-${index}`}
               className={`flex items-center space-x-4 p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer ${user.id === activeUser?.id ? 'bg-blue-50 dark:bg-blue-900' : ''}`}
               onClick={() => handleUserClick(user)}
-            >
+              >
               <Avatar>
                 <AvatarImage src={user.avatar_url} alt={user.username} />
                 <AvatarFallback>{user.username[0].toUpperCase()}</AvatarFallback>
@@ -238,14 +240,14 @@ export default function BoxedChatInterface() {
                 <div
                   key={msg.id}
                   className={`flex ${msg.user == user?.id ? 'justify-end' : 'justify-start'} p-1 m-3 mb-3`}
-                >
+                  >
                   <div
                     className={`max-w-[50vw] ${
                       msg.user == user?.id
-                        ? 'bg-blue-500 text-white'
+                      ? 'bg-blue-500 text-white'
                         : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
                     } rounded-lg p-4`}
-                  >
+                    >
                     <p className="break-words whitespace-pre-wrap">{msg.content}</p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{printTime(msg.timestamp)}</p>
                   </div>
@@ -264,7 +266,7 @@ export default function BoxedChatInterface() {
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
               className="flex-1"
-            />
+              />
             <Button onClick={handleSend}>
               <Send className="h-5 w-5 mr-2" />
               Send
@@ -272,6 +274,7 @@ export default function BoxedChatInterface() {
           </div>
         </div>}
       </div>
+    </div>
     </div>
   );
 }

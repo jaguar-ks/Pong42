@@ -36,8 +36,15 @@ const HorizontalNavbar: React.FC = () => {
 
     const handleIconToggle = (icon: string) => {
         setActiveIcon(prevIcon => prevIcon === icon ? "" : icon);
-        setNotification(false)
+        if (icon === "notifications") {
+            setNotification(false);
+        }
     };
+
+    const handleSearchToggle = (status: boolean) => {
+        setIsSearchActive(status);
+        handleIconToggle("search");
+    }
 
     const handleMenuToggle = (status: boolean) => {
         setIsMenuOpen(status);
@@ -71,7 +78,7 @@ const HorizontalNavbar: React.FC = () => {
                             </button>
                         )}
                         {!isSearchActive && (
-                            <button className={styles.iconButton} onClick={() => setIsSearchActive(true)}>
+                            <button className={styles.iconButton} onClick={() => handleSearchToggle(true)}>
                                 <Image className={styles.menuDotImage} src={searchIcon} alt="Search Icon" />
                             </button>
                         )}
