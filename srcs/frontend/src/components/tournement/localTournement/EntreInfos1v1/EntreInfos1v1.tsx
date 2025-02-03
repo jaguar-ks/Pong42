@@ -1,9 +1,7 @@
 // In EntreInfos.tsx
 
 "use client";
-import React, { useEffect } from "react";
 import styles from "./EntreInfos.module.css";
-import { useUserContext } from "@/context/UserContext";
 
 // 1. Define the props interface:
 interface EntreInfosProps {
