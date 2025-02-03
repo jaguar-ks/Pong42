@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
     console.log("Middleware executed");
-    
+
     // Get the "access_token" from cookies
     const accessToken = req.cookies.get('access_token')?.value;
 
