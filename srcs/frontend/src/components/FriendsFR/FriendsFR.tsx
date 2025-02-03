@@ -1,103 +1,72 @@
-"use client";
-import React, { useState } from "react";
-import Image from "next/image";
-import axios from "axios";
-import styles from "./friends.module.css";
-import sendMsgIcon from "../../../assets/send message.svg";
-import addFriendIcon from "../../../assets/add-friendBlack.svg";
-import challengeIcon from "../../../assets/challengeBlack.svg";
-import blockFriendIcon from "../../../assets/blockFriend.svg";
-import { useUserContext } from "@/context/UserContext";
+"use client"
+
+import type React from "react"
+import Image from "next/image"
+import axios from "axios"
+import { useRouter } from "next/navigation"
+import styles from "./friends.module.css"
+import sendMsgIcon from "../../../assets/send message.svg"
+import addFriendIcon from "../../../assets/add-friendBlack.svg"
+import blockFriendIcon from "../../../assets/blockFriend.svg"
+import { useUserContext } from "@/context/UserContext"
 
 type FriendsFRProps = {
-  id: number;
-};
-
-
+  id: number
+}
 
 const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
-  const { searchedUserData, updateSearchedUserData } = useUserContext();
-  const [showPopup, setShowPopup] = useState(false);
+  const { searchedUserData, updateSearchedUserData } = useUserContext()
+  const router = useRouter()
 
   const sendFriendRequest = async () => {
     try {
       const response = await axios.post(
         `http://localhost:8000/api/users/me/connections/`,
         { recipient_id: id },
-        { withCredentials: true }
-      );
-      console.log("Friend request sent:", response.data);
+        { withCredentials: true },
+      )
+      console.log("Friend request sent:", response.data)
       updateSearchedUserData({
         ...searchedUserData,
         connection: {
-          ...(searchedUserData?.connection || {id: 0}),
+          ...(searchedUserData?.connection || { id: 0 }),
           status: "sent_request",
         },
-      });
+      })
     } catch (error) {
-      console.error("Error sending friend request:", error);
+      console.error("Error sending friend request:", error)
     }
-  };
-
-  const cancelFriendRequest = async () => {
-    setShowPopup(true);
-  };
-
-  const confirmCancelRequest = async () => {
-    try {
-      await axios.delete(
-        `http://localhost:8000/api/users/me/connections/${searchedUserData.connection?.id}/`,
-        { withCredentials: true }
-      );
-      console.log("Friend request cancelled");
-      updateSearchedUserData({
-        ...searchedUserData,
-        connection: {
-          ...(searchedUserData?.connection || {id: 0}),
-          status: "",
-        },
-      });
-    } catch (error) {
-      console.error("Error cancelling friend request:", error);
-    }
-    setShowPopup(false);
-  };
+  }
 
   const sendMessage = () => {
-    console.log("Sending message");
-  };
-
-  const sendChallenge = () => {
-    console.log("Sending game challenge");
-  };
+    router.push("/users/chat")
+  }
 
   const blockUser = async () => {
     try {
       const response = await axios.post(
         `http://localhost:8000/api/users/me/connections/block/`,
         { recipient_id: id },
-        { withCredentials: true }
-      );
-      console.log("User blocked:", response.data);
+        { withCredentials: true },
+      )
+      console.log("User blocked:", response.data)
+      router.push("/users/home")
     } catch (error) {
-      console.error("Error blocking user:", error);
+      console.error("Error blocking user:", error)
     }
-  };
+  }
 
   return (
     <div className={styles.friends}>
       <div className={styles.buttonWrapper}>
         <button
-          onClick={
-            searchedUserData?.connection?.status === "sent_request"
-              ? cancelFriendRequest
-              : sendFriendRequest
-          }
+          onClick={sendFriendRequest}
           className={styles.button}
+          disabled={searchedUserData?.connection?.status === "sent_request"}
         >
           <div className={styles.iconWrapper}>
             <Image
-              src={addFriendIcon}
+              src={addFriendIcon || "/placeholder.svg"}
               alt="Send Request"
               width={24}
               height={24}
@@ -106,10 +75,10 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
           </div>
           <span className={styles.buttonText}>
             {searchedUserData?.connection?.status === "sent_request"
-              ? "Cancel Request"
+              ? "Request Sent"
               : searchedUserData?.connection?.status === "friends"
-              ? "Friends"
-              : "Send Request"}
+                ? "Friends"
+                : "Send Request"}
           </span>
         </button>
       </div>
@@ -117,7 +86,7 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
         <button onClick={sendMessage} className={styles.button}>
           <div className={styles.iconWrapper}>
             <Image
-              src={sendMsgIcon}
+              src={sendMsgIcon || "/placeholder.svg"}
               alt="Send Message"
               width={24}
               height={24}
@@ -128,24 +97,10 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
         </button>
       </div>
       <div className={styles.buttonWrapper}>
-        <button onClick={sendChallenge} className={styles.button}>
-          <div className={styles.iconWrapper}>
-            <Image
-              src={challengeIcon}
-              alt="Challenge"
-              width={24}
-              height={24}
-              className={styles.icon}
-            />
-          </div>
-          <span className={styles.buttonText}>Challenge</span>
-        </button>
-      </div>
-      <div className={styles.buttonWrapper}>
         <button onClick={blockUser} className={styles.button}>
           <div className={styles.iconWrapper}>
             <Image
-              src={blockFriendIcon}
+              src={blockFriendIcon || "/placeholder.svg"}
               alt="Block"
               width={24}
               height={24}
@@ -155,28 +110,9 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
           <span className={styles.buttonText}>Block</span>
         </button>
       </div>
-
-      {showPopup && (
-        <div className={styles.popup}>
-          <p>Are you sure you want to cancel the friend request?</p>
-          <div className={styles.popupButtons}>
-            <button
-              onClick={confirmCancelRequest}
-              className={styles.popupButton}
-            >
-              Yes
-            </button>
-            <button
-              onClick={() => setShowPopup(false)}
-              className={styles.popupButton}
-            >
-              No
-            </button>
-          </div>
-        </div>
-      )}
     </div>
-  );
-};
+  )
+}
 
-export default FriendsFR;
+export default FriendsFR
+
