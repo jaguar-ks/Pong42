@@ -45,3 +45,10 @@ class UserRatingHistory(AllUsersMixins, ListAPIView):
             return RatingHistory.objects.filter(user=user).order_by('-date')
         except Exception as e:
             raise Http404(f"No user found with the provided user ID")
+
+class AuthUserRatingHistory(UserRatingHistory):
+
+    def get_queryset(self):
+        user = self.request.user
+        return RatingHistory.objects.filter(user=user).order_by('-date')
+
