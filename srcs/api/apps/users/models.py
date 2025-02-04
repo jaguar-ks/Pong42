@@ -244,6 +244,8 @@ class Notification(models.Model):
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
+    sender = models.CharField(max_length=100, null=True, blank=True)
+    connection_id = models.IntegerField(null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.user} - {self.notification_type}"

@@ -90,6 +90,14 @@ class ConnectionViewSet(
 
         connection.status = Connection.FRIENDS
         connection.save()
+        sent = Notification.objects.filter(Q(connection_id=connection.id, user=connection.recipient)).first()
+        if sent:
+            sent.connection_id = None
+            sent.sender = None
+            sent.message = f"You accepted {connection.initiator.username}'s friend request"
+            sent.save()
+            data = serializers.NotificationSerializer(sent)
+            send_real_time_notif(sent.user.id, data.data)
         notif = Notification.objects.create(
             user=connection.initiator,
             notification_type=Notification.NOTIFICATION_TYPES["connections"],
@@ -159,5 +167,11 @@ class ConnectionViewSet(
         if connection.status == Connection.BLOCKED and connection.recipient == user:
             raise PermissionDenied("Cannot remove a connection where you are blocked")
 
+        
+        notif = Notification.objects.filter(Q(connection_id=connection.id, user=connection.recipient)).first()
+        if notif:
+            notif.delete()
+
         connection.delete()
+        
         return Response(status=status.HTTP_204_NO_CONTENT)
