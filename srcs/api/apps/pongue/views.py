@@ -12,9 +12,13 @@ class UserGameHistory(AllUsersMixins, ListAPIView):
 
     def get_queryset(self):
         try:
-            user = self.get_unblocked_users().get(
+            users = self.get_unblocked_users()
+            if users.count() == 0:
+                return GameMatch.objects.none()
+            user = users.get(
                 pk=self.kwargs.get("user_id"),
             )
+
             return (
                 GameMatch.objects.filter(
                     Q(player1=user) | Q(player2=user),
@@ -32,7 +36,10 @@ class UserRatingHistory(AllUsersMixins, ListAPIView):
 
     def get_queryset(self):
         try:
-            user = self.get_unblocked_users().get(
+            users = self.get_unblocked_users()
+            if users.count() == 0:
+                return GameMatch.objects.none()
+            user = users.get(
                 pk=self.kwargs.get("user_id"),
             )
             return RatingHistory.objects.filter(user=user).order_by('-date')

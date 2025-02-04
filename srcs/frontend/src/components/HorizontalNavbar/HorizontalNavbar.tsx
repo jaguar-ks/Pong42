@@ -22,17 +22,13 @@ const HorizontalNavbar: React.FC = () => {
     const { userData } = useUserContext();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navbarRef = useRef<HTMLDivElement>(null);
-    const { messages: wsMessages, notification, setNotification} = useWebSocket();
+    const { notification, setNotification} = useWebSocket();
 
     useEffect (() => {
         if (userData.has_notif) {
             setNotification(true);
         }
     }, [userData.has_notif, setNotification]);
-    
-    useEffect(() => {
-        console.log('Received messages from WebSocket:', wsMessages);
-    }, [wsMessages]);
 
     const handleIconToggle = (icon: string) => {
         setActiveIcon(prevIcon => prevIcon === icon ? "" : icon);

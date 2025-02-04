@@ -37,7 +37,6 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
         const res = await axios.get(`http://localhost:8000/api/pongue/1/rating_history`, {
           withCredentials: true,
         })
-        console.log("response ========================= " , res);
         if (!res.data || !Array.isArray(res.data.results)) {
           throw new Error("Invalid data received from server")
         }

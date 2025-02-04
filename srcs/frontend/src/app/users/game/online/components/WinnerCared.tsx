@@ -18,11 +18,10 @@ interface WinningBoardProps {
 
 export default function WinningBoard({ player }: WinningBoardProps) {
   const router = useRouter()
-  const { me, winner, setStage, setGameStarted } = useGameSocket()
+  const { me, winner, disconnectSocket } = useGameSocket()
 
   const handleClick = () => {
-    setGameStarted(false)
-    setStage(false)
+    disconnectSocket()
     router.push('/users/game/online')
   }
 

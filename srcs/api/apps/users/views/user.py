@@ -69,4 +69,4 @@ class UserSearchView(AllUsersMixins, generics.ListAPIView):
     search_fields = ["username", "email", "first_name", "last_name"]
 
     def get_queryset(self):
-        return self.get_unblocked_users()
+        return self.get_unblocked_users().exclude(id=self.request.user.id)

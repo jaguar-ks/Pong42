@@ -36,16 +36,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             online_group,
             {
                 'type': 'status_update',
-                'data': {
+                'data': json.dumps({
                     'type': 'online',
                     'user_id': self.user.id,
                     'is_online': self.user.id in online_users,
-                }
+                })
             }
         )
 
     async def status_update(self, event):
-        await self.send(text_data=json.dumps(event['data']))
+        await self.send(text_data=event['data'])
 
     async def disconnect(self, close_code):
         online_users.remove(self.user.id)

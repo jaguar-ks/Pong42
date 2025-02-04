@@ -117,6 +117,8 @@ class ConnectionSerializer(serializers.Serializer):
                 user=connection.recipient,
                 notification_type=Notification.NOTIFICATION_TYPES['connections'],
                 message=f"{connection.initiator.username} sent you a friend request",
+                sender=connection.initiator.username,
+                connection_id=connection.id
             )
             data = NotificationSerializer(notif)
             send_real_time_notif(notif.user.id, data.data)
@@ -195,5 +197,7 @@ class NotificationSerializer(serializers.ModelSerializer):
             'message',        # Notification message
             'created_at',     # Timestamp for when the notification was created
             'read',           # Boolean indicating if the notification is read
+            'sender',         # The sender of the notification
+            'connection_id',  # Connection ID associated with the notification
         ]
         read_only_fields = ['id', 'created_at']  # Mark id and created_at as read-only
