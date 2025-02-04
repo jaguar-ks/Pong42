@@ -29,10 +29,11 @@ class Participant:
 
 
 class GameRoom:
-    def __init__(self, name: str, participants: Dict[int, Participant], is_invite_only: bool = False):
+    def __init__(self, name: str, participants: Dict[int, Participant], is_invite_only: bool = False, opp: Dict = None):
         self.name = name
         self.participants = participants
         self.is_invite_only = is_invite_only
+        self.opp = opp
         self.game_task: asyncio.Task = None
         self.room_lock: asyncio.Lock = asyncio.Lock()
         self.game: pong.Game = None
@@ -43,6 +44,7 @@ class GameRoom:
             "participants": [asdict(p) for _, p in self.participants.items()],
             "is_invite_only": self.is_invite_only,
             "status": "ready" if len(self.participants) == 2 else "waiting",
+            'opp': self.opp
         }
 
     async def add_participant(self, user, safe=False):
@@ -69,14 +71,14 @@ class RoomsManager:
 
     @classmethod
     async def create_new_room(
-        cls, participants, is_invite_only=False, room_name=None
+        cls, participants, is_invite_only=False, room_name=None, opp=None
     ) -> GameRoom:
         async with cls.rooms_lock:
             room_name = room_name or get_random_string(15)
             while room_name in cls.rooms:
                 room_name = get_random_string(15)
             cls.rooms[room_name] = GameRoom(
-                name=room_name, participants=participants, is_invite_only=is_invite_only
+                name=room_name, participants=participants, is_invite_only=is_invite_only, opp=opp
             )
             return cls.rooms[room_name]
 
