@@ -8,14 +8,13 @@ import Plane from '../components/plane';
 import Paddle from '../components/paddle';
 import { useGameSocket } from '@/context/GameSocketContext';
 import WinnerCared from './WinnerCared';
-import styles from '../styles/Game.module.css';
 
 const planeH = 15;
 const planeW = 11.25;
 const paddleWidth = 1.875;
 
 export default function ThreeScene({ onScoreUpdate }) {
-  const { myPaddel, oppPaddel, ball, move, gameEnded, winner } = useGameSocket();
+  const { myPaddel, oppPaddel, ball, move, gameEnded, winner, me: wsMe } = useGameSocket();
   const ballRef = useRef();
 
   // Memoize player position calculation
@@ -66,7 +65,7 @@ export default function ThreeScene({ onScoreUpdate }) {
   // Fixed JSX structure
   return (
     <div className="h-full aspect-[1/0.5]">
-      {gameEnded && <WinnerCared player={winner} />}
+      {gameEnded && <WinnerCared player={wsMe} winner={winner} />}
       <Canvas camera={{ position: [0, 20, 0], fov: 60 }}>
         <OrbitControls />
         <ambientLight intensity={0.4} />
