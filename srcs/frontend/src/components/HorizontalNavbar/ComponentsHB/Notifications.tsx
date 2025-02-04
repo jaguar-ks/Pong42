@@ -99,7 +99,7 @@ const Notifications: React.FC = () => {
 
     try {
       setGameStarted(true);
-      setRoom(`${sender}*${userData.username}`);
+      setRoom(`${sender}_${userData.username}`);
       router.push(`/users/game/online/`);
 
       updateNotificationState(notificationId, { clicked: true });

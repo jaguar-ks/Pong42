@@ -88,7 +88,7 @@ const Friends = () => {
 
     const handleChallenge = (user: {id: number, username: string, avatar_url: string | null}) => {
         setGameStarted(true);
-        setRoom(userData.username + "*" + user.username);
+        setRoom(userData.username + "_" + user.username);
         router.push(`/users/game/online/`);
     };
 

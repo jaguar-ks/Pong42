@@ -1,12 +1,14 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import styles from "./playerInfos.module.css";
 import TimeDifference from "../TimeDifference/TimeDifference";
 import CopyToClipboard from "../CopyToClipboard/CopyToClipboard";
 import { useUserContext } from "@/context/UserContext";
 import { useWebSocket } from "@/context/WebSocketContext";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 // Helper function to truncate text
 const truncateText = (text: string | undefined, maxLength: number) => {
@@ -25,12 +27,30 @@ const InfoItem: React.FC<{ title: string; value: string | undefined }> = ({ titl
   </div>
 );
 
+
+
 // Main PlayerInfos component
 const PlayerInfos: React.FC<{ user: string }> = ({ user }) => {
   const { userData, userDataSearch } = useUserContext();
   const dt = user === "search" ? userDataSearch : userData;
   const { onlineUser } = useWebSocket();
   const data = dt.id === onlineUser.user_id ? {...dt, is_online: onlineUser.is_online} : dt;
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        // Use the test_auth endpoint to verify authentication
+        await axios.get("http://localhost:8000/api/auth/test_auth/",{withCredentials: true})
+      } catch (err) {
+        console.log("Token validation error:", err);
+        router.push("/auth/signin");
+      } finally{
+      }
+    }
+    checkToken();
+  }, [])
+
 
   const defaultAvatarUrl = "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png";
 

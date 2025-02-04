@@ -21,7 +21,7 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         """Handle joining/creating private rooms"""
         room = await self.manager.get_room(room_name=room_name)
         if not room:
-            opp = await sync_to_async(User.objects.get)(username=room_name.split("*")[1])
+            opp = await sync_to_async(User.objects.get)(username=room_name.split("_")[1])
             room = await self.manager.create_new_room(
                 room_name=room_name,
                 participants={self.user.id: Participant.from_user(self.user)},
@@ -37,11 +37,11 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             data = NotificationSerializer(notif).data
             await sync_to_async(send_real_time_notif)(opp.id, data)
             return room, False
-        notif = await sync_to_async(Notification.objects.filter)(user=self.user, sender=room_name.split("*")[0])
+        notif = await sync_to_async(Notification.objects.filter)(user=self.user, sender=room_name.split("_")[0])
         notif = await sync_to_async(notif.first)()
         if notif:
             notif.sender = None
-            notif.message = f"You accepted {room_name.split('*')[0]}'s game request"
+            notif.message = f"You accepted {room_name.split('_')[0]}'s game request"
             await sync_to_async(notif.save)()
             data = NotificationSerializer(notif).data
             await sync_to_async(send_real_time_notif)(self.user.id, data)
@@ -173,6 +173,15 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def disconnect(self, code):
         await self.__clear_resources()
         if hasattr(self, "room_name"):
+            notif = await sync_to_async(Notification.objects.filter)(
+                user=self.user,
+                notification_type=Notification.NOTIFICATION_TYPES['game'],
+                sender=self.room_name.split("_")[0]
+            )
+            notif = await sync_to_async(notif.first)()
+            if notif:
+                notif.sender = None
+                await sync_to_async(notif.save)()
             await self.channel_layer.group_send(
                 self.room_name,
                 {

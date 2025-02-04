@@ -30,6 +30,11 @@
     clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
 }
 
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .button {
     width: calc(100% - 4px);
     height: calc(100% - 4px);

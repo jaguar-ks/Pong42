@@ -8,6 +8,8 @@ import addFriendIcon from "../../../assets/add-friendBlack.svg";
 import challengeIcon from "../../../assets/challengeBlack.svg";
 import blockFriendIcon from "../../../assets/blockFriend.svg";
 import { useUserContext } from "@/context/UserContext";
+import { useGameSocket } from "@/context/GameSocketContext";
+import { useRouter } from "next/navigation";
 
 type FriendsFRProps = {
   id: number;
@@ -16,8 +18,10 @@ type FriendsFRProps = {
 
 
 const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
-  const { searchedUserData, updateSearchedUserData } = useUserContext();
+  const { searchedUserData, updateSearchedUserData, userData } = useUserContext();
+  const { setGameStarted, setRoom } = useGameSocket();
   const [showPopup, setShowPopup] = useState(false);
+  const router = useRouter();
 
   const sendFriendRequest = async () => {
     try {
@@ -68,6 +72,9 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
   };
 
   const sendChallenge = () => {
+    setGameStarted(true);
+    setRoom(`${userData.username}_${searchedUserData.username}`);
+    router.push('/users/game/online');
     console.log("Sending game challenge");
   };
 
@@ -114,7 +121,7 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
         </button>
       </div>
       <div className={styles.buttonWrapper}>
-        <button onClick={sendMessage} className={styles.button}>
+        <button onClick={sendMessage} className={styles.button} disabled={searchedUserData?.connection?.status !== "friends"}>
           <div className={styles.iconWrapper}>
             <Image
               src={sendMsgIcon}
@@ -129,7 +136,7 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
       </div>
       <div className={styles.buttonWrapper}>
         <button onClick={sendChallenge} className={styles.button}>
-          <div className={styles.iconWrapper}>
+          <div className={styles.iconWrapper} onClick={sendChallenge} disabled={searchedUserData?.connection?.status !== "friends"}>
             <Image
               src={challengeIcon}
               alt="Challenge"

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import axios, { type AxiosError } from "axios"
@@ -25,10 +25,9 @@ interface ErrorResponse {
   username?: string[]
   password?: string[]
   otp_code?: string[]
-  
 }
 
-const SignInPage: React.FC = () => {
+const SignInContent = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -201,5 +200,10 @@ const SignInPage: React.FC = () => {
   )
 }
 
-export default SignInPage
+const SignInPage = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <SignInContent />
+  </Suspense>
+)
 
+export default SignInPage

@@ -30,9 +30,16 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const res = await axios.get(`http://localhost:8000/api/pongue/${data.id}/rating_history`, {
+        setError(null) // Reset error state
+        if (!data.id) {
+          throw new Error("User ID is not available")
+        }
+        const res = await axios.get(`http://localhost:8000/api/pongue/1/rating_history`, {
           withCredentials: true,
         })
+        if (!res.data || !Array.isArray(res.data.results)) {
+          throw new Error("Invalid data received from server")
+        }
         const ratingHistory: RatingHistory[] = res.data.results
 
         // Sort rating history by date
@@ -44,14 +51,14 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
 
         setChartData(ratings)
         setLabels(dates)
-        setLoading(false)
       } catch (err) {
-        console.error("Error in fetching rating history", err)
-        setError("Failed to load rating history. Please try again later.")
+        console.error("Error in fetching rating history =========================", err)
+        setError(err instanceof Error ? err.message : "Failed to load rating history. Please try again later.")
+      } finally {
         setLoading(false)
       }
     }
-    if (typeof data.id === "number") fetchData()
+    fetchData()
   }, [data.id])
 
   if (loading) {
@@ -59,7 +66,11 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
   }
 
   if (error) {
-    return <div className={styles.error}>{error}</div>
+    return <div className={styles.error}>Error: {error}</div>
+  }
+
+  if (chartData.length === 0) {
+    return <div className={styles.noData}>No rating history available.</div>
   }
 
   const minValue = Math.min(...chartData) - Math.min(...chartData) / 5
