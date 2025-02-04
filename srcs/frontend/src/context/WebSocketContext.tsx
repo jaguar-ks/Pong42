@@ -9,13 +9,15 @@ interface Message {
   timestamp: string;
 }
 
-type Notifications ={
-  id: number,
-  user: number,
-  notification_type: string,
-  message: string,
-  created_at: string,
-  read: boolean,
+type Notifications = {
+  id: number;
+  user: number;
+  notification_type: string;
+  message: string;
+  created_at: string;
+  read: boolean;
+  sender: string | null;
+  connection_id: number | null;
 }
 
 interface WebSocketContextType {
@@ -26,6 +28,9 @@ interface WebSocketContextType {
   clearMessages: () => void;
   notification: boolean;
   setNotification: React.Dispatch<React.SetStateAction<boolean>>;
+  onlineUser: { user_id: number; is_online: boolean };
+  connectionUpdate: boolean;
+  setConnectionUpdate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
@@ -36,39 +41,51 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   const [isConnected, setIsConnected] = useState(false);
   const { userData } = useContext(UserContext);
   const [notification, setNotification] = useState(false);
-  const [notifications, setNotifications] = useState<Notifications[]>([])
-  const [onlineUser, setOnlineUser] = useState<{user_id:number, is_online:boolean}>({user_id:0, is_online:false});
+  const [notifications, setNotifications] = useState<Notifications[]>([]);
+  const [onlineUser, setOnlineUser] = useState<{ user_id: number; is_online: boolean }>({ user_id: 0, is_online: false });
+  const [connectionUpdate, setConnectionUpdate] = useState(false);
+  const userDataRef = useRef(userData);
+  const reconnectInterval = useRef<NodeJS.Timeout>();
+  const messageQueue = useRef<Array<() => void>>([]);
+  const keepAliveInterval = useRef<NodeJS.Timeout>();
+  const [retryCount, setRetryCount] = useState(0);
 
-  useEffect(() => {
-      const wsUrl = `ws://localhost:8000/ws/chat/`;
-      
-      if (!ws.current)
-        ws.current = new WebSocket(wsUrl);
+  const connect = () => {
+    const wsUrl = `ws://localhost:8000/ws/chat/`;
+    
+    if (ws.current && [WebSocket.OPEN, WebSocket.CONNECTING].includes(ws.current.readyState)) {
+      return;
+    }
 
-      ws.current.onopen = () => {
-        console.log('Connected to chat');
-        setIsConnected(true);
-      };
+    ws.current = new WebSocket(wsUrl);
 
-      ws.current.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        if(message.type === 'message'){
+    ws.current.onopen = () => {
+      console.log('Connected to chat');
+      setIsConnected(true);
+      setRetryCount(0);
+      messageQueue.current.forEach(send => send());
+      messageQueue.current = [];
+    };
+
+    ws.current.onmessage = (event) => {
+      try {
+        const message = typeof event.data === 'string' 
+          ? JSON.parse(event.data)
+          : event.data;
+
+        if (message.type === 'message') {
           setMessages(prev => {
-            //check if message already exists
             const messageExists = prev.some(
               msg => 
                 msg.message === message.message && 
                 msg.timestamp === message.timestamp &&
                 msg.sender_id === message.sender_id
             );
-            
-              if (messageExists) {
-                return prev;
-              }
-              return [...prev, message];
-            });
-          }
-        if (message.type === 'notification'){
+            return messageExists ? prev : [...prev, message];
+          });
+        }
+
+        if (message.type === 'notification') {
           setNotifications(prev => {
             const notificationExists = prev.some(
               notif =>
@@ -76,53 +93,97 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
                 notif.created_at === message.created_at &&
                 notif.user === message.user
             );
-            if (notificationExists){
-              return prev;
-            }
-            return [...prev, message];
+            return notificationExists ? prev : [...prev, message];
           });
-          setNotification(true)
+          console.log('Notification:', notifications, message);
+          setNotification(true);
+          
+          if (message.notification_type === 'Connections' && 
+              !connectionUpdate && 
+              (message.user === userDataRef.current?.id)) {
+            setConnectionUpdate(true);
+          }
         }
+
         if (message.type === 'online') {
           const { user_id, is_online } = message;
-          setOnlineUser({user_id: user_id, is_online: is_online});
-          console.log(message);
+          setOnlineUser({ user_id, is_online });
         }
-      };
+      } catch (error) {
+        console.error('Error processing message:', error);
+      }
+    };
 
-      ws.current.onclose = () => {
-        console.log('Disconnected from chat');
-        setIsConnected(false);
-      };
+    ws.current.onclose = () => {
+      console.log('Disconnected from chat');
+      setIsConnected(false);
+      const timeout = Math.min(1000 * Math.pow(2, retryCount), 30000);
+      reconnectInterval.current = setTimeout(() => {
+        setRetryCount(prev => prev + 1);
+        connect();
+      }, timeout);
+    };
 
-      ws.current.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        setIsConnected(false);
-      };
-    if (!userData.id) {
-      return;
-    }
+    ws.current.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      setIsConnected(false);
+    };
+  };
+
+  useEffect(() => {
+    userDataRef.current = userData;
+  }, [userData]);
+
+  useEffect(() => {
+    connect();
 
     return () => {
       if (ws.current) {
         ws.current.close();
       }
+      if (reconnectInterval.current) {
+        clearTimeout(reconnectInterval.current);
+      }
+      if (keepAliveInterval.current) {
+        clearInterval(keepAliveInterval.current);
+      }
     };
-  }, [notifications, userData.id]);
+  }, []);
+
+  useEffect(() => {
+    if (isConnected) {
+      keepAliveInterval.current = setInterval(() => {
+        ws.current?.send(JSON.stringify({ type: 'ping' }));
+      }, 30000);
+    }
+    return () => {
+      if (keepAliveInterval.current) {
+        clearInterval(keepAliveInterval.current);
+      }
+    };
+  }, [isConnected]);
 
   const close = () => {
     if (ws.current) {
       ws.current.close();
     }
-  }
+  };
 
   const sendMessage = (recipientId: number, message: string) => {
-    if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({
-        recipient_id: recipientId,
-        message: message,
-        type: 'message',
-      }));
+    const sendFn = () => {
+      if (ws.current?.readyState === WebSocket.OPEN) {
+        ws.current.send(JSON.stringify({
+          recipient_id: recipientId,
+          message: message,
+          type: 'message',
+        }));
+      }
+    };
+
+    if (isConnected) {
+      sendFn();
+    } else {
+      messageQueue.current.push(sendFn);
     }
   };
 
@@ -131,7 +192,18 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   };
 
   return (
-    <WebSocketContext.Provider value={{close, sendMessage, messages, isConnected, clearMessages, notification ,setNotification, onlineUser }}>
+    <WebSocketContext.Provider value={{
+      close,
+      sendMessage,
+      messages,
+      isConnected,
+      clearMessages,
+      notification,
+      setNotification,
+      onlineUser,
+      connectionUpdate,
+      setConnectionUpdate
+    }}>
       {children}
     </WebSocketContext.Provider>
   );

@@ -36,9 +36,7 @@ export const MatchHistoryFr: React.FC<MatchHistoryFrProps> = ({ id }) => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        console.log("Fetching matches for user ID:", userData.id)
         const res = await axios.get(`http://localhost:8000/api/pongue/${id}/matches`, { withCredentials: true })
-        console.log("Match data:", res.data.results)
         setMatches(res.data.results)
       } catch (err) {
         console.error("Error fetching match data:", err)

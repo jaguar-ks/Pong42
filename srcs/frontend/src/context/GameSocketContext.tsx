@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useUserContext } from './UserContext';
 
 interface GameSocketContextType {
@@ -17,6 +17,8 @@ interface GameSocketContextType {
   gameEnded: boolean;
   setGameEnded: React.Dispatch<React.SetStateAction<boolean>>;
   winner: PlayerData;
+  room: string | null;
+  setRoom: React.Dispatch<React.SetStateAction<string | null>>;
   disconnectSocket: () => void;
 }
 
@@ -50,106 +52,195 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
   const winner = useRef<PlayerData>({ id: 0, username: '', avatar: '' });
   const [gameEnded, setGameEnded] = useState(false);
   const { userData } = useUserContext();
-  const me = { id: userData.id, username: userData.username, avatar: userData.avatar_url }
+  const [room, setRoom] = useState<string | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const messageQueue = useRef<Array<() => void>>([]);
+  const meRef = useRef<PlayerData>({ 
+    id: userData.id, 
+    username: userData.username, 
+    avatar: userData.avatar_url 
+  });
+
+  const getOpponent = useCallback(() => {
+    return opp.current;
+  }, [ opp ]);
+  // Update meRef when userData changes
+  useEffect(() => {
+    meRef.current = {
+      id: userData.id,
+      username: userData.username,
+      avatar: userData.avatar_url
+    };
+  }, [userData]);
+
+  const resetGameState = useCallback(() => {
+    setMyPaddel({ x: 0, y: 0, score: 0 });
+    setOppPaddel({ x: 0, y: 0, score: 0 });
+    setBall({ x: 0, y: 0 });
+    setStage(false);
+    setGameEnded(false);
+    winner.current = { id: 0, username: '', avatar: '' };
+  }, []);
+
+  const handleMessage = useCallback((event: MessageEvent) => {
+    try {
+      const data = JSON.parse(event.data);
+      switch (data.type) {
+        case 'room.waiting':
+          if (data.data.is_invite_only) {
+            opp.current = {
+              id: data.data.opp.id,
+              username: data.data.opp.username,
+              avatar: data.data.opp.avatar,
+            };
+            console.log('opp:', opp.current);
+          }
+          break;
+        case 'game.start':
+          const op = data.data.participants.find(
+            (p: { id: number }) => p.id !== meRef.current.id
+          );
+          opp.current = {
+            id: op.id,
+            username: op.username,
+            avatar: op.avatar_url || '',
+          };
+          break;
+        case 'game.update':
+          setStage(true);
+          setMyPaddel(prev => ({
+            ...prev,
+            x: data.data[meRef.current.id].x,
+            y: data.data[meRef.current.id].y,
+            score: data.data[meRef.current.id].score,
+          }));
+          setOppPaddel(prev => ({
+            ...prev,
+            x: data.data[opp.current.id].x,
+            y: data.data[opp.current.id].y,
+            score: data.data[opp.current.id].score,
+          }));
+          setBall({ x: data.data.ball.x, y: data.data.ball.y });
+          break;
+        case 'game.over':
+          setGameEnded(true);
+          winner.current = meRef.current.id === data.data.winner ? meRef.current : opp.current;
+          // resetGameState();
+          break;
+        default:
+          console.warn('Unhandled message type:', data);
+          break;
+      }
+    } catch (error) {
+      console.error('Error processing message:', error);
+    }
+  }, [resetGameState]);
+
+  const connectWebSocket = useCallback(() => {
+    if (ws.current && [WebSocket.OPEN, WebSocket.CONNECTING].includes(ws.current.readyState)) {
+      return;
+    }
+
+    const wsUrl = room ? `ws://localhost:8000/ws/game/${room}/` : `ws://localhost:8000/ws/game/`;
+    ws.current = new WebSocket(wsUrl);
+
+    ws.current.onopen = () => {
+      setIsConnected(true);
+      messageQueue.current.forEach(send => send());
+      messageQueue.current = [];
+    };
+
+    ws.current.onmessage = handleMessage;
+
+    // Modified onclose handler - remove reconnection logic
+    ws.current.onclose = () => {
+      setIsConnected(false);
+    };
+
+    ws.current.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      setIsConnected(false);
+      disconnectSocket();
+    };
+  }, [room, handleMessage]);
 
   useEffect(() => {
     if (gameStarted) {
-      const wsUrl = `ws://localhost:8000/ws/game/`;
-      if (!ws.current) {
-        ws.current = new WebSocket(wsUrl);
-      }
-
-      const handleMessage = (event: MessageEvent) => {
-        const data = JSON.parse(event.data);
-        switch (data.type) {
-          case 'game.start':
-            const op = data.data.participants.find((p) => p.id !== userData.id);
-            opp.current = {
-              id: op.id,
-              username: op.username,
-              avatar: op.avatar_url,
-            };
-            break;
-          case 'game.update':
-            setStage(true);
-            setMyPaddel({
-              x: data.data[me.id].x,
-              y: data.data[me.id].y,
-              score: data.data[me.id].score,
-            });
-            setOppPaddel({
-              x: data.data[opp.current.id].x,
-              y: data.data[opp.current.id].y,
-              score: data.data[opp.current.id].score,
-            });
-            setBall({ x: data.data.ball.x, y: data.data.ball.y });
-            break;
-          case 'game.over':
-            console.log('Game over');
-            setGameEnded(true);
-            winner.current = me.id === data.data.winner ? me : opp.current;
-            console.log(winner.current);
-            break;
-          default:
-            console.warn('Unhandled message type:', data.type);
-        }
-      };
-
-      ws.current.onopen = () => {
-        console.log('Game state started');
-      };
-
-      ws.current.onmessage = handleMessage;
-
-      ws.current.onclose = () => {
-        console.log('Disconnected from game');
-      };
-
-      ws.current.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
-
-      return () => {
-        if (ws.current) {
-          ws.current.close();
-          ws.current = null;
-        }
-      };
+      connectWebSocket();
     }
-  }, [gameStarted, userData]);
+    return () => {
+      if (ws.current) {
+        ws.current.close();
+        ws.current = null;
+      }
+      setIsConnected(false);
+    };
+  }, [gameStarted, connectWebSocket]);
 
-  const disconnectSocket = () => {
+  const disconnectSocket = useCallback(() => {
     if (ws.current) {
       ws.current.close();
       ws.current = null;
     }
-  };
+    setRoom(null);
+    resetGameState();
+    setGameStarted(false);
+    setIsConnected(false);
+  }, [resetGameState]);
 
-  const move = (direction: string) => {
-    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({ action: 'move', direction }));
+  const move = useCallback((direction: string) => {
+    const sendMove = () => {
+      if (ws.current?.readyState === WebSocket.OPEN) {
+        ws.current.send(JSON.stringify({ action: 'move', direction }));
+      }
+    };
+
+    if (isConnected) {
+      sendMove();
+    } else {
+      messageQueue.current.push(sendMove);
     }
-  };
+  }, [isConnected]);
+
+  const contextValue = useMemo(() => ({
+    stageReady,
+    setStage,
+    gameStarted,
+    setGameStarted,
+    myPaddel,
+    oppPaddel,
+    me: meRef.current,
+    opp: opp.current,
+    move,
+    ball,
+    disconnectSocket,
+    gameEnded,
+    setGameEnded,
+    winner: winner.current,
+    room,
+    setRoom,
+    isConnected,
+    getOpponent,
+  }), [
+    stageReady,
+    gameStarted,
+    myPaddel,
+    oppPaddel,
+    ball,
+    gameEnded,
+    room,
+    isConnected,
+    move,
+    disconnectSocket,
+    setStage,
+    setGameStarted,
+    setGameEnded,
+    setRoom,
+    getOpponent,
+  ]);
 
   return (
-    <GameSocketContext.Provider
-      value={{
-        stageReady,
-        setStage,
-        gameStarted,
-        setGameStarted,
-        myPaddel,
-        oppPaddel,
-        me: me,
-        opp: opp.current,
-        move,
-        ball,
-        disconnectSocket,
-        gameEnded,
-        setGameEnded,
-        winner: winner.current,
-      }}
-    >
+    <GameSocketContext.Provider value={contextValue}>
       {children}
     </GameSocketContext.Provider>
   );

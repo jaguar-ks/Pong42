@@ -4,6 +4,10 @@ import Image from "next/image";
 import axios from "axios";
 import TestImage from "../../../assets/player.png";
 import styles from "./friends.module.css";
+import { useWebSocket } from "@/context/WebSocketContext";
+import { useRouter } from "next/navigation";
+import { useGameSocket } from "@/context/GameSocketContext";
+import { useUserContext } from "@/context/UserContext";
 
 const buttons: string[] = ["Friends", "Request", "Blocked"];
 
@@ -36,6 +40,10 @@ const Friends = () => {
     const [friends, setFriends] = useState<BlockType[]>([]);
     const [nowBlocked, setNowBlocked] = useState<BlockType[]>([]);
     const [clicked, setClicked] = useState("Friends");
+    const { connectionUpdate, setConnectionUpdate } = useWebSocket();
+    const router = useRouter();
+    const { setGameStarted, setRoom } = useGameSocket();
+    const { userData } = useUserContext();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -50,9 +58,11 @@ const Friends = () => {
                 console.error("Error in fetching user data", err);
             }
         };
-
         fetchData();
-    }, []);
+        if (connectionUpdate) {
+            setConnectionUpdate(false);
+        }
+    }, [connectionUpdate, setConnectionUpdate]);
 
     const handleBlock = async (id: number) => {
         try {
@@ -76,6 +86,12 @@ const Friends = () => {
         }
     };
 
+    const handleChallenge = (user: {id: number, username: string, avatar_url: string | null}) => {
+        setGameStarted(true);
+        setRoom(userData.username + "*" + user.username);
+        router.push(`/users/game/online/`);
+    };
+
     const FriendsList = () => (
         <div>
             {friends.map((friend) => (
@@ -91,7 +107,7 @@ const Friends = () => {
                         <h3 className={styles.name}>{friend.user.username}</h3>
                         <p className={styles.message}>Friends</p>
                         <div className={styles.actionButtons}>
-                            <button className={`${styles.actionButton} ${styles.challengeButton}`}>Challenge</button>
+                            <button className={`${styles.actionButton} ${styles.challengeButton}`} onClick={() => handleChallenge(friend.user)}>Challenge</button>
                             <button className={`${styles.actionButton} ${styles.blockButton}`} onClick={() => handleBlock(friend.user.id)}>Block</button>
                         </div>
                     </div>

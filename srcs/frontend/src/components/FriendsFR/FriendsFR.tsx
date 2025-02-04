@@ -30,7 +30,7 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
       updateSearchedUserData({
         ...searchedUserData,
         connection: {
-          ...(searchedUserData?.connection || {id: 0}),
+          ...(searchedUserData?.connection || {id: response.data.id}),
           status: "sent_request",
         },
       });

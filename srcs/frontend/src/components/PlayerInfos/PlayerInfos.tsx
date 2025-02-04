@@ -31,8 +31,6 @@ const PlayerInfos: React.FC<{ user: string }> = ({ user }) => {
   const dt = user === "search" ? userDataSearch : userData;
   const { onlineUser } = useWebSocket();
   const data = dt.id === onlineUser.user_id ? {...dt, is_online: onlineUser.is_online} : dt;
-  console.log("onlineUser", onlineUser);
-
 
   const defaultAvatarUrl = "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png";
 

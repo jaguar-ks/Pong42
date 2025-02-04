@@ -14,10 +14,13 @@ import { MatchHistoryFr } from "@/components/MatchHistoryFr/MatchHistoryFr";
 import ProgressBarFr from "@/components/ProgressBarFr/ProgressBarFr";
 import { AchievementsFr } from "@/components/AchievementsFr/AchievementsFr";
 import axios from "axios";
+import { useWebSocket } from "@/context/WebSocketContext";
+
 
 const SearchProfile = () => {
-  const { updateSearchedUserData, updateCurrentPage, searchedUserData, updateUserDataSearch, userDataSearch } = useUserContext();
+  const { updateSearchedUserData, updateCurrentPage, searchedUserData, updateUserDataSearch } = useUserContext();
   const { id } = useParams();
+  const { connectionUpdate, setConnectionUpdate } = useWebSocket();
 
   // Convert id to number safely
   const numericId = typeof id === "string" ? parseInt(id, 10) : Array.isArray(id) ? parseInt(id[0], 10) : NaN;
@@ -54,12 +57,15 @@ const SearchProfile = () => {
 
     if (!isNaN(numericId)) {
       fetchData();
+      if (connectionUpdate) {
+        setConnectionUpdate(false);
+      }
     } else {
       console.error("Invalid user ID");
       setUserExist(true);
       setIsLoading(false);
     }
-  }, [numericId, updateCurrentPage, updateSearchedUserData, updateUserDataSearch, userDataSearch.is_online, searchedUserData.is_online]);
+  }, [numericId, updateCurrentPage, updateSearchedUserData, updateUserDataSearch, connectionUpdate]);
 
   return (
     <div className={classes.home}>
