@@ -8,24 +8,25 @@ import { useGameSocket } from "@/context/GameSocketContext"
 
 interface Player {
   id: number
-  name: string
+  username: string
   avatar: string
 }
 
 interface WinningBoardProps {
   player: Player
+  winner: Player
 }
 
-export default function WinningBoard({ player }: WinningBoardProps) {
+export default function WinningBoard({ player, winner }: WinningBoardProps) {
   const router = useRouter()
-  const { me, winner, disconnectSocket } = useGameSocket()
+  const { disconnectSocket, } = useGameSocket()
 
   const handleClick = () => {
     disconnectSocket()
     router.push('/users/game/online')
   }
 
-  const isWinner = winner?.id === me?.id
+  const isWinner = winner?.id === player.id
 
   return (
     <Card className="w-full max-w-md mx-auto shadow-lg">
@@ -38,7 +39,7 @@ export default function WinningBoard({ player }: WinningBoardProps) {
       
       <CardContent className="flex flex-col items-center space-y-4 py-6">
         <div className="relative w-32 h-32">
-          <Avatar className="w-full h-full border-4 border-amber-400">
+          <Avatar className={`w-full h-full border-4 ${isWinner ? 'border-amber-400' : 'border-red-500'}`}>
             <img 
               src={player.avatar} 
               alt={player.name} 
