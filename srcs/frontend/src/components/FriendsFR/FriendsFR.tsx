@@ -68,6 +68,7 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
   };
 
   const sendMessage = () => {
+    router.push(`/users/chat/${searchedUserData.id}`);
     console.log("Sending message");
   };
 
@@ -86,6 +87,7 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
         { withCredentials: true }
       );
       console.log("User blocked:", response.data);
+      router.push("/users/home");
     } catch (error) {
       console.error("Error blocking user:", error);
     }
