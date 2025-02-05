@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useWebSocket } from '@/context/WebSocketContext';
-import axios from 'axios';
-import '../layout.css'
+import axios from 'axios'; 
+import '../../layout.css'
 import Api from '@/lib/api';
 import { useParams } from "next/navigation";
 
@@ -20,7 +20,7 @@ type Message = {
 
 type User = {
   conv_id: number,
-  id: string;
+  id: number;
   username: string;
   avatar_url: string;
   is_online: string;
@@ -39,7 +39,7 @@ export default function BoxedChatInterface() {
   const { sendMessage, messages: wsMessages } = useWebSocket();
   const [user, setUser] = useState<User>({
     conv_id: 0,
-    id: '',
+    id: 0,
     username: '',
     avatar_url: '',
     is_online: '',
@@ -80,6 +80,12 @@ export default function BoxedChatInterface() {
             rating: userData.user.rating,
           }));
         setUsers(fetchedUsers);
+        if (numericId) {
+          const selectedUser: User | undefined = fetchedUsers.find((usr) => usr.id === numericId);
+          if (selectedUser) {
+            setActiveUser(selectedUser);
+          }
+        }
         // if (fetchedUsers.length > 0) {
         //   setActiveUser(fetchedUsers[0]);
         // }

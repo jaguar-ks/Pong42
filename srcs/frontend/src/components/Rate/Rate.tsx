@@ -31,12 +31,8 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
       try {
         setLoading(true)
         setError(null)
-        if (!data) {
-          throw new Error("User ID is not available")
-        }
-        const res = await axios.get(`http://localhost:8000/api/pongue/${data}/rating_history`, {
-          withCredentials: true,
-        })
+        if (!data) return
+        const res = await Api.get(`/pongue/${data}/rating_history`)
         if (!res.data || !Array.isArray(res.data.results)) {
           throw new Error("Invalid data received from server")
         }
