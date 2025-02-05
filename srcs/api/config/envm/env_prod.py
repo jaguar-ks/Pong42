@@ -45,4 +45,10 @@ class ENV:
             return str(default)
         return str(self.secrets["data"][key])
 
+    def list(self, key, default=None):
+        if key not in self.secrets["data"] and default != None:
+            return default
+        ans = str(self.secrets["data"][key]).split(',')
+        return list(map(lambda x: x.strip(), ans))
+
 env = ENV()
