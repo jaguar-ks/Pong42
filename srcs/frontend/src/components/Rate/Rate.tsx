@@ -8,6 +8,7 @@ import ChartDataLabels from "chartjs-plugin-datalabels"
 import styles from "./rate.module.css"
 import axios from "axios"
 import { useUserContext } from "@/context/UserContext"
+import Api from "@/lib/api"
 
 const Line = dynamic(() => import("react-chartjs-2").then((mod) => mod.Line), {
   ssr: false,
