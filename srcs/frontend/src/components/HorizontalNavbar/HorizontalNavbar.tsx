@@ -111,7 +111,7 @@ const HorizontalNavbar: React.FC = () => {
                                 width={40}
                                 height={40}
                                 className={styles.profileImage}
-                                src={userData.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"}
+                                src={userData.avatar_url || process.env.NEXT_PUBLIC_DEFAULT_AVATAR}
                                 alt="Player Avatar"
                             />
                         </button>

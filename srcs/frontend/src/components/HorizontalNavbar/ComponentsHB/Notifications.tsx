@@ -7,6 +7,7 @@ import { useWebSocket } from '@/context/WebSocketContext';
 import { useRouter } from 'next/navigation';
 import { useGameSocket } from '@/context/GameSocketContext';
 import { useUserContext } from '@/context/UserContext';
+import Api from '@/lib/api';
 
 type Notification = {
   id: number;
@@ -36,8 +37,8 @@ const Notifications: React.FC = () => {
 
   const fetchNotifications = async () => {
     try {
-      await axios.get<{ results: Notification[] }>(
-        'http://localhost:8000/api/users/me/notifications/',
+      await Api.get<{ results: Notification[] }>(
+        '/users/me/notifications/',
         { withCredentials: true }
       ).then((res) => {
         setNotifications(res.data.results);
@@ -76,8 +77,8 @@ const Notifications: React.FC = () => {
     try {
       // Optimized API call handling
       const request = action === 'accept' 
-        ? axios.get(`http://localhost:8000/api/users/me/connections/${connectionId}/accept/`, { withCredentials: true })
-        : axios.delete(`http://localhost:8000/api/users/me/connections/${connectionId}/`, { withCredentials: true });
+        ? Api.get(`/users/me/connections/${connectionId}/accept/`, { withCredentials: true })
+        : Api.delete(`/users/me/connections/${connectionId}/`, { withCredentials: true });
 
       updateNotificationState(notificationId, { clicked: true });
       

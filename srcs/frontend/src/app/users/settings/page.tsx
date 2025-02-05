@@ -12,6 +12,7 @@ import ChangePassword from '@/components/Settings/ChangePassword/ChangePassword'
 import ChangeTFA from '@/components/Settings/ChangeTFA/ChangeTFA';
 import ImageUpload from '@/components/Settings/ChangeImage/ImageUpload';
 import styles from './Settings.module.css';
+import Api from '@/lib/api';
 
 const Settings: React.FC = () => {
   const [currentPage, setCurrentPage] = React.useState("");
@@ -25,7 +26,7 @@ const Settings: React.FC = () => {
       const checkToken = async () => {
         try {
           // Use the test_auth endpoint to verify authentication
-          await axios.get("http://localhost:8000/api/auth/test_auth/",{withCredentials: true})
+          await Api.get("/auth/test_auth/",{withCredentials: true})
         } catch (err) {
           console.log("Token validation error:", err);
           router.push("/auth/signin");
@@ -34,7 +35,7 @@ const Settings: React.FC = () => {
       }
       checkToken();
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/", { withCredentials: true });
+        const res = await Api.get("/users/me/", { withCredentials: true });
         updateUserData({
           id: res.data.id,
           otp_uri: res.data.otp_uri,
@@ -87,7 +88,7 @@ const Settings: React.FC = () => {
             <div className={styles.avatarWrapper}>
               <Image 
                 alt='Avatar' 
-                src={userData.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} 
+                src={userData.avatar_url || process.env.NEXT_PUBLIC_DEFAULT_AVATAR} 
                 width={100} 
                 height={100} 
                 className={styles.avatar}

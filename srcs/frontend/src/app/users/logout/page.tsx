@@ -6,6 +6,7 @@ import classes from './page.module.css';
 import axios from 'axios';
 import { useUserContext } from '@/context/UserContext';
 import { useWebSocket } from '@/context/WebSocketContext';
+import Api from '@/lib/api';
 
 const Logout: React.FC = () => {
   const router = useRouter();
@@ -19,7 +20,7 @@ const Logout: React.FC = () => {
     const checkToken = async () => {
       try {
         // Use the test_auth endpoint to verify authentication
-        await axios.get("http://localhost:8000/api/auth/test_auth/",{withCredentials: true})
+        await Api.get("/auth/test_auth/",{withCredentials: true})
       } catch (err) {
         console.log("Token validation error:", err);
         router.push("/auth/signin");
@@ -38,7 +39,7 @@ const Logout: React.FC = () => {
   const handleYes = async () => {
     setIsLoading(true);
     try {
-      await axios.post("http://localhost:8000/api/auth/sign-out/", {}, { withCredentials: true });
+      await Api.post("/auth/sign-out/", {}, { withCredentials: true });
       close();
       router.push('/auth/signin');
     } catch (error) {

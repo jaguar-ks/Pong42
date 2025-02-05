@@ -140,8 +140,8 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
     if (ws.current && [WebSocket.OPEN, WebSocket.CONNECTING].includes(ws.current.readyState)) {
       return;
     }
-
-    const wsUrl = room ? `ws://localhost:8000/ws/game/${room}/` : `ws://localhost:8000/ws/game/`;
+    const wsBaseUlr = process.env.NEXT_PUBLIC_WS_URL;
+    const wsUrl = room ? `${wsBaseUlr}/game/${room}/` : `${wsBaseUlr}/game/`;
     ws.current = new WebSocket(wsUrl);
 
     ws.current.onopen = () => {

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
 import axios from 'axios';
 import { useUserContext } from '@/context/UserContext';
 import styles from './change.module.css';
+import Api from '@/lib/api';
 
 interface ChangeLastnameProps {
   setCurrentPage: (page: string) => void;
@@ -28,8 +29,8 @@ const ChangeLastname: React.FC<ChangeLastnameProps> = ({ setCurrentPage }) => {
   const handleChangeLastName = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
-      const res = await axios.patch(
-        "http://localhost:8000/api/users/me/",
+      const res = await Api.patch(
+        "/users/me/",
         { last_name: newLastName },
         { withCredentials: true }
       );

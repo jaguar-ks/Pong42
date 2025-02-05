@@ -8,6 +8,7 @@ import { useWebSocket } from "@/context/WebSocketContext";
 import { useRouter } from "next/navigation";
 import { useGameSocket } from "@/context/GameSocketContext";
 import { useUserContext } from "@/context/UserContext";
+import Api from "@/lib/api";
 
 const buttons: string[] = ["Friends", "Request", "Blocked"];
 
@@ -48,7 +49,7 @@ const Friends = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get(`http://localhost:8000/api/users/me/connections/`, {
+                const res = await Api.get(`/users/me/connections/`, {
                     withCredentials: true,
                 });
                 setRequests(res.data.results.filter((item: RequestType) => item.status === "incoming_request"));
@@ -66,8 +67,8 @@ const Friends = () => {
 
     const handleBlock = async (id: number) => {
         try {
-            const response = await axios.post(
-                `http://localhost:8000/api/users/me/connections/block/`,
+            const response = await Api.post(
+                `/users/me/connections/block/`,
                 {
                     "recipient_id": id
                 },
@@ -119,7 +120,7 @@ const Friends = () => {
 
     const handleAcceptRequest = async (id: number) => {
         try {
-            const response = await axios.get(`http://localhost:8000/api/users/me/connections/${id}/accept/`, {
+            const response = await Api.get(`/users/me/connections/${id}/accept/`, {
                 withCredentials: true,
             });
             console.log(response);
@@ -146,7 +147,7 @@ const Friends = () => {
 
     const handleRejectRequest = async (id: number) => {
         try {
-            const resp = await axios.delete(`http://localhost:8000/api/users/me/connections/${id}/`, {
+            const resp = await Api.delete(`/users/me/connections/${id}/`, {
                 withCredentials: true,
             });
             if (resp.status === 204) {
@@ -196,7 +197,7 @@ const Friends = () => {
         console.log("id : " + id);
         const idd = id + 1;
         try {
-            await axios.delete(`http://localhost:8000/api/users/me/connections/${id}/`, {
+            await Api.delete(`/users/me/connections/${id}/`, {
                 withCredentials: true,
             });
             setBlocked(blocked.filter((item) => item.id !== id));
@@ -204,7 +205,7 @@ const Friends = () => {
             console.log("User unblocked successfully 1");
         } catch (errr) {
             try {
-                await axios.delete(`http://localhost:8000/api/users/me/connections/${idd}/`, {
+                await Api.delete(`/users/me/connections/${idd}/`, {
                     withCredentials: true,
                 });
                 setBlocked(blocked.filter((item) => item.id !== idd - 1));

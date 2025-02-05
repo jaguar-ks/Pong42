@@ -9,6 +9,7 @@ import { useUserContext } from "@/context/UserContext";
 import { useWebSocket } from "@/context/WebSocketContext";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Api from "@/lib/api";
 
 // Helper function to truncate text
 const truncateText = (text: string | undefined, maxLength: number) => {
@@ -41,7 +42,7 @@ const PlayerInfos: React.FC<{ user: string }> = ({ user }) => {
     const checkToken = async () => {
       try {
         // Use the test_auth endpoint to verify authentication
-        await axios.get("http://localhost:8000/api/auth/test_auth/",{withCredentials: true})
+        await Api.get("/auth/test_auth/",{withCredentials: true})
       } catch (err) {
         console.log("Token validation error:", err);
         router.push("/auth/signin");
@@ -52,7 +53,7 @@ const PlayerInfos: React.FC<{ user: string }> = ({ user }) => {
   }, [])
 
 
-  const defaultAvatarUrl = "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png";
+  const defaultAvatarUrl = process.env.NEXT_PUBLIC_DEFAULT_AVATAR;
 
   // Type guard to check if the data is of type UserDataType
   const isUserDataType = (data: typeof userData | typeof userDataSearch): data is typeof userData =>

@@ -23,9 +23,11 @@ python3 manage.py migrate
 
 
 python3 manage.py shell < tools/create_superuser.py
+python3 manage.py collectstatic --noinput
 
 if [ ${FIRST} == "1" ]; then
     python3 manage.py shell < tools/fake_users.py
     sed -i 's/FIRST=\"1\"/FIRST=\"0\"/' cred.env
 fi
+
 python manage.py runserver 0.0.0.0:8000

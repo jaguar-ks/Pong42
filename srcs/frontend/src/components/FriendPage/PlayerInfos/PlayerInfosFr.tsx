@@ -13,7 +13,7 @@ const PlayerInfosFr = () => {
     return (
         <div className={classes.playerinfos}>
             <div className={classes.imageC}>
-                <Image className={classes.image} src={searchedUserData.avatar_url ? searchedUserData.avatar_url : "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png" } alt='avatar' width={100} height={100}/>
+                <Image className={classes.image} src={searchedUserData.avatar_url ? searchedUserData.avatar_url : process.env.NEXT_PUBLIC_DEFAULT_AVATAR } alt='avatar' width={100} height={100}/>
             </div>
             <div className={classes.infosContainer}>
                 <div className={classes.info}>

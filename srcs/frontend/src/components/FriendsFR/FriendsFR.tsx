@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import axios from "axios";
 import styles from "./friends.module.css";
 import sendMsgIcon from "../../../assets/send message.svg";
 import addFriendIcon from "../../../assets/add-friendBlack.svg";
@@ -10,6 +9,7 @@ import blockFriendIcon from "../../../assets/blockFriend.svg";
 import { useUserContext } from "@/context/UserContext";
 import { useGameSocket } from "@/context/GameSocketContext";
 import { useRouter } from "next/navigation";
+import Api from "@/lib/api";
 
 type FriendsFRProps = {
   id: number;
@@ -25,8 +25,8 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
 
   const sendFriendRequest = async () => {
     try {
-      const response = await axios.post(
-        `http://localhost:8000/api/users/me/connections/`,
+      const response = await Api.post(
+        `/users/me/connections/`,
         { recipient_id: id },
         { withCredentials: true }
       );
@@ -49,8 +49,8 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
 
   const confirmCancelRequest = async () => {
     try {
-      await axios.delete(
-        `http://localhost:8000/api/users/me/connections/${searchedUserData.connection?.id}/`,
+      await Api.delete(
+        `/users/me/connections/${searchedUserData.connection?.id}/`,
         { withCredentials: true }
       );
       console.log("Friend request cancelled");
@@ -80,8 +80,8 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
 
   const blockUser = async () => {
     try {
-      const response = await axios.post(
-        `http://localhost:8000/api/users/me/connections/block/`,
+      const response = await Api.post(
+        `/users/me/connections/block/`,
         { recipient_id: id },
         { withCredentials: true }
       );

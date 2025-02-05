@@ -12,6 +12,7 @@ import { Achievements } from "../../../components/Achievements/Achievements"
 import { useUserContext } from "@/context/UserContext"
 import axios from "axios"
 import { MatchHistory } from "@/components/MatchHistory/MatchHistory"
+import Api from "@/lib/api"
 
 
 
@@ -24,7 +25,7 @@ const Home = () => {
     const checkToken = async () => {
       try {
         // Use the test_auth endpoint to verify authentication
-        await axios.get("http://localhost:8000/api/auth/test_auth/",{withCredentials: true})
+        await Api.get("/auth/test_auth/",{withCredentials: true})
       } catch (err) {
         console.log("Token validation error:", err);
         router.push("/auth/signin");

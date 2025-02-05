@@ -8,6 +8,7 @@ import ChartDataLabels from "chartjs-plugin-datalabels"
 import styles from "./rate.module.css"
 import axios from "axios"
 import { useUserContext } from "@/context/UserContext"
+import Api from "@/lib/api"
 
 const Line = dynamic(() => import("react-chartjs-2").then((mod) => mod.Line), {
   ssr: false,
@@ -34,7 +35,7 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
         if (!data.id) {
           throw new Error("User ID is not available")
         }
-        const res = await axios.get(`http://localhost:8000/api/pongue/1/rating_history`, {
+        const res = await Api.get(`/pongue/1/rating_history`, {
           withCredentials: true,
         })
         if (!res.data || !Array.isArray(res.data.results)) {

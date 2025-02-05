@@ -37,7 +37,7 @@ const Profile: React.FC<ProfileProps> = ({ username, setActiveIcon }) => {
     <div className={classes.dropdownContent}>
       <div className={classes.profileHeader}>
         <Image
-          src={userData.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"}
+          src={userData.avatar_url || process.env.NEXT_PUBLIC_DEFAULT_AVATAR}
           alt={username}
           width={60}
           height={60}

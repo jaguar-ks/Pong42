@@ -12,6 +12,7 @@ import imageee from "../../../../assets/syberPlayer.png"
 import googleIcon from "../../../../assets/googleSigninLogoBlack.svg"
 import githubIcon from "../../../../assets/githubSignInLogo.svg"
 import FTIcon from "../../../../assets/FTSignUnImage1.svg"
+import Api from "@/lib/api"
 
 // If you want single-string errors for each field:
 type ServerErrorData = {
@@ -63,7 +64,7 @@ export default function SignUpPage() {
 
     // Submit to backend
     try {
-      await axios.post("http://localhost:8000/api/auth/sign-up/", {
+      await Api.post("/auth/sign-up/", {
         username: formData.username,
         password: formData.password,
         email: formData.email,
@@ -90,7 +91,7 @@ export default function SignUpPage() {
   const handleSignUp = async (index: number) => {
     setIsLoading(true)
     try {
-      const res = await axios.get("http://localhost:8000/api/auth/social/providers/")
+      const res = await Api.get("/auth/social/providers/")
       router.push(res.data.providers[index].provider_url)
     } catch (error) {
       if (axios.isAxiosError(error)) {
