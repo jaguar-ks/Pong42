@@ -31,7 +31,7 @@ application = ProtocolTypeRouter(
             WebSocketJWTMiddleware(
                 URLRouter(
                     [
-                        re_path(r'ws/game/(?:(?P<room_name>\w+)/)?$', GameConsumer.as_asgi()),
+                        re_path(r'ws/game/(?:(?P<room_name>[\w\-]+)/)?$', GameConsumer.as_asgi()),
                         re_path(r'ws/chat/$', ChatConsumer.as_asgi()),
                         re_path(r'', unmatched_route), # catch all unmatched routes
                     ]
