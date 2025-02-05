@@ -135,8 +135,8 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
         </button>
       </div>
       <div className={styles.buttonWrapper}>
-        <button onClick={sendChallenge} className={styles.button}>
-          <div className={styles.iconWrapper} onClick={sendChallenge} disabled={searchedUserData?.connection?.status !== "friends"}>
+        <button onClick={sendChallenge} className={styles.button} disabled={searchedUserData?.connection?.status !== "friends"}>
+          <div className={styles.iconWrapper}>
             <Image
               src={challengeIcon}
               alt="Challenge"
