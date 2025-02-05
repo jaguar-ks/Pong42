@@ -13,7 +13,7 @@ def send_verification_email(user):
     """
     token, uid = generate_token_and_uid(user)
 
-    verification_url = f"{settings.WEBSITE_DOMAIN_NAME}{reverse('verify_email')}?{urlencode({'uid': uid, 'token': token})}"
+    verification_url = f"{settings.WEBSITE_DOMAIN_NAME}/auth/verifyEmail?{urlencode({'uid': uid, 'token': token})}"
 
     context = {
         "website_name": settings.WEBSITE_NAME,
