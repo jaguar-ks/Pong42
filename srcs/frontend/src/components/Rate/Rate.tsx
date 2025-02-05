@@ -33,9 +33,9 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
         setLoading(true)
         setError(null) // Reset error state
         if (!data.id) {
-          throw new Error("User ID is not available")
+          return
         }
-        const res = await Api.get(`/pongue/1/rating_history`, {
+        const res = await Api.get(`/pongue/${data.id}/rating_history`, {
           withCredentials: true,
         })
         if (!res.data || !Array.isArray(res.data.results)) {
