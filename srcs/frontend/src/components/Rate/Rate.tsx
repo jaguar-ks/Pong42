@@ -8,7 +8,6 @@ import ChartDataLabels from "chartjs-plugin-datalabels"
 import styles from "./rate.module.css"
 import axios from "axios"
 import { useUserContext } from "@/context/UserContext"
-import Api from "@/lib/api"
 
 const Line = dynamic(() => import("react-chartjs-2").then((mod) => mod.Line), {
   ssr: false,
@@ -25,17 +24,17 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
   const [labels, setLabels] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const data = user === "search" ? userDataSearch : userData
+  const data = user === "search" ? userDataSearch.id : userData.id
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        setError(null) // Reset error state
-        if (!data.id) {
+        setError(null)
+        if (!data) {
           throw new Error("User ID is not available")
         }
-        const res = await Api.get(`/pongue/1/rating_history`, {
+        const res = await axios.get(`http://localhost:8000/api/pongue/${data}/rating_history`, {
           withCredentials: true,
         })
         if (!res.data || !Array.isArray(res.data.results)) {
@@ -60,7 +59,7 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
       }
     }
     fetchData()
-  }, [data.id])
+  }, [data])
 
   if (loading) {
     return <div className={styles.loading}>Loading rating history...</div>
@@ -70,19 +69,15 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
     return <div className={styles.error}>Error: {error}</div>
   }
 
-  if (chartData.length === 0) {
-    return <div className={styles.noData}>No rating history available.</div>
-  }
-
-  const minValue = Math.min(...chartData) - Math.min(...chartData) / 5
-  const maxValue = Math.max(...chartData) + Math.max(...chartData) / 5
+  const minValue = chartData.length > 0 ? Math.min(...chartData) - Math.min(...chartData) / 5 : 0
+  const maxValue = chartData.length > 0 ? Math.max(...chartData) + Math.max(...chartData) / 5 : 100
 
   const chartDataConfig = {
-    labels: labels,
+    labels: chartData.length > 0 ? labels : ["No Data"],
     datasets: [
       {
         label: "Rating over Time",
-        data: chartData,
+        data: chartData.length > 0 ? chartData : [],
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 2,
@@ -122,6 +117,9 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
         },
         anchor: "end",
         align: "top" as const,
+        display: (context) => {
+          return context.dataset.data.length > 0
+        },
       },
     },
   }
