@@ -38,7 +38,6 @@ create_django_secrets() {
         GITHUB_OAUTH_REDIRECT_URI="${GITHUB_OAUTH_REDIRECT_URI}" \
         DB_NAME="${DB_NAME}" \
         POSTGRES_DB="${POSTGRES_DB}" \
-        FRONT_BASE_URL="${FRONT_BASE_URL}" \
         DEFAULT_PROFILE_IMAGE_URL="${DEFAULT_PROFILE_IMAGE_URL}"
 }
 
