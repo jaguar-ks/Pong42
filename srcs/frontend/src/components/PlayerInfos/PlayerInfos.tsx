@@ -9,6 +9,7 @@ import { useUserContext } from "@/context/UserContext";
 import { useWebSocket } from "@/context/WebSocketContext";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Api from "@/lib/api";
 
 // Helper function to truncate text
 const truncateText = (text: string | undefined, maxLength: number) => {
@@ -41,7 +42,7 @@ const PlayerInfos: React.FC<{ user: string }> = ({ user }) => {
     const checkToken = async () => {
       try {
         // Use the test_auth endpoint to verify authentication
-        await axios.get("http://localhost:8000/api/auth/test_auth/",{withCredentials: true})
+        await Api.get("/auth/test_auth/",{withCredentials: true})
       } catch (err) {
         console.log("Token validation error:", err);
         router.push("/auth/signin");

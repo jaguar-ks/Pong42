@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, ChangeEvent, MouseEvent } from 'react';
 import axios from 'axios';
 import { useUserContext } from '@/context/UserContext';
 import styles from './changeUsername.module.css';
+import Api from '@/lib/api';
 
 interface ChangeUsernameProps {
   setCurrentPage: (page: string) => void;
@@ -30,8 +31,8 @@ const ChangeUsername: React.FC<ChangeUsernameProps> = ({ setCurrentPage }) => {
   const handleChangeUsername = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
-      const res = await axios.patch(
-        "http://localhost:8000/api/users/me/",
+      const res = await Api.patch(
+        "/users/me/",
         { username: newUsername },
         { withCredentials: true }
       );

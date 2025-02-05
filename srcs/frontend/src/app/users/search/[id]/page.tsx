@@ -15,6 +15,7 @@ import ProgressBarFr from "@/components/ProgressBarFr/ProgressBarFr";
 import { AchievementsFr } from "@/components/AchievementsFr/AchievementsFr";
 import axios from "axios";
 import { useWebSocket } from "@/context/WebSocketContext";
+import Api from "@/lib/api";
 
 
 const SearchProfile = () => {
@@ -34,7 +35,7 @@ const SearchProfile = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get(`http://localhost:8000/api/users/${numericId}/`, {
+        const res = await Api.get(`/users/${numericId}/`, {
           withCredentials: true,
         });
         console.log("Fetched Data:", res.data);

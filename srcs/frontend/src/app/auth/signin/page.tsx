@@ -12,6 +12,7 @@ import imageee from "../../../../assets/syberPlayer.png"
 import googleIcon from "../../../../assets/googleSigninLogoBlack.svg"
 import githubIcon from "../../../../assets/githubSignInLogo.svg"
 import FTIcon from "../../../../assets/FTSignUnImage1.svg"
+import Api from "@/lib/api"
 
 interface Errors {
   details: string
@@ -66,7 +67,7 @@ const SignInContent = () => {
     setIsLoading(true)
 
     try {
-      await axios.post("http://localhost:8000/api/auth/sign-in/", { username, password }, { withCredentials: true })
+      await Api.post("/auth/sign-in/", { username, password }, { withCredentials: true })
       router.push("/users/home")
     } catch (err) {
       console.error("Error:", err)
@@ -88,7 +89,7 @@ const SignInContent = () => {
 
   const handleSignUp = async (index: number) => {
     try {
-      const res = await axios.get("http://localhost:8000/api/auth/social/providers/")
+      const res = await Api.get("auth/social/providers/")
       router.push(res.data.providers[index].provider_url)
     } catch (err) {
       console.error("Error:", err)

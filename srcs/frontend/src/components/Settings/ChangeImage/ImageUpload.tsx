@@ -5,6 +5,7 @@ import Image from "next/image";
 import axios from "axios";
 import { useUserContext } from "@/context/UserContext";
 import styles from './imageUpload.module.css';
+import Api from "@/lib/api";
 
 interface ImageUploadProps {
   setCurrentPage: (page: string) => void;
@@ -19,7 +20,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/");
+        const res = await Api.get("/users/me/");
         setNewImage(res.data.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png");
       } catch (error: unknown) {
         console.log("Error in fetching user data", error);
@@ -86,8 +87,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
 
     setIsLoading(true);
     try {
-      const res: { data: { avatar_url: string } } = await axios.patch(
-        "http://localhost:8000/api/users/me/",
+      const res: { data: { avatar_url: string } } = await Api.patch(
+        "/users/me/",
         {
           avatar_url: newImage,
         },

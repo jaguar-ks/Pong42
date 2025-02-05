@@ -6,6 +6,7 @@ import axios from 'axios';
 import classes from './page.module.css';
 import { useUserContext } from '@/context/UserContext';
 import { useRouter } from 'next/navigation';
+import Api from '@/lib/api';
 
 interface Player {
   id: number;
@@ -35,7 +36,7 @@ const Leaderboard: React.FC = () => {
     const checkToken = async () => {
       try {
         // Use the test_auth endpoint to verify authentication
-        await axios.get("http://localhost:8000/api/auth/test_auth/",{withCredentials: true})
+        await Api.get("/auth/test_auth/",{withCredentials: true})
       } catch (err) {
         console.log("Token validation error:", err);
         router.push("/auth/signin");
@@ -49,7 +50,7 @@ const Leaderboard: React.FC = () => {
   const fetchLeaderboard = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get<LeaderboardResponse>(`http://localhost:8000/api/users/leaderboard/?page=${currentPage}`, { withCredentials: true });
+      const response = await Api.get<LeaderboardResponse>(`/users/leaderboard/?page=${currentPage}`, { withCredentials: true });
       setLeaderboardData(response.data);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);

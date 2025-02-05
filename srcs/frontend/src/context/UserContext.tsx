@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import axios from "axios";
+import Api from "@/lib/api";
 
 // Define a type for the context value
 interface UserContextType {
@@ -175,7 +176,7 @@ export const useUserContext = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get("http://localhost:8000/api/users/me/", { withCredentials: true });
+                const res = await Api.get("/users/me/", { withCredentials: true });
                 context.updateUserData({
                     id: res.data.id,
                     otp_uri: res.data.otp_uri,

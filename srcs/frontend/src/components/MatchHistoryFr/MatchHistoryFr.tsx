@@ -6,6 +6,7 @@ import { useUserContext } from "@/context/UserContext"
 import classes from "./MatchHistoryFr.module.css"
 import playerIcon from "../../../assets/player.png"
 import axios from "axios"
+import Api from "@/lib/api"
 
 interface Player {
   id: number
@@ -36,7 +37,7 @@ export const MatchHistoryFr: React.FC<MatchHistoryFrProps> = ({ id }) => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const res = await axios.get(`http://localhost:8000/api/pongue/${id}/matches`, { withCredentials: true })
+        const res = await Api.get(`/pongue/${id}/matches`, { withCredentials: true })
         setMatches(res.data.results)
       } catch (err) {
         console.error("Error fetching match data:", err)

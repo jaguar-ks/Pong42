@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useWebSocket } from '@/context/WebSocketContext';
 import axios from 'axios';
 import '../layout.css'
+import Api from '@/lib/api';
 
 type Message = {
   id: number;
@@ -54,14 +55,14 @@ export default function BoxedChatInterface() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/users/me/', { withCredentials: true })
+    Api.get('/users/me/', { withCredentials: true })
       .then((response) => {
         setUser(response.data);
       });
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/users/me/connections/', { withCredentials: true })
+    Api.get('/users/me/connections/', { withCredentials: true })
       .then((response) => {
         const fetchedUsers: User[] = response.data.results
           .filter((userData) => userData.status === "friends")
@@ -110,8 +111,8 @@ export default function BoxedChatInterface() {
   const fetchMessages = useCallback(async (page: number) => {
     if (activeUser) {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/api/users/me/connections/${activeUser.conv_id}/messages/`,
+        const response = await Api.get(
+          `/users/me/connections/${activeUser.conv_id}/messages/`,
           {
             params: { page },
             withCredentials: true,

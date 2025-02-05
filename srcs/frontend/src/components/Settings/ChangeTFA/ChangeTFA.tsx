@@ -5,6 +5,7 @@ import axios from "axios";
 import { useUserContext } from "@/context/UserContext";
 import QRCode from "react-qr-code";
 import styles from './change.module.css';
+import Api from "@/lib/api";
 
 interface ChangeTFAProps {
   setCurrentPage: (page: string) => void;
@@ -23,7 +24,7 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
     const fetchUserData = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/", { withCredentials: true });
+        const res = await Api.get("/users/me/", { withCredentials: true });
         setIsActive(res.data.two_fa_enabled);
       } catch (err) {
         console.error("Failed to fetch user data:", err);
@@ -41,7 +42,7 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
     } else {
       setIsLoading(true);
       try {
-        const res = await axios.get("http://localhost:8000/api/users/me/", { withCredentials: true });
+        const res = await Api.get("/users/me/", { withCredentials: true });
         setCode(res.data.otp_uri);
         setShowInput(true);
       } catch (err) {
@@ -58,16 +59,16 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
     setError("");
     try {
       if (isActive) {
-        await axios.post(
-          "http://localhost:8000/api/auth/2fa/disable/",
+        await Api.post(
+          "/auth/2fa/disable/",
           { otp_code: inputCode },
           { withCredentials: true }
         );
         updateUserData({ ...userData, two_fa_enabled: false });
         setIsActive(false);
       } else {
-        await axios.post(
-          "http://localhost:8000/api/auth/2fa/enable/",
+        await Api.post(
+          "/auth/2fa/enable/",
           { otp_code: inputCode },
           { withCredentials: true }
         );

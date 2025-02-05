@@ -5,6 +5,7 @@ import classes from "./OtpForLogin.module.css"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 import OtpInput from "./OtpInput"
+import Api from "@/lib/api"
 
 interface OtpForLoginProps {
   setErrors: React.Dispatch<React.SetStateAction<{ details: string; username: string; password: string; otp: string }>>
@@ -20,8 +21,8 @@ const OtpForLogin: React.FC<OtpForLoginProps> = ({ setErrors, username, password
   const handleSignin = async (inputCode: string): Promise<void> => {
     setIsLoading(true)
     try {
-      await axios.post(
-        `http://localhost:8000/api/auth/sign-in/`,
+      await Api.post(
+        `/auth/sign-in/`,
         { username, password, otp_code: inputCode },
         { withCredentials: true },
       )

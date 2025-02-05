@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useUserContext } from "@/context/UserContext";
 import classes from "./SearchBar.module.css";
 import searchLogoBlack from "../../../../assets/SearchBlack.svg";
+import Api from "@/lib/api";
 
 interface SearchResult {
     id: number;
@@ -124,8 +125,8 @@ const SearchBar: React.FC = () => {
 
     const fetchSearchResults = async (page = 1) => {
         try {
-            const response = await axios.get<SearchResponse>(
-                "http://localhost:8000/api/users/search/",
+            const response = await Api.get<SearchResponse>(
+                "/users/search/",
                 {
                     params: { page, search: debouncedSearch },
                     withCredentials: true,

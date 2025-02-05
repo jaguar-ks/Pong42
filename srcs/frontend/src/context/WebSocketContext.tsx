@@ -51,7 +51,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
   const [retryCount, setRetryCount] = useState(0);
 
   const connect = () => {
-    const wsUrl = `ws://localhost:8000/ws/chat/`;
+    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL}/chat/`;
     
     if (ws.current && [WebSocket.OPEN, WebSocket.CONNECTING].includes(ws.current.readyState)) {
       return;

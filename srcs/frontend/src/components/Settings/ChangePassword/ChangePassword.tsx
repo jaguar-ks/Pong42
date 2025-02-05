@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, ChangeEvent } from 'react';
 import axios from 'axios';
 import styles from './change.module.css';
+import Api from '@/lib/api';
 
 interface ChangePasswordProps {
   setCurrentPage: (page: string) => void;
@@ -35,8 +36,8 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ setCurrentPage }) => {
       return;
     }
     try {
-      const res = await axios.patch(
-        "http://localhost:8000/api/users/me/",
+      const res = await Api.patch(
+        "/users/me/",
         { password: newPassword },
         { withCredentials: true }
       );
