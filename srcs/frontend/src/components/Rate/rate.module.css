@@ -8,7 +8,7 @@
     border: 1px solid #eeeee0;
     padding: 15px;
     clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 30px);
-    border: 2px solid #3040d3;
+    border: 2px solid #ffffff;
   }
   
   .title {
