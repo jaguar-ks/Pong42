@@ -36,6 +36,7 @@ services:
         volumes:
             - ./srcs/api:/var/www
             - vault_creds:/var/www/cred.d/
+            - static_files:/var/www/static/
         networks:
             - transcendance_net
             - elk
@@ -226,6 +227,7 @@ services:
         volumes:
             - ./srcs/nginx/logs/:/var/log/nginx/
             - ./srcs/nginx/modlogs/:/var/log/modsecurity/
+            - static_files:/usr/share/nginx/html/staticfiles/
         networks:
             - transcendance_net
         depends_on:
@@ -240,6 +242,7 @@ volumes:
     vault_creds:
         name: vault_creds
     es_data:
+    static_files:
 
 networks:
     transcendance_net:

@@ -44,3 +44,5 @@ htmlcov/
 */vault/data/*
 */vault/init/*
 *cred*
+
+static/
