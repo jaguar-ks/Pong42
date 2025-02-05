@@ -53,7 +53,7 @@ const PlayerInfos: React.FC<{ user: string }> = ({ user }) => {
   }, [])
 
 
-  const defaultAvatarUrl = "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png";
+  const defaultAvatarUrl = process.env.NEXT_PUBLIC_DEFAULT_AVATAR;
 
   // Type guard to check if the data is of type UserDataType
   const isUserDataType = (data: typeof userData | typeof userDataSearch): data is typeof userData =>

@@ -20,7 +20,7 @@ const PLAYERS: Player[] = [
   { id: 4, name: "Alex", avatar: "/animalsProfile/catprofile.png" },
 ]
 
-const FALLBACK_AVATAR = 'https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png'
+const FALLBACK_AVATAR = process.env.NEXT_PUBLIC_DEFAULT_AVATAR;
 
 export default function PingPongMatchup() {
   const { 

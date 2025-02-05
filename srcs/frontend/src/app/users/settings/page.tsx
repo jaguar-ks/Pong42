@@ -88,7 +88,7 @@ const Settings: React.FC = () => {
             <div className={styles.avatarWrapper}>
               <Image 
                 alt='Avatar' 
-                src={userData.avatar_url || "https://res.cloudinary.com/doufu6atn/image/upload/v1726742774/nxdrt0md7buyeghyjyvj.png"} 
+                src={userData.avatar_url || process.env.NEXT_PUBLIC_DEFAULT_AVATAR} 
                 width={100} 
                 height={100} 
                 className={styles.avatar}
