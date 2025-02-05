@@ -7,11 +7,7 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=True)
 
-ALLOWED_HOSTS = []
-
-
 # Application definition
-
 INSTALLED_APPS = [
     "daphne",
     "jazzmin",
@@ -83,18 +79,6 @@ TEMPLATES = [
 
 ASGI_APPLICATION = "config.asgi.application"
 
-CORS_ALLOW_CREDENTIALS = True
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:8000",
-    "https://127.0.0.1",
-    "https://localhost",
-]
-
-ALLOWED_HOSTS = ['*']
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -125,21 +109,26 @@ USE_I18N = True
 
 USE_TZ = True
 
+STATIC_URL = "/staticfiles/"
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-STATIC_URL = "static/"
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+STATIC_ROOT = BASE_DIR / 'static'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.User"
 
-WEBSITE_DOMAIN_NAME = env("DOMAIN_NAME")
 WEBSITE_NAME = env("WEBSITE_NAME")
-FRONT_BASE_URL = env("FRONT_BASE_URL", default="http://localhost:3000/")
+
+WEBSITE_DOMAIN_NAME = env("DOMAIN_NAME")
+
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+
+CSRF_TRUSTED_ORIGINS = [
+    WEBSITE_DOMAIN_NAME
+]
+
+CSRF_COOKIE_SECURE = True
+
+CSRF_COOKIE_SAMESITE = 'None'
 
 from config.settings import *
