@@ -44,7 +44,7 @@ class OauthProvidersUrls(serializers.Serializer):
 
 
 class OauthCallBackSerializer(serializers.Serializer):
-    code = serializers.CharField(max_length=200, write_only=True)
+    code = serializers.CharField(write_only=True, required=False)
     user = UserSerializer(read_only=True)
     token = serializers.CharField(max_length=200, read_only=True)
 
@@ -79,6 +79,9 @@ class OauthCallBackSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         provider = self.context["provider"]
+        code = attrs.get('code', None)
+        if not code:
+            raise Exception(f"failed to sign-in using {provider} oauth")
         config = PROVIDERS_SETTINGS.get(provider)
         if not config:
             raise Http404(f"provider {provider} not implemented")
@@ -98,7 +101,7 @@ class OauthCallBackSerializer(serializers.Serializer):
                 include_client_id=True,
             )
         except Exception as e:
-            raise serializers.ValidationError(f"Token exchange failed: {str(e)}")
+            raise Exception(f"Token exchange failed: {str(e)}")
         # Fetch user info
         try:
             user_info_response = oauth_session.get(config["user_info_url"])
@@ -106,7 +109,7 @@ class OauthCallBackSerializer(serializers.Serializer):
             user_info = user_info_response.json()
             return self.extract_user_info(user_info, config["user_info_kwargs"])
         except Exception as e:
-            raise serializers.ValidationError(f"Failed to fetch user info: {str(e)}")
+            raise Exception(f"Failed to fetch user info: {str(e)}")
 
     def extract_user_info(self, user_info, keys):
         data = {}
@@ -129,7 +132,7 @@ class OauthCallBackSerializer(serializers.Serializer):
     def create(self, validated_data: dict):
         email = validated_data.pop("email", None)
         if not email:
-            raise serializers.ValidationError(
+            raise Exception(
                 f"Your provider {self.context['provider']} does not provide email"
             )
 
@@ -158,6 +161,6 @@ class OauthCallBackSerializer(serializers.Serializer):
             token = SlidingToken.for_user(user=user)
             return {"token": str(token), "user": UserSerializer(user).data}
         except Exception:
-            raise serializers.ValidationError(
+            raise Exception(
                 "sign-in failed please try another way, or contact support"
             )
