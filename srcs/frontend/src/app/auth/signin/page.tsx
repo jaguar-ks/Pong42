@@ -70,7 +70,6 @@ const SignInContent = () => {
       await Api.post("/auth/sign-in/", { username, password }, { withCredentials: true })
       router.push("/users/home")
     } catch (err) {
-      console.error("Error:", err)
       if (axios.isAxiosError(err)) {
         const axiosError = err as AxiosError<ErrorResponse>
         setErrors({
@@ -92,7 +91,6 @@ const SignInContent = () => {
       const res = await Api.get("auth/social/providers/")
       router.push(res.data.providers[index].provider_url)
     } catch (err) {
-      console.error("Error:", err)
       if (axios.isAxiosError(err)) {
         const axiosError = err as AxiosError<ErrorResponse>
         setErrors((prev) => ({

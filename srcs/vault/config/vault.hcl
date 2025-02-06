@@ -10,7 +10,7 @@ listener "tcp" {
 }
 
 # Enable Vault UI
-ui = true
+ui = false
 
 # API Address
 api_addr = "http://127.0.0.1:8200"
@@ -19,6 +19,6 @@ api_addr = "http://127.0.0.1:8200"
 # default_lease_ttl = "1h"
 # max_lease_ttl     = "24h"
 log_file = "/vault/logs/vault.log"  # Path to store the log file
-log_level = "trace"             # Capture all log levels
+log_level = "info"             # Capture all log levels
 log_format = "json"
 

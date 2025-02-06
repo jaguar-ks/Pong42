@@ -79,9 +79,7 @@ export default function BoxedChatInterface() {
         setUsers(fetchedUsers);
         setFiltered(fetchedUsers);
       })
-      .catch((error) => {
-        console.error('Error fetching users:', error);
-      });
+      .catch();
   }, []);
 
   useEffect(() => {
@@ -133,7 +131,6 @@ export default function BoxedChatInterface() {
         });
         setHasMore(response.data.next !== null);
       } catch (error) {
-        console.error('Error fetching messages:', error);
       }
     }
   }, [activeUser]);

@@ -140,7 +140,6 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
           break;
       }
     } catch (error) {
-      console.error('Error processing message:', error);
     }
   }, [resetGameState]);
 
@@ -166,7 +165,6 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
     };
 
     ws.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
       setIsConnected(false);
       disconnectSocket();
     };

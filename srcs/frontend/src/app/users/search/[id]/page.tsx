@@ -41,10 +41,8 @@ const SearchProfile = () => {
         setUserExist(false)
       } catch (err) {
         if (axios.isAxiosError(err)) {
-          console.error("Error fetching user data:", err.response?.data?.detail)
           setUserExist(true)
         } else {
-          console.error("Unknown error:", err)
           setUserExist(true)
         }
       } finally {
@@ -58,7 +56,6 @@ const SearchProfile = () => {
         setConnectionUpdate(false)
       }
     } else {
-      console.error("Invalid user ID")
       setUserExist(true)
       setIsLoading(false)
     }

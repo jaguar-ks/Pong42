@@ -53,7 +53,6 @@ const Notifications: React.FC = () => {
       });
 
     } catch (error) {
-      console.error('Error fetching notifications:', error);
     }
   };
 
@@ -88,7 +87,6 @@ const Notifications: React.FC = () => {
       // Refresh notifications after successful action
       await fetchNotifications();
     } catch (error) {
-      console.error(`Error ${action}ing friend request:`, error);
     }
   };
 
@@ -108,7 +106,6 @@ const Notifications: React.FC = () => {
       // Refresh notifications after successful action
       await fetchNotifications();
     } catch (error) {
-      console.error(`Error acceptinging friend request:`, error);
     }
   };
 

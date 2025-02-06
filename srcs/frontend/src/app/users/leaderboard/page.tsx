@@ -54,7 +54,6 @@ const Leaderboard: React.FC = () => {
       const response = await Api.get<LeaderboardResponse>(`/users/leaderboard/?page=${currentPage}`, { withCredentials: true });
       setLeaderboardData(response.data);
     } catch (error) {
-      console.error('Error fetching leaderboard:', error);
     } finally {
       setIsLoading(false);
     }

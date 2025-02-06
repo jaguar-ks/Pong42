@@ -40,7 +40,6 @@ export const MatchHistoryFr: React.FC<MatchHistoryFrProps> = ({ id }) => {
         const res = await Api.get(`/pongue/${id}/matches`, { withCredentials: true })
         setMatches(res.data.results)
       } catch (err) {
-        console.error("Error fetching match data:", err)
         setError("Failed to load match history. Please try again later.")
       } finally {
         setLoading(false)

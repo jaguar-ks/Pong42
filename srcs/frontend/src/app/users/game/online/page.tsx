@@ -58,6 +58,12 @@ export default function PingPongMatchup() {
         name: opp.username,
         avatar: opp.avatar || FALLBACK_AVATAR
       })
+      if (player1.id === player2.id) {
+        disconnectSocket()
+        setStage(false)
+        setIsMatching(false)
+        setGameStarted(false)
+      }
     }
   }, [room, getOpponent])
 
