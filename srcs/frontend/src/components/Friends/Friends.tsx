@@ -66,25 +66,7 @@ const Friends = () => {
     }, [connectionUpdate, setConnectionUpdate]);
 
     const handleBlock = async (id: number) => {
-        try {
-            const response = await Api.post(
-                `/users/me/connections/block/`,
-                {
-                    "recipient_id": id
-                },
-                { withCredentials: true }
-            );
-            console.log("User blocked:", response.data);
-
-        // Move the blocked user from friends to blocked
-        const blockedFriend = friends.find(friend => friend.user.id === id);
-        if (blockedFriend) {
-            setFriends(prevFriends => prevFriends.filter(friend => friend.user.id !== id));
-            setBlocked(prevBlocked => [...prevBlocked, blockedFriend]);
-        }
-        } catch (error) {
-            console.error("Error blocking user:", error);
-        }
+        router.push(`/users/chat/${id}`);
     };
 
     const handleChallenge = (user: {id: number, username: string, avatar_url: string | null}) => {
@@ -109,7 +91,7 @@ const Friends = () => {
                         <p className={styles.message}>Friends</p>
                         <div className={styles.actionButtons}>
                             <button className={`${styles.actionButton} ${styles.challengeButton}`} onClick={() => handleChallenge(friend.user)}>Challenge</button>
-                            <button className={`${styles.actionButton} ${styles.blockButton}`} onClick={() => handleBlock(friend.user.id)}>Block</button>
+                            <button className={`${styles.actionButton} ${styles.messageButton}`} onClick={() => handleBlock(friend.user.id)}>Send message</button>
                         </div>
                     </div>
                 </div>

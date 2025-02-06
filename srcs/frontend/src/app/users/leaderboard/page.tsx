@@ -93,7 +93,7 @@ const Leaderboard: React.FC = () => {
               <div key={player.id} className={classes.playerRow} onClick={() => handleClickOnPlayer(player.id)}>
                 <div className={classes.player}>
                   <div className={classes.avatarContainer}>
-                    <Image src={ player.avatar_url} alt={player.username} width={40} height={40} className={classes.avatar} />
+                    <Image src={ player.avatar_url || process.env.NEXT_PUBLIC_DEFAULT_AVATAR} alt={player.username} width={40} height={40} className={classes.avatar} />
                   </div>
                   <span className={classes.username}>{player.username}</span>
                 </div>

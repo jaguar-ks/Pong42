@@ -34,7 +34,7 @@ services:
         build:
             context: ./srcs/api/
         volumes:
-            - ./srcs/api:/var/www
+            # - ./srcs/api:/var/www
             - vault_creds:/var/www/cred.d/
             - static_files:/var/www/static/
         networks:
@@ -45,7 +45,6 @@ services:
         env_file:
             - ./srcs/api/.env
         environment:
-            # - PROD=false
             - PROD=true
         depends_on:
             vault:

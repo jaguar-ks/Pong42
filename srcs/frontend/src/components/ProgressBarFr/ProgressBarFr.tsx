@@ -1,32 +1,32 @@
 "use client"
-import React from 'react'
-import classes from './progressBarFr.module.css'
+import classes from "./progressBar.module.css"
 
 const calculateLevel = (rating: number): number => {
-  return Math.floor(rating / 100) + 1;
+  if (rating < 500) return 0
+  return Math.floor((rating - 500) / 100) + 1
 }
 
 const calculatePercentage = (rating: number): number => {
-  return rating % 100;
+  if (rating === null || rating === undefined) return 0
+  if (rating < 500) return 0
+  return (rating - 500) % 100
 }
 
-interface ProgressBarFrProps {
-  ratingFr: number;
-}
-
-const ProgressBarFr: React.FC<ProgressBarFrProps> = ({ ratingFr }) => {
-  const rating = ratingFr || 0; 
-  const level = calculateLevel(rating);
-  const percentage = calculatePercentage(rating);
+const ProgressBar = ({ratingFr}) => {
+  const rating = ratingFr;
+  const level = calculateLevel(rating)
+  const percentage = calculatePercentage(rating)
 
   return (
     <div className={classes.container}>
-      <div className={classes.Fr} style={{ width: `${percentage}%` }}></div>
+      <div className={classes.progressBar} style={{ width: `${percentage}%` }}></div>
       <div className={classes.textContainer}>
-        <p className={classes.level}>Level {level} - {percentage}%</p>
+        <p className={classes.level}>
+          Level {level} - {Math.round(percentage)}%
+        </p>
       </div>
     </div>
-  );
+  )
 }
 
-export default ProgressBarFr;
+export default ProgressBar

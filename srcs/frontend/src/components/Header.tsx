@@ -15,7 +15,7 @@ export function Header({ forWhat }: HeaderProps) {
         <div className={styles.container}>
           <div className={styles.logoContainer}>
             <Link href="/" className={styles.logo}>
-              <Image className={styles.logoImage} src={logoImageSVG || "/placeholder.svg"} alt="Logo" />
+              <Image className={styles.logoImage} src={logoImageSVG} alt="Logo" />
             </Link>
           </div>
           <div className={styles.linkContainer}>
@@ -28,7 +28,7 @@ export function Header({ forWhat }: HeaderProps) {
           </div>
         </div>
       </nav>
-      <Image src={headerLine || "/placeholder.svg"} alt="headerLine" className={styles.corruptedLines} />
+      <Image src={headerLine} alt="headerLine" className={styles.corruptedLines} />
     </header>
   )
 }
