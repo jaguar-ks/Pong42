@@ -25,7 +25,7 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
   const [labels, setLabels] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const data = user === "search" ? userDataSearch.id : userData.id
+  const data = user === "search" ? userDataSearch.id : "me"
 
   useEffect(() => {
     const fetchData = async () => {
