@@ -6,10 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useWebSocket } from '@/context/WebSocketContext';
-import axios from 'axios';
 import '../layout.css'
 import Api from '@/lib/api';
-import { useParams } from "next/navigation";
 
 type Message = {
   id: number;
@@ -37,6 +35,7 @@ function printTime(time: string) {
 
 export default function BoxedChatInterface() {
   const { sendMessage, messages: wsMessages } = useWebSocket();
+  const [filtered, setFiltered] = useState<User[]>([]);
   const [user, setUser] = useState<User>({
     conv_id: 0,
     id: '',
@@ -54,8 +53,6 @@ export default function BoxedChatInterface() {
   const [page, setPage] = useState(1); 
   const [hasMore, setHasMore] = useState(true); 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { id } = useParams();
-  const numericId = typeof id === "string" ? parseInt(id, 10) : Array.isArray(id) ? parseInt(id[0], 10) : NaN;
 
   useEffect(() => {
     Api.get('/users/me/', { withCredentials: true })
@@ -80,9 +77,7 @@ export default function BoxedChatInterface() {
             rating: userData.user.rating,
           }));
         setUsers(fetchedUsers);
-        // if (fetchedUsers.length > 0) {
-        //   setActiveUser(fetchedUsers[0]);
-        // }
+        setFiltered(fetchedUsers);
       })
       .catch((error) => {
         console.error('Error fetching users:', error);
@@ -90,6 +85,7 @@ export default function BoxedChatInterface() {
   }, []);
 
   useEffect(() => {
+    if (!activeUser) return;
     if (wsMessages.length > 0) {
       setMessages((prevMessages) => {
         const lastMessage = wsMessages[wsMessages.length - 1];
@@ -165,7 +161,11 @@ export default function BoxedChatInterface() {
 
   const handleSearchfriends = (target: string) => {
     const filteredUsers = users.filter((user) => user.username.toLowerCase().includes(target.toLowerCase()));
-    setUsers(filteredUsers);
+    if (target === '') {
+      setFiltered(users);
+    }
+    else
+      setFiltered(filteredUsers);
   };
 
   const handleUserClick = (user: User) => {
@@ -181,8 +181,8 @@ export default function BoxedChatInterface() {
   };
 
   return (
-    <div className="main-content">
-    <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex">
+    <div className="main-content md:p-10 w-full overflow-hidden">
+    <div className="w-full bg-white/90 backdrop-blur-sm border border-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex">
       <div className="h-full w-1/3 border-r border-gray-200 dark:border-gray-700">
         <div className="p-4">
           <Input
@@ -193,7 +193,7 @@ export default function BoxedChatInterface() {
             />
         </div>
         <ScrollArea className="h-[calc(92vh-4rem)]">
-          {users.map((user, index) => (
+          {filtered.map((user, index) => (
             <div
               key={`${user.id}-${index}`}
               className={`flex items-center space-x-4 p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer ${user.id === activeUser?.id ? 'bg-blue-50 dark:bg-blue-900' : ''}`}
