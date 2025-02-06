@@ -12,9 +12,9 @@ import imageee from "../../../../assets/syberPlayer.png"
 import googleIcon from "../../../../assets/googleSigninLogoBlack.svg"
 import githubIcon from "../../../../assets/githubSignInLogo.svg"
 import FTIcon from "../../../../assets/FTSignUnImage1.svg"
+import playerImage from "../../../../assets/player.png"
 import Api from "@/lib/api"
 
-// If you want single-string errors for each field:
 type ServerErrorData = {
   first_name?: string
   last_name?: string
@@ -176,7 +176,7 @@ export default function SignUpPage() {
                   <div className={styles.socialButtonsContainer}>
                     <button onClick={() => handleSignUp(1)} className={styles.socialButton}>
                       <Image
-                        src={googleIcon || "/placeholder.svg"}
+                        src={googleIcon}
                         alt="Sign up with Google"
                         width={40}
                         height={40}
@@ -185,7 +185,7 @@ export default function SignUpPage() {
                     </button>
                     <button onClick={() => handleSignUp(2)} className={styles.socialButton}>
                       <Image
-                        src={githubIcon || "/placeholder.svg"}
+                        src={githubIcon}
                         alt="Sign up with GitHub"
                         width={40}
                         height={40}
@@ -194,7 +194,7 @@ export default function SignUpPage() {
                     </button>
                     <button onClick={() => handleSignUp(0)} className={styles.socialButton}>
                       <Image
-                        src={FTIcon || "/placeholder.svg"}
+                        src={FTIcon}
                         alt="Sign up with 42"
                         width={40}
                         height={40}
@@ -226,7 +226,7 @@ export default function SignUpPage() {
                 <div className={styles.containerImage}>
                   <div className={styles.ImageContainer}>
                     <Image
-                      src={imageee || "/placeholder.svg"}
+                      src={imageee}
                       alt="Login Player"
                       width={500}
                       height={500}
