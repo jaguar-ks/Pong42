@@ -22,8 +22,8 @@ export default function GameComponent({player1, player2, setPage}) {
   }
 
   return (
-      <div className="space-y-4">
-         <div className="grid grid-cols-3 gap-10">
+    <div className="flex flex-col justify-center space-y-4 w-full h-full overflow-hidden">
+      <div className="grid grid-cols-3 gap-10">
              <PlayerCard
               playerName={player1}
               playerScore={gameState.player1Score}
@@ -42,9 +42,12 @@ export default function GameComponent({player1, player2, setPage}) {
           />
         </div> 
 
-        <div className="h-full rounded-lg border bg-muted overflow-hidden">
+        <div className="h-full w-full flex justify-center items-center rounded-lg border overflow-hidden">
           <ThreeScene onScoreUpdate={handleScoreUpdate} player1={player1} player2={player2} setPage={setPage} />
         </div> 
       </div>
   )
 }
+
+
+

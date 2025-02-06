@@ -170,6 +170,8 @@ class UpdateAuthUserSerializer(serializers.ModelSerializer):
     def validate_username(self, username):
         if User.objects.filter(username=username).exists():
             raise serializers.ValidationError("this username already in use")
+        return username
+
 
     def validate(self, attrs):
         return {key: value for key, value in attrs.items() if value}

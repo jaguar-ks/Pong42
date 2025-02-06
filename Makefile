@@ -1,5 +1,7 @@
 images=$(shell docker image ls -aq)
 
+.PHONY: all build up down delete_images fclean init_vault remove_log
+
 all: build
 
 build:
@@ -26,13 +28,12 @@ init_vault:
 	rm -rf ./srcs/vault/init/*
 	rm -rf ./srcs/api/cred.env
 	rm -rf ./srcs/api/cred.d
+
 remove_log:
 	rm -rf ./srcs/postgres/logs/*
 	rm -rf ./srcs/vault/logs/*
 	rm -rf ./srcs/redis/logs/*
 	rm -rf ./srcs/nginx/logs/*
 	rm -rf ./srcs/nginx/modlogs/*
-
-.PHONY: all build up down delete_images fclean init_vault remove_log
 
 .SILENT: all build up down delete_images fclean init_vault remove_log

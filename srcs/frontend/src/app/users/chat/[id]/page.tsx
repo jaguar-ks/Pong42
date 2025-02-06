@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useWebSocket } from '@/context/WebSocketContext';
-import axios from 'axios'; 
 import '../../layout.css'
 import Api from '@/lib/api';
 import { useParams } from "next/navigation";
@@ -52,8 +51,9 @@ export default function BoxedChatInterface() {
   const [users, setUsers] = useState<User[]>([]);
   const [activeUser, setActiveUser] = useState<User | null>(null);
   const [page, setPage] = useState(1); 
-  const [hasMore, setHasMore] = useState(true); 
+  const [hasMore, setHasMore] = useState(false); 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [filtered, setFiltered] = useState<User[]>([]);
   const { id } = useParams();
   const numericId = typeof id === "string" ? parseInt(id, 10) : Array.isArray(id) ? parseInt(id[0], 10) : NaN;
 
@@ -80,22 +80,19 @@ export default function BoxedChatInterface() {
             rating: userData.user.rating,
           }));
         setUsers(fetchedUsers);
+        setFiltered(fetchedUsers);
         if (numericId) {
           const selectedUser: User | undefined = fetchedUsers.find((usr) => usr.id === numericId);
           if (selectedUser) {
             setActiveUser(selectedUser);
           }
         }
-        // if (fetchedUsers.length > 0) {
-        //   setActiveUser(fetchedUsers[0]);
-        // }
       })
-      .catch((error) => {
-        console.error('Error fetching users:', error);
-      });
+      .catch();
   }, []);
 
   useEffect(() => {
+    if (!activeUser) return;
     if (wsMessages.length > 0) {
       setMessages((prevMessages) => {
         const lastMessage = wsMessages[wsMessages.length - 1];
@@ -133,17 +130,16 @@ export default function BoxedChatInterface() {
           user: msgData.sender_id,
           content: msgData.content,
           timestamp: msgData.timestamp,
-        }));
+        })).reverse();
 
         setMessages((prevMessages) => {
-          const uniqueMessages = [...new Set([...prevMessages, ...fetchedMessages].map((msg) => msg.id))].map((id) => {
-            return [...prevMessages, ...fetchedMessages].find((msg) => msg.id === id);
+          const uniqueMessages = [...new Set([ ...fetchedMessages, ...prevMessages].map((msg) => msg.id))].map((id) => {
+            return [ ...fetchedMessages, ...prevMessages].find((msg) => msg.id === id);
           });
           return uniqueMessages as Message[];
         });
         setHasMore(response.data.next !== null);
       } catch (error) {
-        console.error('Error fetching messages:', error);
       }
     }
   }, [activeUser]);
@@ -171,7 +167,11 @@ export default function BoxedChatInterface() {
 
   const handleSearchfriends = (target: string) => {
     const filteredUsers = users.filter((user) => user.username.toLowerCase().includes(target.toLowerCase()));
-    setUsers(filteredUsers);
+    if (target === '') {
+      setFiltered(users);
+    }
+    else
+      setFiltered(filteredUsers);
   };
 
   const handleUserClick = (user: User) => {
@@ -187,8 +187,8 @@ export default function BoxedChatInterface() {
   };
 
   return (
-    <div className="main-content">
-    <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex">
+    <div className="main-content md:p-10 w-full overflow-hidden">
+    <div className="w-full bg-white/90 backdrop-blur-sm border border-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex">
       <div className="h-full w-1/3 border-r border-gray-200 dark:border-gray-700">
         <div className="p-4">
           <Input
@@ -199,7 +199,7 @@ export default function BoxedChatInterface() {
             />
         </div>
         <ScrollArea className="h-[calc(92vh-4rem)]">
-          {users.map((user, index) => (
+          {filtered.map((user, index) => (
             <div
               key={`${user.id}-${index}`}
               className={`flex items-center space-x-4 p-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer ${user.id === activeUser?.id ? 'bg-blue-50 dark:bg-blue-900' : ''}`}
@@ -231,7 +231,7 @@ export default function BoxedChatInterface() {
           </div>
         </div>
         <ScrollArea className="h-[calc(85vh-4rem)]">
-          {hasMore && (
+        {hasMore && (
             <div className="flex justify-center p-4">
               <Button variant="ghost" onClick={handleLoadMore}>
                 Load More
@@ -265,7 +265,7 @@ export default function BoxedChatInterface() {
               </React.Fragment>
             );
           })}
-          <div ref={messagesEndRef} />
+          {hasMore && (<div ref={messagesEndRef} />)}
         </ScrollArea>
         {activeUser&&<div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex space-x-2">

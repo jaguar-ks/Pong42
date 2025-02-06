@@ -27,7 +27,6 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
         const res = await Api.get("/users/me/", { withCredentials: true });
         setIsActive(res.data.two_fa_enabled);
       } catch (err) {
-        console.error("Failed to fetch user data:", err);
       } finally {
         setIsLoading(false);
       }
@@ -47,7 +46,6 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
         setShowInput(true);
       } catch (err) {
         setError("Failed to fetch QR code. Please try again.");
-        console.error("Error fetching QR code:", err);
       } finally {
         setIsLoading(false);
       }
@@ -81,7 +79,6 @@ const ChangeTFA: React.FC<ChangeTFAProps> = ({ setCurrentPage }) => {
       setCurrentPage("");
     } catch (err) {
       setError("Invalid OTP code. Please try again.");
-      console.error("Error handling OTP:", err);
     } finally {
       setIsLoading(false);
     }

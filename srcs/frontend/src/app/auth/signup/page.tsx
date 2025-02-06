@@ -95,11 +95,7 @@ export default function SignUpPage() {
       const res = await Api.get("/auth/social/providers/")
       router.push(res.data.providers[index].provider_url)
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("Error:", error.response)
-      } else {
-        console.error("Error:", error)
-      }
+      
     } finally {
       setIsLoading(false)
     }

@@ -1,6 +1,7 @@
 'use client';
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useUserContext } from './UserContext';
+import { usePathname, useRouter } from 'next/navigation'
 
 interface GameSocketContextType {
   move: (direction: string) => void;
@@ -55,12 +56,13 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
   const [room, setRoom] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const messageQueue = useRef<Array<() => void>>([]);
+  const pathName = usePathname();
   const meRef = useRef<PlayerData>({ 
     id: userData.id, 
     username: userData.username, 
     avatar: userData.avatar_url 
   });
-
+  const router = useRouter();
   const getOpponent = useCallback(() => {
     return opp.current;
   }, [ opp ]);
@@ -124,15 +126,21 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
           break;
         case 'game.over':
           setGameEnded(true);
+          setRoom(null);
           winner.current = meRef.current.id === data.data.winner ? meRef.current : opp.current;
           // resetGameState();
           break;
+        case 'opponent.disconnected':
+          disconnectSocket()
+          setGameEnded(true);
+          setRoom(null);
+          router.push('/users/game');
+          break ;
         default:
-          console.warn('Unhandled message type:', data);
+          // console.warn('Unhandled message type:', data);
           break;
       }
     } catch (error) {
-      console.error('Error processing message:', error);
     }
   }, [resetGameState]);
 
@@ -158,11 +166,16 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
     };
 
     ws.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
       setIsConnected(false);
       disconnectSocket();
     };
   }, [room, handleMessage]);
+
+  useEffect(() => {
+    if (pathName !== '/users/game/online') {
+      disconnectSocket();
+    }
+  }, [pathName]);
 
   useEffect(() => {
     if (gameStarted) {

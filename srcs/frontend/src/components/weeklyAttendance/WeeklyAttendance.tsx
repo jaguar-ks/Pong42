@@ -35,7 +35,7 @@ const WeeklyAttendance: React.FC<WeeklyAttendanceProps> = ({ user }) => {
   useEffect(() => {
     const data = user === 'search' ? userDataSearch : userData;
 
-    const adjustedData = [data.wins || 0.01, data.loses || 0.01];
+    const adjustedData = [data.wins, data.loses];
 
     setChartData({
       labels: ['Wins', 'Losses'],
@@ -56,17 +56,8 @@ const WeeklyAttendance: React.FC<WeeklyAttendanceProps> = ({ user }) => {
 
   const options = {
     plugins: {
-      legend: {
-        display: true,
-      },
       datalabels: {
         color: 'black',
-        formatter: (value: number) => {
-          // Display 0 if the value is 0.01
-          return value === 0.01 ? 0 : value;
-        },
-        anchor: 'center' as const, // Ensure TypeScript knows this is a valid value
-        align: 'center' as const,  // Ensure TypeScript knows this is a valid value
       },
     },
   };

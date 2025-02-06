@@ -24,7 +24,7 @@ const Local = () => {
     }
 
     return(
-       <div className={styles.gameView}>
+       <div className={styles.container}>
         <h2 className={styles.subtitle}>Local Game Setup :</h2>
             <div className={styles.gameTypeSelection}>
             <button className={styles.imageButton} onClick={() => setGameType('single')}>

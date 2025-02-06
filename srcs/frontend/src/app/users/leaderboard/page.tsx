@@ -54,7 +54,6 @@ const Leaderboard: React.FC = () => {
       const response = await Api.get<LeaderboardResponse>(`/users/leaderboard/?page=${currentPage}`, { withCredentials: true });
       setLeaderboardData(response.data);
     } catch (error) {
-      console.error('Error fetching leaderboard:', error);
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +92,11 @@ const Leaderboard: React.FC = () => {
               <div key={player.id} className={classes.playerRow} onClick={() => handleClickOnPlayer(player.id)}>
                 <div className={classes.player}>
                   <div className={classes.avatarContainer}>
+<<<<<<< HEAD
                     <Image src={ player.avatar_url} alt={player.username} width={40} height={40} className={classes.avatar} />
+=======
+                    <Image src={ player.avatar_url || process.env.NEXT_PUBLIC_DEFAULT_AVATAR} alt={player.username} width={40} height={40} className={classes.avatar} />
+>>>>>>> 2e6ba57 (FIX | UPDATE : changed the online game UI and the chat)
                   </div>
                   <span className={classes.username}>{player.username}</span>
                 </div>

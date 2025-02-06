@@ -6,6 +6,7 @@ import { useGameSocket } from "@/context/GameSocketContext"
 import GameComponent from "./gameComponent"
 import Image from "next/image"
 import styles from "../styles/Game.module.css"
+import { useUserContext } from "@/context/UserContext"
 
 interface Player {
   id: number
@@ -37,20 +38,21 @@ export default function PingPongMatchup() {
   const [isMatching, setIsMatching] = useState(false)
   const [countdown, setCountdown] = useState(5)
   const intervalRef = useRef<NodeJS.Timeout>()
+  const { userData } = useUserContext()
 
   const player1 = useMemo(() => ({
     id: me.id,
     name: me.username,
-    avatar: me.avatar || FALLBACK_AVATAR,
+    avatar: me.avatar || userData.avatar_url || FALLBACK_AVATAR,
   }), [me.id, me.username, me.avatar])
 
   
-  // Handle opponent data when room is available
+  
   useEffect(() => {
     if (room && !stageReady) {
       const opp = getOpponent()
       console.log('OPP:', opp)
-      // Only update if we have valid opponent data
+      
       setPlayer2({
         id: opp.id,
         name: opp.username,
@@ -59,12 +61,12 @@ export default function PingPongMatchup() {
     }
   }, [room, getOpponent])
 
-  // Random opponent animation effect
+  
   useEffect(() => {
     if (!stageReady && isMatching && !room) {
       intervalRef.current = setInterval(() => {
         setPlayer2(PLAYERS[Math.floor(Math.random() * PLAYERS.length)])
-      }, 1000)
+      }, 500)
     }
 
     return () => {
@@ -72,7 +74,7 @@ export default function PingPongMatchup() {
     }
   }, [isMatching, stageReady, room])
 
-  // Countdown effect
+  
   useEffect(() => {
     if (!stageReady) return
 
@@ -105,7 +107,11 @@ export default function PingPongMatchup() {
           Starting in {countdown} seconds...
         </div>
       </div>
-    ) : <GameComponent />
+    ) : ( 
+      <div className="flex justify-center items-center w-full h-full p-10">
+        <GameComponent />
+      </div>
+    )
   }
 
   return (
@@ -132,7 +138,7 @@ export default function PingPongMatchup() {
       <div>
         {(isMatching || room) ? (
           <div className="flex flex-col justify-center items-center w-full mb-8">
-            <div className="text-3xl font-bold mb-4 text-white bg-green-600 px-6 py-2 rounded-full drop-shadow-lg animate-fade-in">
+            <div className="text-3xl font-bold mb-4 text-white px-6 py-2 rounded-full drop-shadow-lg animate-fade-in">
               {room ? `Waiting For ${player2.name} to join...` : "Searching for Opponent..."}
             </div>
             <Button
@@ -156,11 +162,11 @@ export default function PingPongMatchup() {
 }
 
 function PlayerCard({ player, color }: { player: Player, color: "blue" | "red" }) {
-  // Use a combination of ID and avatar URL as the key to force re-render
+  
   const [avatarKey, setAvatarKey] = useState(`${player.id}-${Date.now()}`);
   const [avatarSrc, setAvatarSrc] = useState(player.avatar);
 
-  // Update both the source and key when player changes
+  
   useEffect(() => {
     setAvatarSrc(player.avatar);
     setAvatarKey(`${player.id}-${Date.now()}`);
@@ -173,7 +179,7 @@ function PlayerCard({ player, color }: { player: Player, color: "blue" | "red" }
         color === 'blue' ? 'border-blue-500' : 'border-red-500'
       } overflow-hidden relative`}>
         <Image
-          key={avatarKey} // Force re-render with new key
+          key={avatarKey} 
           src={avatarSrc}
           alt={`${player.name}'s avatar`}
           fill

@@ -12,13 +12,9 @@ class UserGameHistory(AllUsersMixins, ListAPIView):
 
     def get_queryset(self):
         try:
-            users = self.get_unblocked_users()
-            if users.count() == 0:
-                return GameMatch.objects.none()
-            user = users.get(
+            user = self.get_unblocked_users().get(
                 pk=self.kwargs.get("user_id"),
             )
-
             return (
                 GameMatch.objects.filter(
                     Q(player1=user) | Q(player2=user),
@@ -27,8 +23,15 @@ class UserGameHistory(AllUsersMixins, ListAPIView):
                 .order_by("-created_at")
             )
         except Exception as e:
-            print(e)
             raise Http404(f"No user found with the provided user ID")
+
+
+class AuthUserMatchHistory(UserGameHistory):
+    def get_queryset(self):
+        user = self.request.user
+        return GameMatch.objects.filter(
+            Q(player1=user) | Q(player2=user)
+        ).select_related('player1', 'player2')
 
 
 class UserRatingHistory(AllUsersMixins, ListAPIView):
@@ -51,4 +54,3 @@ class AuthUserRatingHistory(UserRatingHistory):
     def get_queryset(self):
         user = self.request.user
         return RatingHistory.objects.filter(user=user).order_by('-date')
-

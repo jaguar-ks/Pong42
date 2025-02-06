@@ -39,7 +39,6 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
         },
       });
     } catch (error) {
-      console.error("Error sending friend request:", error);
     }
   };
 
@@ -62,7 +61,6 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
         },
       });
     } catch (error) {
-      console.error("Error cancelling friend request:", error);
     }
     setShowPopup(false);
   };
@@ -89,7 +87,6 @@ const FriendsFR: React.FC<FriendsFRProps> = ({ id }) => {
       console.log("User blocked:", response.data);
       router.push("/users/home");
     } catch (error) {
-      console.error("Error blocking user:", error);
     }
   };
 

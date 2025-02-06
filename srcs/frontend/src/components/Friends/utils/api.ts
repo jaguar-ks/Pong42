@@ -15,7 +15,6 @@ export const fetchUserConnections = async (
     setBlocked(res.data.results.filter((item: UserConnection) => item.status === "blocked"));
     setFriends(res.data.results.filter((item: UserConnection) => item.status === "friends"));
   } catch (err) {
-    console.error("Error in fetching user data", err);
   }
 };
 

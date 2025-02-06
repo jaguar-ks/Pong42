@@ -64,13 +64,23 @@ const SignInPage = () => {
       password: "",
       otp: "",
     })
+
+    // Validate inputs
+    if (!username.trim()) {
+      setErrors((prev) => ({ ...prev, username: "Username is required" }))
+      return
+    }
+    if (!password.trim()) {
+      setErrors((prev) => ({ ...prev, password: "Password is required" }))
+      return
+    }
+
     setIsLoading(true)
 
     try {
       await Api.post("/auth/sign-in/", { username, password }, { withCredentials: true })
       router.push("/users/home")
     } catch (err) {
-      console.error("Error:", err)
       if (axios.isAxiosError(err)) {
         const axiosError = err as AxiosError<ErrorResponse>
         setErrors({
@@ -92,7 +102,6 @@ const SignInPage = () => {
       const res = await Api.get("auth/social/providers/")
       router.push(res.data.providers[index].provider_url)
     } catch (err) {
-      console.error("Error:", err)
       if (axios.isAxiosError(err)) {
         const axiosError = err as AxiosError<ErrorResponse>
         setErrors((prev) => ({
@@ -138,7 +147,11 @@ const SignInPage = () => {
                 {errors.details && <p className={styles.error}>{errors.details}</p>}
                 <div className={styles.submitContainer}>
                   <div className={styles.submitButtonContainer}>
-                    <button type="submit" disabled={isLoading} className={styles.submitButton}>
+                    <button
+                      type="submit"
+                      disabled={isLoading || !username.trim() || !password.trim()}
+                      className={styles.submitButton}
+                    >
                       {isLoading ? "Loading..." : "Sign In"}
                     </button>
                   </div>

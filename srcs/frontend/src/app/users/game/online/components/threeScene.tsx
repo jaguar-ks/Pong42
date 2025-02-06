@@ -17,10 +17,8 @@ export default function ThreeScene({ onScoreUpdate }) {
   const { myPaddel, oppPaddel, ball, move, gameEnded, winner, me: wsMe } = useGameSocket();
   const ballRef = useRef();
 
-  // Memoize player position calculation
   const me = useMemo(() => (myPaddel.y === 0 ? -1 : 1), [myPaddel.y]);
 
-  // Score update handler
   const handleScoreUpdate = useCallback(() => {
     onScoreUpdate?.({
       player1: myPaddel.score,
@@ -29,7 +27,7 @@ export default function ThreeScene({ onScoreUpdate }) {
     });
   }, [onScoreUpdate, myPaddel.score, oppPaddel.score]);
 
-  // Keyboard controls
+  
   useEffect(() => {
     const handleKeyDown = (event) => {
       switch (event.key) {
@@ -44,9 +42,9 @@ export default function ThreeScene({ onScoreUpdate }) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [move, me]); // Added missing 'me' dependency
+  }, [move, me]); 
 
-  // Ball position updates
+  
   useEffect(() => {
     if (ballRef.current) {
       ballRef.current.position.set(
@@ -55,46 +53,60 @@ export default function ThreeScene({ onScoreUpdate }) {
         -7.5 + ((ball.y * planeH) / 800)
       );
     }
-  }, [ball.x, ball.y, me]); // Added missing 'me' dependency
+  }, [ball.x, ball.y, me]); 
 
-  // Score updates
+  
   useEffect(() => {
     handleScoreUpdate();
   }, [handleScoreUpdate]);
 
-  // Fixed JSX structure
+  
   return (
-    <div className="h-full aspect-[1/0.5]">
-      {gameEnded && <WinnerCared player={wsMe} winner={winner} />}
-      <Canvas camera={{ position: [0, 20, 0], fov: 60 }}>
-        <OrbitControls />
-        <ambientLight intensity={0.4} />
-        <Plane />
-        <Sphere ref={ballRef} args={[0.2, 32, 32]} position={[0, 0.2, 0]}>
-          <meshPhysicalMaterial
-            color="white"
-            roughness={0.1}
-            clearcoat={1}
-            clearcoatRoughness={0.1}
-          />
-        </Sphere>
-        <Paddle
-          position={[
-            me * (-5.625 + (myPaddel.x * planeW) / 600 + paddleWidth / 2),
-            0,
-            me * (planeH / 2 - 0.1),
-          ]}
-          color="red"
-        />
-        <Paddle
-          position={[
-            me * (-5.625 + (oppPaddel.x * planeW) / 600 + paddleWidth / 2),
-            0,
-            me * (-(planeH / 2) + 0.1),
-          ]}
-          color="blue"
-        />
-      </Canvas>
-    </div>
+    
+      (
+        gameEnded 
+          ? 
+        <WinnerCared player={wsMe} winner={winner} />
+          :
+          <div className="w-full h-full ">
+          <Canvas
+            camera={{ position: [0, 20, 0], fov: 60 }}
+            gl={{ alpha: true }}  
+            onCreated={({ gl }) => {
+              gl.setClearColor(0xffffff, 0.5); 
+            }}
+            style={{ background: 'transparent' }} 
+          >
+          <OrbitControls />
+          <ambientLight intensity={0.4} />
+          <Plane />
+          <Sphere ref={ballRef} args={[0.2, 32, 32]} position={[0, 0.2, 0]}>
+            <meshPhysicalMaterial
+              color="white"
+              roughness={0.1}
+              clearcoat={1}
+              clearcoatRoughness={0.1}
+            />
+          </Sphere>
+          <Paddle
+            position={[
+              me * (-5.625 + (myPaddel.x * planeW) / 600 + paddleWidth / 2),
+              0,
+              me * (planeH / 2 - 0.1),
+            ]}
+            color="red"
+            />
+          <Paddle
+            position={[
+              me * (-5.625 + (oppPaddel.x * planeW) / 600 + paddleWidth / 2),
+              0,
+              me * (-(planeH / 2) + 0.1),
+            ]}
+            color="blue"
+            />
+          </Canvas>
+          </div>
+      )
+    
   );
 }
