@@ -64,6 +64,17 @@ const SignInContent = () => {
       password: "",
       otp: "",
     })
+
+    // Validate inputs
+    if (!username.trim()) {
+      setErrors((prev) => ({ ...prev, username: "Username is required" }))
+      return
+    }
+    if (!password.trim()) {
+      setErrors((prev) => ({ ...prev, password: "Password is required" }))
+      return
+    }
+
     setIsLoading(true)
 
     try {
@@ -136,7 +147,11 @@ const SignInContent = () => {
                 {errors.details && <p className={styles.error}>{errors.details}</p>}
                 <div className={styles.submitContainer}>
                   <div className={styles.submitButtonContainer}>
-                    <button type="submit" disabled={isLoading} className={styles.submitButton}>
+                    <button
+                      type="submit"
+                      disabled={isLoading || !username.trim() || !password.trim()}
+                      className={styles.submitButton}
+                    >
                       {isLoading ? "Loading..." : "Sign In"}
                     </button>
                   </div>
@@ -206,3 +221,4 @@ const SignInPage = () => (
 )
 
 export default SignInPage
+
