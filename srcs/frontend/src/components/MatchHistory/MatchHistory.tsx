@@ -5,7 +5,6 @@ import Image from "next/image"
 import { useUserContext } from "@/context/UserContext"
 import classes from "./MatchHistory.module.css"
 import playerIcon from "../../../assets/player.png"
-import axios from "axios"
 import Api from "@/lib/api"
 
 interface Player {
@@ -43,7 +42,6 @@ export const MatchHistory = () => {
       }
     }
 
-    // Trigger fetch only if userData.id is a valid number
     if (typeof userData.id === "number") {
       fetchData()
     }

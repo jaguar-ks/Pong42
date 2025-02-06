@@ -24,7 +24,7 @@ interface MatchData {
 }
 
 interface MatchHistoryFrProps {
-  id: number // Explicitly define the type of id
+  id: number
 }
 
 export const MatchHistoryFr: React.FC<MatchHistoryFrProps> = ({ id }) => {
@@ -46,8 +46,6 @@ export const MatchHistoryFr: React.FC<MatchHistoryFrProps> = ({ id }) => {
         setLoading(false)
       }
     }
-
-    // Trigger fetch only if userData.id is a valid number
     if (typeof userData.id === "number") {
       fetchData()
     }
@@ -88,7 +86,7 @@ export const MatchHistoryFr: React.FC<MatchHistoryFrProps> = ({ id }) => {
               <div className={classes.details}>
                 <div className={classes.opponent}>
                   <Image
-                    src={opponent.avatar_url || playerIcon || "/placeholder.svg"}
+                    src={opponent.avatar_url || playerIcon}
                     alt={opponent.username}
                     width={24}
                     height={24}

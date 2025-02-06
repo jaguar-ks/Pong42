@@ -65,6 +65,8 @@
 
 .image {
   transition: transform 0.3s ease;
+  width: auto;
+  height: auto;
 }
 
 .imageButton:hover .image {

@@ -16,7 +16,6 @@ export const Achievements = () => {
   const { userData } = useUserContext();
 
   const achievements: Achievement[] = [
-    // Simple Achievements
     {
       title: 'Warrior',
       desc: 'Win 10 games',
@@ -48,7 +47,6 @@ export const Achievements = () => {
       isUnlocked: userData.wins + userData.loses >= 10
     },
   
-    // Medium Achievements
     {
       title: 'Veteran',
       desc: 'Win 100 games',
@@ -107,7 +105,7 @@ export const Achievements = () => {
       title: 'Unstoppable Streak',
       desc: 'Win 20 games in a row',
       imgUrl: achieImage,
-      isUnlocked: userData.wins >= 20 // Requires tracking win streaks
+      isUnlocked: userData.wins >= 20
     },
     {
       title: 'World-Class Player',
@@ -119,13 +117,7 @@ export const Achievements = () => {
       title: 'Perfectionist',
       desc: 'Win 10 games in a row',
       imgUrl: achieImage,
-      isUnlocked: userData.wins >= 10 // Requires additional tracking
-    },
-    {
-      title: 'Comeback King',
-      desc: 'Win a game after being behind by 50% rating',
-      imgUrl: achieImage,
-      isUnlocked: false // Requires additional tracking
+      isUnlocked: userData.wins >= 10
     }
   ];
   

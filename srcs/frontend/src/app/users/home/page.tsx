@@ -24,7 +24,6 @@ const Home = () => {
     updateCurrentPage("home")
     const checkToken = async () => {
       try {
-        // Use the test_auth endpoint to verify authentication
         await Api.get("/auth/test_auth/",{withCredentials: true})
       } catch (err) {
         console.log("Token validation error:", err);

@@ -1,11 +1,11 @@
 "use client"
 
-import { useEffect, useState, Suspense } from "react"
+import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import styles from "./verifyEmail.module.css"
 import Api from "@/lib/api"
 
-function VerifyEmailContent() {
+export default function VerifyEmailPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [message, setMessage] = useState("")
@@ -91,7 +91,6 @@ function VerifyEmailContent() {
         <h1 className={styles.title}>
           {resendSuccess ? "Verification Email Sent Successfully!" : "Email Verification"}
         </h1>
-
         {isLoading && <p className={styles.loadingMessage}>Verifying your email...</p>}
         {message && <p className={`${styles.message} ${styles.successMessage}`}>{message}</p>}
         {error && !resendSuccess && <p className={`${styles.message} ${styles.errorMessage}`}>{error}</p>}
@@ -130,12 +129,3 @@ function VerifyEmailContent() {
     </div>
   )
 }
-
-export default function VerifyEmailPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <VerifyEmailContent />
-    </Suspense>
-  )
-}
-
