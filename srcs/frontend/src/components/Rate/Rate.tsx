@@ -38,18 +38,11 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
           throw new Error("Invalid data received from server")
         }
         const ratingHistory: RatingHistory[] = res.data.results
-
-        // Sort rating history by date
-        ratingHistory.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-
-        // Extract ratings and dates
         const ratings = ratingHistory.map((item) => item.rating)
-        const dates = ratingHistory.map((item) => new Date(item.date).toLocaleDateString())
-
+        const dates = ratingHistory.map((item) => item.date)
         setChartData(ratings)
         setLabels(dates)
       } catch (err) {
-        console.error("Error in fetching rating history =========================", err)
         setError(err instanceof Error ? err.message : "Failed to load rating history. Please try again later.")
       } finally {
         setLoading(false)
@@ -66,9 +59,6 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
     return <div className={styles.error}>Error: {error}</div>
   }
 
-  const minValue = chartData.length > 0 ? Math.min(...chartData) - Math.min(...chartData) / 5 : 0
-  const maxValue = chartData.length > 0 ? Math.max(...chartData) + Math.max(...chartData) / 5 : 100
-
   const chartDataConfig = {
     labels: chartData.length > 0 ? labels : ["No Data"],
     datasets: [
@@ -83,47 +73,9 @@ const Rate: React.FC<{ user: string }> = ({ user }) => {
       },
     ],
   }
-
-  const options: ChartOptions<"line"> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Date",
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: "Rating",
-        },
-        min: minValue,
-        max: maxValue,
-      },
-    },
-    plugins: {
-      legend: {
-        display: true,
-      },
-      datalabels: {
-        color: "black",
-        formatter: (value: number) => {
-          return value.toFixed(0)
-        },
-        anchor: "end",
-        align: "top" as const,
-        display: (context) => {
-          return context.dataset.data.length > 0
-        },
-      },
-    },
-  }
-
   return (
     <div className={styles.container}>
-      <Line data={chartDataConfig} options={options} plugins={[ChartDataLabels]} />
+      <Line data={chartDataConfig} plugins={[ChartDataLabels]} />
     </div>
   )
 }

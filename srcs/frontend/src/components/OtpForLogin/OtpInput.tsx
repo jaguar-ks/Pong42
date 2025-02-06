@@ -1,6 +1,5 @@
 import type React from "react"
 import { useState } from "react"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import styles from "./OtpInput.module.css"
@@ -18,8 +17,7 @@ const OtpInput: React.FC<OtpInputProps> = ({ onComplete, onCancel, isLoading, se
   const [error, setError] = useState<string>("")
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 6)
-    setOtp(value)
+    setOtp(e.target.value)
     setError("")
     setErrorBack("")
   }
@@ -37,11 +35,10 @@ const OtpInput: React.FC<OtpInputProps> = ({ onComplete, onCancel, isLoading, se
     <div className={styles.container}>
       <div className={styles.inputContainer}>
         <Label htmlFor="otp-input">Enter 6-digit OTP</Label>
-        <Input
+        <input
           id="otp-input"
           type="text"
           inputMode="numeric"
-          pattern="\d{6}"
           maxLength={6}
           value={otp}
           onChange={handleChange}
