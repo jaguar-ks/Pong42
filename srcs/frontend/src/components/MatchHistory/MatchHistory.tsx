@@ -5,7 +5,6 @@ import Image from "next/image"
 import { useUserContext } from "@/context/UserContext"
 import classes from "./MatchHistory.module.css"
 import playerIcon from "../../../assets/player.png"
-import axios from "axios"
 import Api from "@/lib/api"
 
 interface Player {
@@ -33,7 +32,7 @@ export const MatchHistory = () => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const res = await Api.get(`/pongue/${userData.id}/matches`, { withCredentials: true })
+        const res = await Api.get(`/pongue/me/matches`, { withCredentials: true })
         setMatches(res.data.results)
       } catch (err) {
         console.error("Error fetching match data:", err)
@@ -43,7 +42,6 @@ export const MatchHistory = () => {
       }
     }
 
-    // Trigger fetch only if userData.id is a valid number
     if (typeof userData.id === "number") {
       fetchData()
     }

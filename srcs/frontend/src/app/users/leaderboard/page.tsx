@@ -110,9 +110,6 @@ const Leaderboard: React.FC = () => {
             >
               Previous
             </button>
-            <span className={classes.pageInfo}>
-              Page {currentPage} of {Math.ceil((leaderboardData?.count || 0) / 30)}
-            </span>
             <button
               className={`${classes.paginationButton} ${!leaderboardData?.next ? classes.disabled : ''}`}
               onClick={handleNextPage}

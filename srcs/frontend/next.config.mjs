@@ -12,16 +12,16 @@ const nextConfig = {
     ],
   },
   eslint: {
-    ignoreDuringBuilds: true, // Ignore ESLint warnings
+    ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true, // Ignore TypeScript warnings
+    ignoreBuildErrors: true,
   },
   experimental: {
-    forceSwcTransforms: true, // Force Next.js to compile without stopping
+    forceSwcTransforms: true,
   },
   webpack: (config) => {
-    config.ignoreWarnings = [/./]; // Ignore all Webpack warnings
+    config.ignoreWarnings = [/./];
     return config;
   },
 };

@@ -28,7 +28,6 @@ const OtpForLogin: React.FC<OtpForLoginProps> = ({ setErrors, username, password
       )
       router.push("/users/home")
     } catch (err: unknown) {
-      // Use a type guard to safely access properties on the error object
       if (axios.isAxiosError(err) && err.response?.data?.otp_code) {
         setError(err.response.data.otp_code[0])
       } else {
@@ -50,7 +49,7 @@ const OtpForLogin: React.FC<OtpForLoginProps> = ({ setErrors, username, password
 
   return (
     <div className={classes.NotifNotif}>
-      <div className={classes.window} onClick={(e) => e.stopPropagation()}>
+      <div className={classes.window}>
         <div className={classes.element}>
           <h1>Confirmation code: </h1>
           <OtpInput

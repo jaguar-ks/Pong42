@@ -2,23 +2,20 @@
 import React from 'react'
 import classes from './progressBarFr.module.css'
 
-// Helper function to calculate level
 const calculateLevel = (rating: number): number => {
   return Math.floor(rating / 100) + 1;
 }
 
-// Helper function to calculate percentage
 const calculatePercentage = (rating: number): number => {
   return rating % 100;
 }
 
-// Define prop types
 interface ProgressBarFrProps {
-  ratingFr: number; // Explicitly define the type for ratingFr
+  ratingFr: number;
 }
 
 const ProgressBarFr: React.FC<ProgressBarFrProps> = ({ ratingFr }) => {
-  const rating = ratingFr || 0; // Default to 0 if ratingFr is undefined
+  const rating = ratingFr || 0; 
   const level = calculateLevel(rating);
   const percentage = calculatePercentage(rating);
 

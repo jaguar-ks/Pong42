@@ -1,72 +1,68 @@
-"use client";
+"use client"
 
-import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { useUserContext } from "@/context/UserContext";
-import PlayerInfos from "@/components/PlayerInfos/PlayerInfos";
-import WeeklyAttendance from "@/components/weeklyAttendance/WeeklyAttendance";
-import Rate from "@/components/Rate/Rate";
-import classes from "./page.module.css";
-import FriendsFR from "@/components/FriendsFR/FriendsFR";
-import Image from "next/image";
-import userNotFoundImage from '../../../../../assets/userNotFound.svg'
-import { MatchHistoryFr } from "@/components/MatchHistoryFr/MatchHistoryFr";
-import ProgressBarFr from "@/components/ProgressBarFr/ProgressBarFr";
-import { AchievementsFr } from "@/components/AchievementsFr/AchievementsFr";
-import axios from "axios";
-import { useWebSocket } from "@/context/WebSocketContext";
-import Api from "@/lib/api";
-
+import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
+import { useUserContext } from "@/context/UserContext"
+import PlayerInfos from "@/components/PlayerInfos/PlayerInfos"
+import WeeklyAttendance from "@/components/weeklyAttendance/WeeklyAttendance"
+import Rate from "@/components/Rate/Rate"
+import classes from "./page.module.css"
+import FriendsFR from "@/components/FriendsFR/FriendsFR"
+import Image from "next/image"
+import userNotFoundImage from "../../../../../assets/userNotFound.svg"
+import { MatchHistoryFr } from "@/components/MatchHistoryFr/MatchHistoryFr"
+import ProgressBarFr from "@/components/ProgressBarFr/ProgressBarFr"
+import { AchievementsFr } from "@/components/AchievementsFr/AchievementsFr"
+import axios from "axios"
+import { useWebSocket } from "@/context/WebSocketContext"
+import Api from "@/lib/api"
 
 const SearchProfile = () => {
-  const { updateSearchedUserData, updateCurrentPage, searchedUserData, updateUserDataSearch } = useUserContext();
-  const { id } = useParams();
-  const { connectionUpdate, setConnectionUpdate } = useWebSocket();
+  const { updateSearchedUserData, updateCurrentPage, searchedUserData, updateUserDataSearch } = useUserContext()
+  const { id } = useParams()
+  const { connectionUpdate, setConnectionUpdate } = useWebSocket()
 
-  // Convert id to number safely
-  const numericId = typeof id === "string" ? parseInt(id, 10) : Array.isArray(id) ? parseInt(id[0], 10) : NaN;
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [userExist, setUserExist] = useState(false);
+  const [isLoading, setIsLoading] = useState(true)
+  const [userExist, setUserExist] = useState(false)
 
   useEffect(() => {
-    updateCurrentPage("");
+    updateCurrentPage("")
 
     const fetchData = async () => {
-      setIsLoading(true);
+      setIsLoading(true)
       try {
-        const res = await Api.get(`/users/${numericId}/`, {
+        const res = await Api.get(`/users/${id}/`, {
           withCredentials: true,
-        });
-        console.log("Fetched Data:", res.data);
+        })
+        console.log("Fetched Data:", res.data)
 
-        updateSearchedUserData(res.data);
-        updateUserDataSearch(res.data);
-        setUserExist(false); // User exists
+        updateSearchedUserData(res.data)
+        updateUserDataSearch(res.data)
+        setUserExist(false)
       } catch (err) {
         if (axios.isAxiosError(err)) {
-          console.error("Error fetching user data:", err.response?.data?.detail);
-          setUserExist(true); // User doesn't exist
+          console.error("Error fetching user data:", err.response?.data?.detail)
+          setUserExist(true)
         } else {
-          console.error("Unknown error:", err);
-          setUserExist(true);
+          console.error("Unknown error:", err)
+          setUserExist(true)
         }
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    if (!isNaN(numericId)) {
-      fetchData();
+    if (id) {
+      fetchData()
       if (connectionUpdate) {
-        setConnectionUpdate(false);
+        setConnectionUpdate(false)
       }
     } else {
-      console.error("Invalid user ID");
-      setUserExist(true);
-      setIsLoading(false);
+      console.error("Invalid user ID")
+      setUserExist(true)
+      setIsLoading(false)
     }
-  }, [numericId, updateCurrentPage, updateSearchedUserData, updateUserDataSearch, connectionUpdate]);
+  }, [id, updateCurrentPage, updateSearchedUserData, updateUserDataSearch, connectionUpdate, setConnectionUpdate])
 
   return (
     <div className={classes.home}>
@@ -81,13 +77,13 @@ const SearchProfile = () => {
             <WeeklyAttendance user="search" />
           </div>
           <div className={classes.box3}>
-            <Rate user="search"/>
+            <Rate user="search" />
           </div>
           <div className={classes.line}>
             <ProgressBarFr ratingFr={searchedUserData.rating} />
           </div>
           <div className={classes.box4}>
-            <FriendsFR id={numericId} />
+            <FriendsFR id={id} />
           </div>
           <div className={classes.box5}>
             <AchievementsFr
@@ -97,7 +93,7 @@ const SearchProfile = () => {
             />
           </div>
           <div className={classes.box6}>
-            <MatchHistoryFr id={numericId} />
+            <MatchHistoryFr id={id} />
           </div>
         </div>
       ) : (
@@ -105,21 +101,19 @@ const SearchProfile = () => {
           <Image
             width={100}
             height={100}
-            src={userNotFoundImage}
+            src={userNotFoundImage || "/placeholder.svg"}
             alt="user not found"
             className={classes.userNotFoundImage}
           />
           <p className={classes.notFoundMessage}>This user does not exist.</p>
-          <button
-            className={classes.homeButton}
-            onClick={() => (window.location.href = "/users/home")}
-          >
+          <button className={classes.homeButton} onClick={() => (window.location.href = "/users/home")}>
             Go to Home
           </button>
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default SearchProfile;
+export default SearchProfile
+

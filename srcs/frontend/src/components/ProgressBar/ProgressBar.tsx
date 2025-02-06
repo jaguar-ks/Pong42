@@ -21,7 +21,7 @@ const ProgressBar = () => {
     <div className={classes.container}>
       <div className={classes.progressBar} style={{width: `${percentage}%`}}></div>
       <div className={classes.textContainer}>
-        <p className={classes.level}>Level {level} - {percentage}%</p>
+        <p className={classes.level}>Level {level} - {Math.round(percentage, 2)}%</p>
       </div>
     </div>
   )
