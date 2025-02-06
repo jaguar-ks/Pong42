@@ -191,7 +191,7 @@ export default function BoxedChatInterface() {
 
   return (
     <div className="main-content md:p-10 w-full overflow-hidden">
-    <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex">
+    <div className="w-full bg-white/90 backdrop-blur-sm border border-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex">
       <div className="h-full w-1/3 border-r border-gray-200 dark:border-gray-700">
         <div className="p-4">
           <Input
