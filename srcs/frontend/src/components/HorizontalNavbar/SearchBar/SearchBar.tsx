@@ -64,12 +64,6 @@ const SearchResultComponent: React.FC<{
                         className={classes.avatarImage}
                     />
                     <span className={classes.username}>{result.username}</span>
-                    {result.is_online && (
-                        <span
-                            className={classes.onlineStatus}
-                            aria-label="Online"
-                        ></span>
-                    )}
                 </button>
             ))}
             {hasMore && onShowMore && (
