@@ -42,7 +42,9 @@ export const MatchHistory = () => {
       }
     }
 
-      fetchData();
+    if (typeof userData.id === "number") {
+      fetchData()
+    }
   }, [userData.id])
 
   const getMatchResult = (match: MatchData) => {
@@ -80,7 +82,7 @@ export const MatchHistory = () => {
               <div className={classes.details}>
                 <div className={classes.opponent}>
                   <Image
-                    src={opponent.avatar_url || playerIcon}
+                    src={opponent.avatar_url || playerIcon || "/placeholder.svg"}
                     alt={opponent.username}
                     width={24}
                     height={24}
