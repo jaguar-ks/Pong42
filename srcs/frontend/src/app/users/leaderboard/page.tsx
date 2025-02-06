@@ -93,8 +93,7 @@ const Leaderboard: React.FC = () => {
               <div key={player.id} className={classes.playerRow} onClick={() => handleClickOnPlayer(player.id)}>
                 <div className={classes.player}>
                   <div className={classes.avatarContainer}>
-                    <Image src={ player.avatar_url || process.env.NEXT_PUBLIC_DEFAULT_AVATAR} alt={player.username} width={40} height={40} className={classes.avatar} />
-                    {player.is_online && <div className={classes.onlineIndicator}></div>}
+                    <Image src={ player.avatar_url} alt={player.username} width={40} height={40} className={classes.avatar} />
                   </div>
                   <span className={classes.username}>{player.username}</span>
                 </div>
@@ -111,9 +110,6 @@ const Leaderboard: React.FC = () => {
             >
               Previous
             </button>
-            <span className={classes.pageInfo}>
-              Page {currentPage} of {Math.ceil((leaderboardData?.count || 0) / 30)}
-            </span>
             <button
               className={`${classes.paginationButton} ${!leaderboardData?.next ? classes.disabled : ''}`}
               onClick={handleNextPage}

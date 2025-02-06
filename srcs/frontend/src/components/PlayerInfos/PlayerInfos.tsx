@@ -4,33 +4,27 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import styles from "./playerInfos.module.css";
 import TimeDifference from "../TimeDifference/TimeDifference";
-import CopyToClipboard from "../CopyToClipboard/CopyToClipboard";
 import { useUserContext } from "@/context/UserContext";
 import { useWebSocket } from "@/context/WebSocketContext";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import Api from "@/lib/api";
 
-// Helper function to truncate text
 const truncateText = (text: string | undefined, maxLength: number) => {
   if (!text) return "Loading...";
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };
 
-// Component to display a single info item
 const InfoItem: React.FC<{ title: string; value: string | undefined }> = ({ title, value }) => (
   <div className={styles.info}>
     <h2 className={styles.title}>{title}:</h2>
     <div className={styles.infoAndCopy}>
       <h2 className={styles.value}>{truncateText(value, 20)}</h2>
-      <CopyToClipboard textToCopy={value || ""} width={18} height={18} />
     </div>
   </div>
 );
 
 
 
-// Main PlayerInfos component
 const PlayerInfos: React.FC<{ user: string }> = ({ user }) => {
   const { userData, userDataSearch } = useUserContext();
   const dt = user === "search" ? userDataSearch : userData;

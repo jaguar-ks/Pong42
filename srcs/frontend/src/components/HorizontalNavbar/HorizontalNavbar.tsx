@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styles from './HorizontalNavbar.module.css';
 import SearchBar from "./SearchBar/SearchBar";
 import NotificationsWhite from '../../../assets/NotificationsWhite.svg';
@@ -15,16 +15,14 @@ import hamburgerDotsBlack from '../../../assets/hamburgerDotsBlack.svg';
 import NavBar from "../NavBar/NavBar";
 import { useWebSocket } from '@/context/WebSocketContext';
 
-
 const HorizontalNavbar: React.FC = () => {
     const [activeIcon, setActiveIcon] = useState("");
     const [isSearchActive, setIsSearchActive] = useState(false);
     const { userData } = useUserContext();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const navbarRef = useRef<HTMLDivElement>(null);
     const { notification, setNotification} = useWebSocket();
 
-    useEffect (() => {
+    useEffect(() => {
         if (userData.has_notif) {
             setNotification(true);
         }
@@ -47,21 +45,8 @@ const HorizontalNavbar: React.FC = () => {
         console.log("Menu status:", status);
     };
 
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (navbarRef.current && !navbarRef.current.contains(event.target as Node)) {
-                setActiveIcon("");
-            }
-        }
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
-
     return (
-        <div className={styles.navbar} ref={navbarRef}>
+        <div className={styles.navbar}>
             <div className={styles.searchBar}>
                 <SearchBar />
             </div>
@@ -70,37 +55,37 @@ const HorizontalNavbar: React.FC = () => {
                     <div className={`${styles.dropdown} ${styles.dropdownSearch}`}>
                         {!isSearchActive && (
                             <button className={styles.iconButton} onClick={() => handleMenuToggle(true)}>
-                                <Image className={styles.menuDotImage} src={hamburgerDotsBlack} alt="hamburger Icon" />
+                                <Image className={styles.menuDotImage} src={hamburgerDotsBlack || "/placeholder.svg"} alt="hamburger Icon" />
                             </button>
                         )}
                         {!isSearchActive && (
                             <button className={styles.iconButton} onClick={() => handleSearchToggle(true)}>
-                                <Image className={styles.menuDotImage} src={searchIcon} alt="Search Icon" />
+                                <Image className={styles.menuDotImage} src={searchIcon || "/placeholder.svg"} alt="Search Icon" />
                             </button>
                         )}
                         {isSearchActive && <SearchBar />}
                     </div>
                 </div>
                 <div className={styles.containerGroups}>
-                <div className={styles.dropdown}>
-                <div className="relative">
-                        <button
-                            className={`${
-                                isSearchActive ? 'hidden' : activeIcon === 'notifications' ? 'bg-blue-500' : 'bg-transparent'
-                            } flex items-center justify-center p-2 rounded-md hover:bg-gray-200`}
-                            onClick={() => handleIconToggle("notifications")}
-                        >
-                            <Image
-                                className="w-6 h-6"
-                                src={activeIcon !== "notifications" ? NotificationsBlack : NotificationsWhite}
-                                alt="Notifications Icon"
-                            />
-                        </button>
-                        {activeIcon === "notifications" && <Notifications />}
-                        {notification && (
-                            <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
-                        )}
-                    </div>
+                    <div className={styles.dropdown}>
+                        <div className="relative">
+                            <button
+                                className={`${
+                                    isSearchActive ? 'hidden' : activeIcon === 'notifications' ? 'bg-blue-500' : 'bg-transparent'
+                                } flex items-center justify-center p-2 rounded-md hover:bg-gray-200`}
+                                onClick={() => handleIconToggle("notifications")}
+                            >
+                                <Image
+                                    className="w-6 h-6"
+                                    src={activeIcon !== "notifications" ? NotificationsBlack : NotificationsWhite}
+                                    alt="Notifications Icon"
+                                />
+                            </button>
+                            {activeIcon === "notifications" && <Notifications />}
+                            {notification && (
+                                <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
+                            )}
+                        </div>
                     </div>
                     <div className={styles.dropdown}>
                         <button
@@ -126,7 +111,7 @@ const HorizontalNavbar: React.FC = () => {
                                 width={40}
                                 height={40}
                                 className={styles.menuDotImage}
-                                src={hamburgerDotsBlack}
+                                src={hamburgerDotsBlack || "/placeholder.svg"}
                                 alt="Menu Icon"
                             />
                         </button>
@@ -135,7 +120,7 @@ const HorizontalNavbar: React.FC = () => {
                 {isSearchActive && (
                     <div>
                         <button className={styles.profileButton} onClick={() => setIsSearchActive(false)}>
-                            <Image className={styles.iconImage} src={closeIcon} alt="Close Icon" />
+                            <Image className={styles.iconImage} src={closeIcon || "/placeholder.svg"} alt="Close Icon" />
                         </button>
                     </div>
                 )}

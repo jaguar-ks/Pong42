@@ -162,9 +162,7 @@ export default function SignUpPage() {
                       onChange={handleChange}
                       error={errors.password}
                     />
-
                     {errors.non_field_errors && <p className={styles.errorText}>{errors.non_field_errors}</p>}
-
                     <div className={styles.submitContainer}>
                       <div className={styles.submitButtonContainer}>
                         <button type="submit" disabled={isLoading} className={styles.submitButton}>
@@ -238,8 +236,7 @@ export default function SignUpPage() {
             )}
           </div>
         </div>
-      </main>
-      <Footer />
+      </main> 
     </div>
   )
 }

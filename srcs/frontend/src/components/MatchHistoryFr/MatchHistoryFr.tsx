@@ -88,7 +88,7 @@ export const MatchHistoryFr: React.FC<MatchHistoryFrProps> = ({ id }) => {
               <div className={classes.details}>
                 <div className={classes.opponent}>
                   <Image
-                    src={opponent.avatar_url || playerIcon || "/placeholder.svg"}
+                    src={opponent.avatar_url || playerIcon}
                     alt={opponent.username}
                     width={24}
                     height={24}
