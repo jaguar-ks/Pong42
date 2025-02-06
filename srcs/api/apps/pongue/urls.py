@@ -10,6 +10,11 @@ urlpatterns = [
         name="user_match_history",
     ),
     path(
+        route="me/matches",
+        view=views.AuthUserMatchHistory.as_view(),
+        name="user_match_history",
+    ),
+    path(
         route="me/rating_history",
         view=views.AuthUserRatingHistory.as_view(),
         name="auth_user_rating",
