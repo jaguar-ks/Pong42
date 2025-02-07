@@ -35,7 +35,7 @@ const WeeklyAttendance: React.FC<WeeklyAttendanceProps> = ({ user }) => {
   useEffect(() => {
     const data = user === 'search' ? userDataSearch : userData;
 
-    const adjustedData = [data.wins || 0.01, data.loses || 0.01];
+    const adjustedData = [data.wins, data.loses];
 
     setChartData({
       labels: ['Wins', 'Losses'],

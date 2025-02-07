@@ -30,7 +30,7 @@ class OauthCallbackView(views.APIView):
             response = redirect(settings.WEBSITE_DOMAIN_NAME + "/users/home")
             sing_in_response(response, serializer.data["token"])
             return response
-        except serializers.ValidationError as e:
+        except Exception as e:
             return redirect(settings.WEBSITE_DOMAIN_NAME + f'/auth/signin?error={e}')
 
 
