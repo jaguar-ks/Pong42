@@ -42,7 +42,6 @@ const HorizontalNavbar: React.FC = () => {
 
     const handleMenuToggle = (status: boolean) => {
         setIsMenuOpen(status);
-        console.log("Menu status:", status);
     };
 
     return (

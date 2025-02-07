@@ -47,7 +47,7 @@ const Notifications: React.FC = () => {
         if (notif.notification_type === 'Connections' && !notif.connection_id && !notif.sender) {
           updateNotificationState(notif.id, { clicked: true });
         }
-        if (notif.notification_type === 'Game' && !notif.sender) {
+        if (notif.notification_type === 'Game' && !notif.sender && notif.read) {
           updateNotificationState(notif.id, { clicked: true });
         }
       });

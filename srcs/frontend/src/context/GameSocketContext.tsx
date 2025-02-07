@@ -132,6 +132,7 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
           break;
         case 'opponent.disconnected':
           disconnectSocket()
+          setGameEnded(true);
           setRoom(null);
           router.push('/users/game');
           break ;
