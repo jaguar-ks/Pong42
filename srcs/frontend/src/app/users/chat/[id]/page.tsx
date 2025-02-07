@@ -51,7 +51,7 @@ export default function BoxedChatInterface() {
   const [users, setUsers] = useState<User[]>([]);
   const [activeUser, setActiveUser] = useState<User | null>(null);
   const [page, setPage] = useState(1); 
-  const [hasMore, setHasMore] = useState(true); 
+  const [hasMore, setHasMore] = useState(false); 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [filtered, setFiltered] = useState<User[]>([]);
   const { id } = useParams();
