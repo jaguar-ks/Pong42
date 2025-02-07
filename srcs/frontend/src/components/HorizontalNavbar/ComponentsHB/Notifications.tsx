@@ -30,13 +30,14 @@ const formatNotificationTime = (isoString: string): string => {
 
 const Notifications: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const { notification: wsNotification, messages: wsMessages } = useWebSocket(); // Removed wsMessages if unused
+  const { notification: wsNotification, setNotification, messages: wsMessages } = useWebSocket(); // Removed wsMessages if unused
   const router = useRouter();
   const { setGameStarted, setRoom } = useGameSocket();
   const { userData } = useUserContext();
 
   const fetchNotifications = async () => {
     try {
+      setNotification(false);
       await Api.get<{ results: Notification[] }>(
         '/users/me/notifications/',
         { withCredentials: true }

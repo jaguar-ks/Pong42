@@ -23,7 +23,7 @@ const HorizontalNavbar: React.FC = () => {
     const { notification, setNotification} = useWebSocket();
 
     useEffect(() => {
-        if (userData.has_notif) {
+        if (userData.has_notif && !notification) {
             setNotification(true);
         }
     }, [userData.has_notif, setNotification]);
