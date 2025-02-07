@@ -110,7 +110,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
           setOnlineUser({ user_id, is_online });
         }
       } catch (error) {
-        console.error('Error processing message:', error);
       }
     };
 
@@ -125,7 +124,6 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
     };
 
     ws.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
       setIsConnected(false);
     };
   };

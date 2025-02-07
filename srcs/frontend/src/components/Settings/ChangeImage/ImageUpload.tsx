@@ -68,7 +68,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
         const fileData: { secure_url: string } = await res.json()
         setNewImage(fileData.secure_url)
       } catch (error: unknown) {
-        console.error("Error uploading image:", error)
         setError("Failed to upload image. Please try again.")
       } finally {
         setIsLoading(false)
@@ -95,7 +94,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ setCurrentPage }) => {
       updateUserData({ ...userData, avatar_url: newImage })
       setCurrentPage("")
     } catch (error: unknown) {
-      console.error("Error updating user data:", error)
       setError("Failed to update avatar. Please try again.")
     } finally {
       setIsLoading(false)

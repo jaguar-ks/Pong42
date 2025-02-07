@@ -132,6 +132,7 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
           break;
         case 'opponent.disconnected':
           disconnectSocket()
+          setGameEnded(true);
           setRoom(null);
           router.push('/users/game');
           break ;
@@ -140,7 +141,6 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
           break;
       }
     } catch (error) {
-      console.error('Error processing message:', error);
     }
   }, [resetGameState]);
 
@@ -166,7 +166,6 @@ export const GameSocketProvider = ({ children }: { children: React.ReactNode }) 
     };
 
     ws.current.onerror = (error) => {
-      console.error('WebSocket error:', error);
       setIsConnected(false);
       disconnectSocket();
     };

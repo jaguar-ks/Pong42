@@ -23,7 +23,7 @@ const HorizontalNavbar: React.FC = () => {
     const { notification, setNotification} = useWebSocket();
 
     useEffect(() => {
-        if (userData.has_notif) {
+        if (userData.has_notif && !notification) {
             setNotification(true);
         }
     }, [userData.has_notif, setNotification]);
@@ -42,7 +42,6 @@ const HorizontalNavbar: React.FC = () => {
 
     const handleMenuToggle = (status: boolean) => {
         setIsMenuOpen(status);
-        console.log("Menu status:", status);
     };
 
     return (

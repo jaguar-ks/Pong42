@@ -34,8 +34,8 @@ services:
         build:
             context: ./srcs/api/
         volumes:
-            # - ./srcs/api:/var/www
-            - vault_creds:/var/www/cred.d/
+            - ./srcs/api:/var/www
+            - ./srcs/vault/init:/var/www/cred.d/
             - static_files:/var/www/static/
         networks:
             - transcendance_net
@@ -200,7 +200,8 @@ services:
             - elk
             - transcendance_net
         volumes:
-            - vault_creds:/vault/init/
+            - ./srcs/vault/init:/vault/init/
+            - ./srcs/vault/data:/vault/data/
             - ./srcs/vault/logs:/vault/logs
         environment:
             - VAULT_ADDR=http://127.0.0.1:8200
@@ -209,7 +210,7 @@ services:
             - ./srcs/postgres/.env
         restart: unless-stopped
         healthcheck:
-            test: ["CMD-SHELL", "ls /vault/init | grep django"]
+            test: ["CMD-SHELL", "[ -f /vault/init/django-cred.json ]"]
             interval: 30s
             timeout: 10s
             retries: 5
@@ -240,8 +241,6 @@ services:
 
 volumes:
     postgres_data:
-    vault_creds:
-        name: vault_creds
     es_data:
     static_files:
 

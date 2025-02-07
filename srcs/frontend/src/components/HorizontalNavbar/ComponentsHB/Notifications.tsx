@@ -30,13 +30,14 @@ const formatNotificationTime = (isoString: string): string => {
 
 const Notifications: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const { notification: wsNotification, messages: wsMessages } = useWebSocket(); // Removed wsMessages if unused
+  const { notification: wsNotification, setNotification, messages: wsMessages } = useWebSocket(); // Removed wsMessages if unused
   const router = useRouter();
   const { setGameStarted, setRoom } = useGameSocket();
   const { userData } = useUserContext();
 
   const fetchNotifications = async () => {
     try {
+      setNotification(false);
       await Api.get<{ results: Notification[] }>(
         '/users/me/notifications/',
         { withCredentials: true }
@@ -47,13 +48,12 @@ const Notifications: React.FC = () => {
         if (notif.notification_type === 'Connections' && !notif.connection_id && !notif.sender) {
           updateNotificationState(notif.id, { clicked: true });
         }
-        if (notif.notification_type === 'Game' && !notif.sender) {
+        if (notif.notification_type === 'Game' && !notif.sender && notif.read) {
           updateNotificationState(notif.id, { clicked: true });
         }
       });
 
     } catch (error) {
-      console.error('Error fetching notifications:', error);
     }
   };
 
@@ -88,7 +88,6 @@ const Notifications: React.FC = () => {
       // Refresh notifications after successful action
       await fetchNotifications();
     } catch (error) {
-      console.error(`Error ${action}ing friend request:`, error);
     }
   };
 
@@ -108,7 +107,6 @@ const Notifications: React.FC = () => {
       // Refresh notifications after successful action
       await fetchNotifications();
     } catch (error) {
-      console.error(`Error acceptinging friend request:`, error);
     }
   };
 

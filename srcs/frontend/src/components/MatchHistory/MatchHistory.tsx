@@ -35,7 +35,6 @@ export const MatchHistory = () => {
         const res = await Api.get(`/pongue/me/matches`, { withCredentials: true })
         setMatches(res.data.results)
       } catch (err) {
-        console.error("Error fetching match data:", err)
         setError("Failed to load match history. Please try again later.")
       } finally {
         setLoading(false)

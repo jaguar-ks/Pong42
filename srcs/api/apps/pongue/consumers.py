@@ -22,6 +22,8 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         room = await self.manager.get_room(room_name=room_name)
         if not room:
             opp = await sync_to_async(User.objects.get)(username=room_name.split("_")[1])
+            if opp.id == self.user.id:
+                raise GameException("you can't challenge yourself")
             room = await self.manager.create_new_room(
                 room_name=room_name,
                 participants={self.user.id: Participant.from_user(self.user)},
@@ -37,15 +39,12 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             data = NotificationSerializer(notif).data
             await sync_to_async(send_real_time_notif)(opp.id, data)
             return room, False
-        notif = await sync_to_async(Notification.objects.filter)(user=self.user, sender=room_name.split("_")[0])
-        notif = await sync_to_async(notif.first)()
-        if notif:
-            notif.sender = None
-            notif.message = f"You accepted {room_name.split('_')[0]}'s game request"
-            await sync_to_async(notif.save)()
-            data = NotificationSerializer(notif).data
-            await sync_to_async(send_real_time_notif)(self.user.id, data)
-            
+        notifs = await sync_to_async(Notification.objects.filter)(
+            user=self.user,
+            notification_type=Notification.NOTIFICATION_TYPES['game'],
+            sender=room_name.split("_")[0]
+        )
+        await sync_to_async(notifs.delete)()
         await room.add_participant(self.user)
         return room, True
 
@@ -173,15 +172,13 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def disconnect(self, code):
         await self.__clear_resources()
         if hasattr(self, "room_name"):
-            notif = await sync_to_async(Notification.objects.filter)(
-                user=self.user,
+            opp = await sync_to_async(User.objects.get)(username=self.room_name.split("_")[1])
+            notifs = await sync_to_async(Notification.objects.filter)(
+                user=opp,
                 notification_type=Notification.NOTIFICATION_TYPES['game'],
                 sender=self.room_name.split("_")[0]
             )
-            notif = await sync_to_async(notif.first)()
-            if notif:
-                notif.sender = None
-                await sync_to_async(notif.save)()
+            await sync_to_async(notifs.delete)()
             await self.channel_layer.group_send(
                 self.room_name,
                 {

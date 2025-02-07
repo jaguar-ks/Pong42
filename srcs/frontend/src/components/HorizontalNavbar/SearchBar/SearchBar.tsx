@@ -134,7 +134,6 @@ const SearchBar: React.FC = () => {
             setHasMore(!!response.data.next);
             setError(null);
         } catch (err) {
-            console.error("Error fetching search results:", err);
             setError("Failed to fetch search results. Please try again.");
         }
     };

@@ -56,7 +56,6 @@ const Friends = () => {
                 setBlocked(res.data.results.filter((item: BlockType) => item.status === "blocked"));
                 setFriends(res.data.results.filter((item: BlockType) => item.status === "friends"));
             } catch (err) {
-                console.error("Error in fetching user data", err);
             }
         };
         fetchData();
@@ -123,7 +122,6 @@ const Friends = () => {
     
             console.log("Friend request accepted successfully");
         } catch (error) {
-            console.error("Error accepting friend request:", error);
         }
     };
 
@@ -137,7 +135,6 @@ const Friends = () => {
             }
             console.log("Friend request rejected successfully");
         } catch (error) {
-            console.error("Error rejecting friend request:", error);
         }
     };
 
@@ -195,7 +192,6 @@ const Friends = () => {
                 console.log("User unblocked successfully 2 ",errr);
 
             } catch (error) {
-                console.error("errrrr", error);
             }
         }
     };

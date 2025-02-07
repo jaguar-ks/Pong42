@@ -11,14 +11,12 @@ if [ ! -e cred.env ]; then
     else
         echo "FIRST=\"0\"" >> cred.env
     fi
-    rm -rf cred.d
 fi
 
 source cred.env
 export ROLE_ID=$ROLE_ID
 export SECRET_ID=$SECRET_ID
 
-rm -rf cred.env
 # Apply migrations
 python3 manage.py makemigrations
 python3 manage.py migrate
