@@ -172,13 +172,14 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
     async def disconnect(self, code):
         await self.__clear_resources()
         if hasattr(self, "room_name"):
-            opp = await sync_to_async(User.objects.get)(username=self.room_name.split("_")[1])
-            notifs = await sync_to_async(Notification.objects.filter)(
-                user=opp,
-                notification_type=Notification.NOTIFICATION_TYPES['game'],
-                sender=self.room_name.split("_")[0]
-            )
-            await sync_to_async(notifs.delete)()
+            if self.room_name.find("_") != -1:
+                opp = await sync_to_async(User.objects.get)(username=self.room_name.split("_")[1])
+                notifs = await sync_to_async(Notification.objects.filter)(
+                    user=opp,
+                    notification_type=Notification.NOTIFICATION_TYPES['game'],
+                    sender=self.room_name.split("_")[0]
+                )
+                await sync_to_async(notifs.delete)()
             await self.channel_layer.group_send(
                 self.room_name,
                 {
