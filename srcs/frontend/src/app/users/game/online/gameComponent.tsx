@@ -10,10 +10,8 @@ export default function GameComponent() {
     winner: null,
   })
 
-  // Memoize the score update handler with useCallback
   const handleScoreUpdate = useCallback((newScore) => {
     setGameState(prevState => {
-      // Only update if scores actually changed
       if (prevState.player1Score === newScore.player1 && 
           prevState.player2Score === newScore.player2) {
         return prevState
@@ -25,7 +23,7 @@ export default function GameComponent() {
         winner: newScore.winner
       }
     })
-  }, []) // Empty dependency array since it only uses setState
+  }, [])
 
   return (
     <div className="flex flex-col justify-center space-y-4 w-full h-full overflow-hidden">
@@ -38,7 +36,6 @@ export default function GameComponent() {
         <PlayerCard direction="right" />
       </div>
       <div className="h-full w-full flex justify-center items-center rounded-lg border overflow-hidden">
-        {/* ThreeScene will now maintain stable prop reference */}
         <ThreeScene onScoreUpdate={handleScoreUpdate} />
       </div>
     </div>
