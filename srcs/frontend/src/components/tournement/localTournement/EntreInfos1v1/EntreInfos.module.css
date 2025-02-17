@@ -1,11 +1,14 @@
 .container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-  }
+  max-width: 1200px;
+  margin: 0 auto; /* Horizontal centering */
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers children horizontally inside the container */
+  /* Add these for vertical centering: */
+  min-height: 100vh; /* Takes full viewport height */
+  justify-content: center; /* Centers children vertically inside the container */
+}
   
   .playerCountButtons {
     display: flex;
@@ -94,7 +97,7 @@
   
   .title {
     text-align: center;
-    color: #333;
+    color: #ffffff;
     margin-bottom: 20px;
   }
   

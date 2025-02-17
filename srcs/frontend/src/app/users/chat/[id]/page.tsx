@@ -130,11 +130,11 @@ export default function BoxedChatInterface() {
           user: msgData.sender_id,
           content: msgData.content,
           timestamp: msgData.timestamp,
-        }));
+        })).reverse();
 
         setMessages((prevMessages) => {
-          const uniqueMessages = [...new Set([...prevMessages, ...fetchedMessages].map((msg) => msg.id))].map((id) => {
-            return [...prevMessages, ...fetchedMessages].find((msg) => msg.id === id);
+          const uniqueMessages = [...new Set([ ...fetchedMessages, ...prevMessages].map((msg) => msg.id))].map((id) => {
+            return [ ...fetchedMessages, ...prevMessages].find((msg) => msg.id === id);
           });
           return uniqueMessages as Message[];
         });
@@ -231,6 +231,13 @@ export default function BoxedChatInterface() {
           </div>
         </div>
         <ScrollArea className="h-[calc(85vh-4rem)]">
+        {hasMore && (
+            <div className="flex justify-center p-4">
+              <Button variant="ghost" onClick={handleLoadMore}>
+                Load More
+              </Button>
+            </div>
+          )}
           {messages.map((msg, i, msgs) => {
             const newDay = i > 0 && msg.timestamp.split('T')[0] > msgs[i - 1].timestamp.split('T')[0];
             return (
@@ -258,14 +265,7 @@ export default function BoxedChatInterface() {
               </React.Fragment>
             );
           })}
-          <div ref={messagesEndRef} />
-          {hasMore && (
-            <div className="flex justify-center p-4">
-              <Button variant="ghost" onClick={handleLoadMore}>
-                Load More
-              </Button>
-            </div>
-          )}
+          {hasMore && (<div ref={messagesEndRef} />)}
         </ScrollArea>
         {activeUser&&<div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex space-x-2">

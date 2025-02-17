@@ -217,7 +217,7 @@ class Message(models.Model):
     is_read = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ["-timestamp"]
+        ordering = ["timestamp"]
 
     def __str__(self):
         return f"{self.sender.username} to {self.connection.get_other_user(self.sender).username}: {self.content[:50]}"
@@ -225,7 +225,7 @@ class Message(models.Model):
     @classmethod
     def get_conversation(cls, connection):
         """Get all messages for a specific connection"""
-        return cls.objects.filter(connection=connection).order_by("-timestamp")
+        return cls.objects.filter(connection=connection).order_by("timestamp")
 
 
 class Notification(models.Model):

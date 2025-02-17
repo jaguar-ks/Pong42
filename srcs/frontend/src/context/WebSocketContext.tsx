@@ -57,6 +57,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
       return;
     }
 
+    if (window.location.href.includes('auth')) return;
     ws.current = new WebSocket(wsUrl);
 
     ws.current.onopen = () => {
@@ -119,7 +120,7 @@ export const WebSocketProvider = ({ children }: { children: React.ReactNode }) =
       const timeout = Math.min(1000 * Math.pow(2, retryCount), 30000);
       reconnectInterval.current = setTimeout(() => {
         setRetryCount(prev => prev + 1);
-        connect();
+        if (retryCount < 5) connect();
       }, timeout);
     };
 
