@@ -1,172 +1,102 @@
-# OWASP Core Rule Set (CRS) - Overview and Default Rules
+# NGINX Technologies Overview
 
-## What is the OWASP CRS?
-The **OWASP Core Rule Set (CRS)** is a set of generic ModSecurity rules designed to protect web applications from a wide range of common attack vectors. It includes pre-defined rules for detecting and blocking threats such as SQL injection, cross-site scripting (XSS), local file inclusion (LFI), and more.
+## Overview
 
----
+This directory contains the configuration files for NGINX, a high-performance HTTP server and reverse proxy, which serves as the web server and load balancer for the Pong42 application.
 
-## Default Included Rule Categories
-The OWASP CRS organizes its rules into several files, each targeting specific types of attacks or tasks. Below is a list of the primary rule files and their purposes:
+## Technologies
 
-### **1. crs-setup.conf**
-- **Purpose:** Configuration file, not a set of rules.
-- **Use:** Provides global configurations for enabling/disabling specific protections, setting thresholds, and other tuning options.
-- **Example:** 
-  - Define application-specific parameters.
-  - Control the severity level for logging.
+### NGINX
 
----
+NGINX is a powerful, open-source web server that can also function as a:
+- Reverse proxy
+- Load balancer
+- HTTP cache
+- API gateway
 
-### **2. REQUEST-901-INITIALIZATION.conf**
-- **Purpose:** Ensures proper initialization of CRS.
-- **Use:** Prepares ModSecurity for the rest of the rules by defining essential variables.
-- **Example:** 
-  - Sets up collections (e.g., `tx` for transaction-specific data).
+### ModSecurity
 
----
+This implementation includes ModSecurity, an open-source web application firewall (WAF) that provides protection against various attacks including:
+- SQL injection
+- Cross-site scripting (XSS)
+- Local/Remote file inclusion
+- Other OWASP Top 10 vulnerabilities
 
-### **3. REQUEST-905-COMMON-EXCEPTIONS.conf**
-- **Purpose:** Contains rules to exclude certain requests from being inspected.
-- **Use:** Prevents false positives by ignoring trusted sources or paths.
-- **Example:** 
-  - Allows health checks (`/health-check`).
+## Directory Structure
 
----
+```
+/srcs/nginx/
+├── dockerfile         # Docker configuration for NGINX
+├── README.md          # OWASP Core Rule Set documentation
+├── NGINX-README.md    # This documentation file
+├── conf/              # NGINX configuration files
+│   └── nginx.conf     # Main NGINX configuration
+├── modsecurity/       # ModSecurity WAF configuration
+│   ├── modsecurity.conf       # Core ModSecurity configuration
+│   └── owasp-crs/             # OWASP Core Rule Set
+└── tools/             # Utility scripts for NGINX
+```
 
-### **4. REQUEST-910-IP-REPUTATION.conf**
-- **Purpose:** Protects against requests from known malicious IP addresses.
-- **Use:** Integrates with third-party IP reputation services.
-- **Example:** 
-  - Block requests from blacklisted IP ranges.
+## Configuration
 
----
+### nginx.conf
 
-### **5. REQUEST-911-METHOD-ENFORCEMENT.conf**
-- **Purpose:** Enforces restrictions on HTTP methods.
-- **Example:** 
-  - Block unsupported methods like `TRACE` or `TRACK`.
+The main NGINX configuration file that defines:
+- Server blocks for different services
+- Proxy settings for backend services
+- SSL/TLS configurations
+- HTTP headers and security settings
+- Load balancing rules
 
----
+### ModSecurity Configuration
 
-### **6. REQUEST-913-SCANNER-DETECTION.conf**
-- **Purpose:** Detects automated scanners and bots.
-- **Example:** 
-  - Matches known patterns of scanning tools.
+ModSecurity is configured with the OWASP Core Rule Set (CRS) to provide security against common web attacks. Key configuration aspects include:
+- Detection and prevention rules
+- Logging settings
+- Rule exclusions and tuning
 
----
+## How It Works
 
-### **7. REQUEST-920-PROTOCOL-ENFORCEMENT.conf**
-- **Purpose:** Validates the HTTP protocol to prevent malformed or malicious requests.
-- **Example:** 
-  - Enforces proper header structure.
+1. **Client Request**: External requests hit the NGINX server first
+2. **ModSecurity Processing**: Requests are analyzed by ModSecurity rules
+3. **Reverse Proxy**: NGINX forwards valid requests to appropriate backend services:
+   - Frontend application (Next.js)
+   - API service (Django)
+   - Other microservices
+4. **Response Handling**: NGINX processes and delivers responses back to clients
+5. **Logging**: Activity is logged for monitoring and debugging
 
----
+## Security Features
 
-### **8. REQUEST-921-PROTOCOL-ATTACK.conf**
-- **Purpose:** Protects against protocol-based attacks.
-- **Example:** 
-  - Detects header injection or HTTP smuggling attempts.
+- TLS/SSL termination
+- HTTP security headers
+- Rate limiting
+- Request filtering
+- Bot protection
+- DDoS mitigation
 
----
+## Integration
 
-### **9. REQUEST-930-APPLICATION-ATTACK-LFI.conf**
-- **Purpose:** Detects **Local File Inclusion (LFI)** attacks.
-- **Example:** 
-  - Blocks requests trying to access files like `/etc/passwd`.
+In the Pong42 project, NGINX integrates with:
+- Frontend Next.js application
+- Django API backend
+- ELK stack for logging and monitoring
+- Vault for certificate management
 
----
+## Common Operations
 
-### **10. REQUEST-931-APPLICATION-ATTACK-RFI.conf**
-- **Purpose:** Protects against **Remote File Inclusion (RFI)** attacks.
-- **Example:** 
-  - Blocks requests with malicious external URLs.
+```bash
+# Test NGINX configuration
+docker exec nginx nginx -t
 
----
+# Reload NGINX configuration
+docker exec nginx nginx -s reload
 
-### **11. REQUEST-932-APPLICATION-ATTACK-RCE.conf**
-- **Purpose:** Detects **Remote Code Execution (RCE)** attempts.
-- **Example:** 
-  - Blocks requests containing code execution patterns like `eval()` or `system()`.
+# View NGINX logs
+docker logs nginx
 
----
+# Check ModSecurity logs
+docker exec nginx cat /var/log/modsec_audit.log
+```
 
-### **12. REQUEST-933-APPLICATION-ATTACK-PHP.conf**
-- **Purpose:** Protects against attacks targeting PHP applications.
-- **Example:** 
-  - Blocks malicious PHP-specific patterns.
-
----
-
-### **13. REQUEST-941-APPLICATION-ATTACK-XSS.conf**
-- **Purpose:** Detects **Cross-Site Scripting (XSS)** attacks.
-- **Example:** 
-  - Blocks requests containing `<script>` tags or JavaScript code.
-
----
-
-### **14. REQUEST-942-APPLICATION-ATTACK-SQLI.conf**
-- **Purpose:** Protects against **SQL Injection (SQLi)** attacks.
-- **Example:** 
-  - Blocks requests containing SQL keywords like `SELECT`, `UNION`, or `DROP`.
-
----
-
-### **15. REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf**
-- **Purpose:** Detects session fixation and hijacking attempts.
-- **Example:** 
-  - Blocks attempts to set cookies via malicious requests.
-
----
-
-### **16. REQUEST-944-APPLICATION-ATTACK-JAVA.conf**
-- **Purpose:** Detects attacks targeting Java applications.
-- **Example:** 
-  - Blocks requests containing Java serialization vulnerabilities.
-
----
-
-### **17. REQUEST-949-BLOCKING-EVALUATION.conf**
-- **Purpose:** Evaluates whether to block a request based on previous rules.
-- **Example:** 
-  - Applies thresholds and scores from earlier rules to decide if the request should be blocked.
-
----
-
-### **18. RESPONSE-950-DATA-LEAKAGES.conf**
-- **Purpose:** Detects data leakage in server responses.
-- **Example:** 
-  - Blocks responses containing sensitive data like credit card numbers or SSNs.
-
----
-
-### **19. RESPONSE-951-DATA-LEAKAGES-SQL.conf**
-- **Purpose:** Detects SQL error messages in server responses.
-- **Example:** 
-  - Blocks responses revealing database errors.
-
----
-
-### **20. RESPONSE-980-CORRELATION.conf**
-- **Purpose:** Allows for correlation between rules and transactions.
-- **Example:** 
-  - Logs detailed information for analyzing multiple rules triggering simultaneously.
-
----
-
-## How to Enable the OWASP CRS
-
-1. **Include the CRS in `modsecurity.conf`:**
-
-   ```conf
-   Include /usr/local/modsecurity-crs/crs-setup.conf
-   Include /usr/local/modsecurity-crs/rules/*.conf
-   ```
-
-1. **Customize the `crs-setup.conf`:**
-
-    - Configure thresholds, exclusions, and parameters based on your application.
-
-1. **Test with Traffic:**
-
-    - Monitor logs to identify false positives or necessary adjustments.
-    - Use tools like curl or penetration testing tools (e.g., OWASP ZAP).
+For more information, refer to the [NGINX documentation](https://nginx.org/en/docs/) and [ModSecurity documentation](https://github.com/SpiderLabs/ModSecurity/wiki).
